@@ -588,7 +588,7 @@
     document.title = t('gen.' + r.gen.id + '.name') + ' · ' + t('brand');
     markTabs();
     buildPanel();
-    regenerate(sameGen && r.seed === state.seed && false);
+    regenerate(false);
     updateHash();
     if (!sameGen) window.scrollTo(0, 0);
   }
@@ -615,6 +615,7 @@
     setupPanZoom();
 
     $('btn-new').addEventListener('click', () => setSeed(Carto.randomSeed()));
+    $('stage-new').addEventListener('click', () => setSeed(Carto.randomSeed()));
     els.seedForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const raw = els.seed.value.trim();

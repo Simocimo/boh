@@ -363,6 +363,7 @@
 
   // Bridson Poisson-disc sampling inside [x0, x0+w] x [y0, y0+h].
   G.poissonDisc = (rng, x0, y0, w, h, r, accept = null, k = 20) => {
+    if (!(w > 0 && h > 0 && isFinite(w) && isFinite(h))) return [];
     const cell = r / Math.SQRT2;
     const gw = Math.ceil(w / cell), gh = Math.ceil(h / cell);
     const grid = new Int32Array(gw * gh).fill(-1);

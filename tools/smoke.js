@@ -30,6 +30,16 @@ function variants(gen) {
   return list;
 }
 
+// Minimum expectations, so a generator that silently produces empty maps fails too.
+const checks = {
+  city: (m) => m.buildingCount > 60 && m.wards.length > 10,
+  dungeon: (m) => m.rooms.length >= 5,
+  realm: (m) => m.settlements.length >= 3 && m.coast.length > 0,
+  village: (m) => m.houses.length >= (m.size === 'hamlet' ? 5 : 15),
+  cave: (m) => m.chambers.length >= 3 && m.outline.length > 0,
+  dwelling: (m) => m.floors.length >= 1 && m.floors.every((f) => f.rooms.length >= 2),
+};
+
 let failures = 0;
 for (const gen of Carto.generators) {
   if (only && gen.id !== only) continue;
@@ -37,7 +47,7 @@ for (const gen of Carto.generators) {
   let time = 0, runs = 0, maxT = 0;
   for (let i = 1; i <= count; i++) {
     const opts = vs[i % vs.length];
-    const seed = i * 7919;
+    const seed = i * (parseInt(process.env.SEED_STEP, 10) || 7919);
     try {
       const t0 = Date.now();
       const model = gen.generate(seed, opts);
@@ -46,6 +56,7 @@ for (const gen of Carto.generators) {
       const dt = Date.now() - t0;
       time += dt; runs++; maxT = Math.max(maxT, dt);
       if (!/^<svg[\s\S]*<\/svg>$/.test(svg) || /NaN|undefined/.test(svg)) throw new Error('bad svg output');
+      if (checks[gen.id] && !checks[gen.id](model)) throw new Error('map below expectations');
       if (i <= 3) fs.writeFileSync(path.join(outDir, `${gen.id}-${i}.svg`), svg);
     } catch (e) {
       failures++;

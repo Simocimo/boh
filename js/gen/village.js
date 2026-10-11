@@ -114,6 +114,9 @@
     const main = wander(edgePoint(c, a0), edgePoint(c, a0 + Math.PI + rng.float(-0.4, 0.4)), noise, 60, 8, 11.7);
     roads.push({ pts: main, w: 7, kind: 'main' });
     const hub = closestOnLine(main, c).p;
+    // The village grows around where the road actually passes.
+    c.x = hub.x;
+    c.y = hub.y;
     const angles = [a0, a0 + Math.PI];
     for (let i = 0; i < cfg.branches; i++) {
       let ang = null;

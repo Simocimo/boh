@@ -433,6 +433,7 @@
   }
 
   function trees(rng, poly, spacing, rMin, rMax) {
+    if (poly.length < 3) return [];
     const bb = G.bbox(poly);
     const pts = G.poissonDisc(rng, bb.x0, bb.y0, bb.w, bb.h, spacing, (p) => G.contains(poly, p) && G.distToPolyline(p, poly, true) > rMin * 0.8);
     return pts.map((p) => ({ x: p.x, y: p.y, r: rng.float(rMin, rMax) }));
