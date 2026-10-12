@@ -1,6 +1,6 @@
 # Il Cartografo Errante
 
-Generatori procedurali di mappe fantasy, ispirati a [Watabou's Procgen Arcana](https://watabou.github.io)
+Generatori procedurali di mappe fantasy, moderne e cyberpunk, ispirati a [Watabou's Procgen Arcana](https://watabou.github.io)
 e ad [Azgaar's Fantasy Map Generator](https://azgaar.github.io/Fantasy-Map-Generator/).
 Tutto gira nel browser: niente server, niente installazione, niente build.
 
@@ -13,6 +13,14 @@ Tutto gira nel browser: niente server, niente installazione, niente build.
 | **Caverna** | Grotte naturali con camere, gallerie, laghi sotterranei, stalagmiti e cristalli, oppure una **radura** nel bosco. |
 | **Dungeon** | Sotterranei "su una pagina": stanze, corridoi, porte (anche segrete e chiuse a chiave), tratteggio della roccia e legenda delle stanze con mostri, tesori e trappole. |
 | **Dimora** | Piante di edifici su più piani (casolari, case di città, locande, botteghe, ville) con porte, finestre, scale e arredi. |
+
+## Ambientazioni
+
+Ogni generatore ha l'opzione **Ambientazione**: **Fantasy** (medievale), **2026** (il mondo di oggi) e **Cyberpunk**
+(futuro prossimo). Cambiano i nomi di luoghi e persone, i testi, le legende, i contenuti (stanze, arredi, nemici,
+tesori, edifici, forme di governo…) e lo stile della mappa: Pergamena per il fantasy, *Mappa moderna* per il 2026,
+*Neon* per il cyberpunk (ogni ambientazione ricorda lo stile che scegli). L'ambientazione finisce nel link e nei
+salvataggi, e le mappe collegate (la città di un regno, il dungeon di un mondo) la ereditano.
 
 ## Modificare il Mondo
 
@@ -132,6 +140,7 @@ js/core/              libreria condivisa
   app.js              interfaccia: percorsi, opzioni, zoom, esportazione
   saves.js            salvataggi locali e sincronizzazione (Claude o Supabase)
   library.js          pagina Salvataggi e invito a installare l'app
+  setting.js          ambientazioni: nomi, testi "@modern"/"@cyber", caratteri
   relief3d.js         export 3D: heightmap a 16 bit, ZIP e script per Blender
   mesh3d.js           modelli 3D delle piante e scrittura dei file glTF (.glb)
 js/config.js          URL e chiave Supabase (facoltativi)
@@ -165,6 +174,10 @@ Carto.register({
   model3d(model)       { /* facoltativo: modello 3D da salvare in .glb (vedi mesh3d.js) */ },
 });
 ```
+
+Ogni generatore riceve in automatico l'opzione `setting` (`fantasy`, `modern`, `cyber`): durante `generate`,
+`render` e le altre funzioni `Carto.Setting.current` vale l'ambientazione della mappa, `Carto.Names` restituisce nomi
+adatti e `t('chiave')` usa `chiave@modern` o `chiave@cyber` quando esistono.
 
 Poi aggiungi lo `<script>` in `index.html` e i testi con `Carto.I18n.add({ it: {...}, en: {...} })`
 (chiavi `gen.<id>.name`, `gen.<id>.desc`, `<id>.opt.<opzione>`, `<id>.opt.<opzione>.<valore>`).
