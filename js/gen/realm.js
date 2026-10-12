@@ -38,6 +38,44 @@
       'realm.leagues': 'leghe',
       'realm.settlements': 'Insediamenti',
       'realm.open': 'Clicca un insediamento sulla mappa, o qui sotto, per aprirne la pianta.',
+      'realm.forest.1': 'Bosco di {n}',
+      'realm.road.main': 'Strada maestra',
+      'realm.road.local': 'Sentiero',
+      // Present day: administrative areas, motorways and kilometres.
+      'realm.title.0@modern': 'Regione di {n}',
+      'realm.title.1@modern': 'Provincia di {n}',
+      'realm.title.2@modern': 'Contea di {n}',
+      'realm.title.3@modern': 'Parco nazionale di {n}',
+      'realm.title.4@modern': 'Area metropolitana di {n}',
+      'realm.sea.1@modern': 'Golfo di {n}',
+      'realm.sea.2@modern': 'Baia di {n}',
+      'realm.forest@modern': 'Riserva naturale di {n}',
+      'realm.forest.1@modern': 'Bosco di {n}',
+      'realm.capital@modern': 'Capoluogo',
+      'realm.town@modern': 'Città',
+      'realm.village@modern': 'Paese',
+      'realm.leagues@modern': 'km',
+      'realm.road.main@modern': 'Autostrade e superstrade',
+      'realm.road.local@modern': 'Strade provinciali',
+      'realm.open@modern': 'Clicca un centro abitato sulla mappa, o qui sotto, per aprirne la pianta.',
+      // Cyberpunk: districts and corporate land, maglev lines, dead land.
+      'realm.title.0@cyber': 'Distretto di {n}',
+      'realm.title.1@cyber': 'Zona franca di {n}',
+      'realm.title.2@cyber': 'Territorio {c}',
+      'realm.title.3@cyber': 'Concessione {c}',
+      'realm.title.4@cyber': 'Zona di esclusione di {n}',
+      'realm.sea.1@cyber': 'Golfo di {n}',
+      'realm.sea.2@cyber': 'Acque morte di {n}',
+      'realm.mountains@cyber': 'Cresta di {n}',
+      'realm.forest@cyber': 'Bosco morto di {n}',
+      'realm.forest.1@cyber': 'Palude tossica di {n}',
+      'realm.capital@cyber': 'Arcologia',
+      'realm.town@cyber': 'Sprawl',
+      'realm.village@cyber': 'Avamposto',
+      'realm.leagues@cyber': 'km',
+      'realm.road.main@cyber': 'Linee maglev',
+      'realm.road.local@cyber': 'Superstrade',
+      'realm.open@cyber': 'Clicca un nodo sulla mappa, o qui sotto, per aprirne la pianta.',
     },
     en: {
       'gen.realm.name': 'Realm',
@@ -69,6 +107,42 @@
       'realm.leagues': 'leagues',
       'realm.settlements': 'Settlements',
       'realm.open': 'Click a settlement on the map, or below, to open its plan.',
+      'realm.forest.1': '{n} Wood',
+      'realm.road.main': 'Main road',
+      'realm.road.local': 'Track',
+      'realm.title.0@modern': '{n} Region',
+      'realm.title.1@modern': 'Province of {n}',
+      'realm.title.2@modern': '{n} County',
+      'realm.title.3@modern': '{n} National Park',
+      'realm.title.4@modern': 'Greater {n}',
+      'realm.sea.1@modern': 'Gulf of {n}',
+      'realm.sea.2@modern': '{n} Bay',
+      'realm.forest@modern': '{n} Nature Reserve',
+      'realm.forest.1@modern': '{n} Woods',
+      'realm.capital@modern': 'Capital',
+      'realm.town@modern': 'City',
+      'realm.village@modern': 'Town',
+      'realm.leagues@modern': 'km',
+      'realm.road.main@modern': 'Motorways and expressways',
+      'realm.road.local@modern': 'Local roads',
+      'realm.open@modern': 'Click a town on the map, or below, to open its plan.',
+      'realm.title.0@cyber': '{n} District',
+      'realm.title.1@cyber': '{n} Free Zone',
+      'realm.title.2@cyber': '{c} Territory',
+      'realm.title.3@cyber': '{c} Concession',
+      'realm.title.4@cyber': '{n} Exclusion Zone',
+      'realm.sea.1@cyber': 'Gulf of {n}',
+      'realm.sea.2@cyber': '{n} Dead Waters',
+      'realm.mountains@cyber': '{n} Ridge',
+      'realm.forest@cyber': '{n} Deadwood',
+      'realm.forest.1@cyber': '{n} Toxic Marsh',
+      'realm.capital@cyber': 'Arcology',
+      'realm.town@cyber': 'Sprawl',
+      'realm.village@cyber': 'Outpost',
+      'realm.leagues@cyber': 'km',
+      'realm.road.main@cyber': 'Maglev lines',
+      'realm.road.local@cyber': 'Highways',
+      'realm.open@cyber': 'Click a node on the map, or below, to open its plan.',
     },
   });
 
@@ -141,6 +215,7 @@
   function generate(seed, opts) {
     const rng = new Carto.Random(seed);
     const shape = opts.shape || 'coast';
+    const setting = Carto.Setting.current;
     const noise = new Carto.Noise(rng.fork('height'));
     const noise2 = new Carto.Noise(rng.fork('ridge'));
     const wet = new Carto.Noise(rng.fork('moisture'));
@@ -312,6 +387,9 @@
 
     // 6. Roads: a spanning tree plus a few shortcuts, routed over the terrain.
     const roads = [];
+    // Present day and cyberpunk: which stretches belong to the main network
+    // (motorways, maglev lines) between the larger centres.
+    const roadMain = [];
     if (opts.roads && settlements.length > 1) {
       const pairs = [];
       const inTree = [0];
@@ -333,17 +411,25 @@
         }
       }
       const roadCell = new Uint8Array(N);
-      pairs.sort((p, q) => (settlements[p[0]].type === 'capital' || settlements[p[1]].type === 'capital' ? -1 : 0) - (settlements[q[0]].type === 'capital' || settlements[q[1]].type === 'capital' ? -1 : 0));
-      for (const [a, b] of pairs) {
+      const isMain = (p) => settlements[p[0]].type !== 'village' && settlements[p[1]].type !== 'village';
+      // The main network is routed first, so the minor roads join it.
+      if (setting !== 'fantasy') pairs.sort((p, q) => isMain(q) - isMain(p));
+      else pairs.sort((p, q) => (settlements[p[0]].type === 'capital' || settlements[p[1]].type === 'capital' ? -1 : 0) - (settlements[q[0]].type === 'capital' || settlements[q[1]].type === 'capital' ? -1 : 0));
+      for (const pair of pairs) {
+        const [a, b] = pair;
         const path = route(cellOf(settlements[a].x, settlements[a].y), cellOf(settlements[b].x, settlements[b].y));
         if (!path) continue;
+        const addRoad = (cells) => {
+          roads.push(cells.map((i) => ({ x: px(i), y: py(i) })));
+          if (setting !== 'fantasy') roadMain.push(isMain(pair));
+        };
         // Skip the parts that already follow a road.
         let seg = [];
         for (const c of path) {
-          if (roadCell[c] && seg.length) { seg.push(c); if (seg.length > 2) roads.push(seg.map((i) => ({ x: px(i), y: py(i) }))); seg = []; continue; }
+          if (roadCell[c] && seg.length) { seg.push(c); if (seg.length > 2) addRoad(seg); seg = []; continue; }
           if (!roadCell[c]) seg.push(c);
         }
-        if (seg.length > 1) roads.push(seg.map((i) => ({ x: px(i), y: py(i) })));
+        if (seg.length > 1) addRoad(seg);
         for (const c of path) roadCell[c] = 1;
       }
       function route(from, to) {
@@ -420,13 +506,24 @@
       features.push({ kind: 'forest', x: c.x, y: c.y, name: Carto.Names.place(nr) });
     }
 
-    return {
+    const model = {
       seed, shape,
       name: opts.name || Carto.Names.place(rng.fork('realm')),
       kind: rng.fork('kind').int(0, 4),
       coast, lakes: lakeLines, ripples, forests, rivers, roads, mountains, hills, trees, settlements, features,
       T, elev: e,
     };
+    if (setting !== 'fantasy') {
+      // A separate stream, so the shared parts above stay as in fantasy.
+      const xr = rng.fork('setting');
+      model.roadMain = roadMain;
+      // The corporation that owns the land (cyberpunk titles) and the kind
+      // of wood: reserve or plain wood today, dead wood or toxic marsh later.
+      if (setting === 'cyber') model.corp = Carto.Names.corp(xr);
+      const wood = features.find((f) => f.kind === 'forest');
+      if (wood) wood.v = xr.int(0, 1);
+    }
+    return model;
   }
 
   // ------------------------------------------------------------- glyphs
@@ -492,8 +589,29 @@
     b.poly(pts);
   }
 
+  // Present day: a road-map dot per centre (square for the capital).
+  // Cyberpunk: a glowing tower for the arcology, blocks for the sprawl.
+  function modernIcon(b, dark, s) {
+    if (s.type === 'capital') { b.poly(G.rect(s.x, s.y, 9, 9, 0)); dark.poly(G.rect(s.x, s.y, 3.6, 3.6, 0)); }
+    else if (s.type === 'town') { b.circle(s.x, s.y, 4.2); dark.circle(s.x, s.y, 1.7); }
+    else dark.circle(s.x, s.y, 2.6);
+  }
+
+  function cyberIcon(b, glow, s) {
+    if (s.type === 'capital') {
+      glow.circle(s.x, s.y - 4, 9);
+      b.poly([{ x: s.x - 4.5, y: s.y + 4 }, { x: s.x - 2, y: s.y - 13 }, { x: s.x, y: s.y - 16 }, { x: s.x + 2, y: s.y - 13 }, { x: s.x + 4.5, y: s.y + 4 }]);
+    } else if (s.type === 'town') {
+      glow.circle(s.x, s.y, 6);
+      b.poly(G.rect(s.x - 3.2, s.y - 1, 3.6, 8, 0));
+      b.poly(G.rect(s.x + 0.6, s.y - 2.5, 3.6, 11, 0));
+      b.poly(G.rect(s.x + 3.8, s.y + 0.5, 3, 6, 0));
+    } else b.poly([{ x: s.x, y: s.y - 3.6 }, { x: s.x + 3.2, y: s.y }, { x: s.x, y: s.y + 3.6 }, { x: s.x - 3.2, y: s.y }]);
+  }
+
   function render(m, o) {
     const pal = o.palette;
+    const setting = Carto.Setting.current;
     const svg = new Svg(W, H);
     svg.rect(0, 0, W, H, { fill: pal.water });
 
@@ -550,7 +668,24 @@
     svg.path(ld, { fill: 'none', stroke: pal.ink, strokeWidth: 1.4, strokeLinejoin: 'round' });
 
     // Roads.
-    if (m.roads.length) {
+    if (m.roads.length && m.roadMain) {
+      // Solid roads: cased motorways and local roads today, maglev lines
+      // glowing over grey highways in the cyberpunk future.
+      const main = new Svg.Batch(), local = new Svg.Batch();
+      m.roads.forEach((r, k) => (m.roadMain[k] ? main : local).smooth(G.chaikin(r.filter((_, i) => i % 2 === 0 || i === r.length - 1), 2, false), false));
+      const ls = local.toString(), ms = main.toString();
+      const round = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' };
+      if (setting === 'cyber') {
+        svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 1.3 }, round));
+        svg.path(ms, Object.assign({ stroke: pal.accent, strokeWidth: 5, opacity: 0.25 }, round));
+        svg.path(ms, Object.assign({ stroke: pal.accent, strokeWidth: 1.5 }, round));
+      } else {
+        svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 2.6 }, round));
+        svg.path(ls, Object.assign({ stroke: pal.road, strokeWidth: 1.4 }, round));
+        svg.path(ms, Object.assign({ stroke: pal.ink, strokeWidth: 3.8 }, round));
+        svg.path(ms, Object.assign({ stroke: pal.accent, strokeWidth: 2.2 }, round));
+      }
+    } else if (m.roads.length) {
       const rb = new Svg.Batch();
       for (const r of m.roads) rb.smooth(G.chaikin(r.filter((_, i) => i % 2 === 0 || i === r.length - 1), 2, false), false);
       svg.path(rb.toString(), { fill: 'none', stroke: pal.inkSoft, strokeWidth: 1.1, strokeDasharray: '4 3', strokeLinecap: 'round' });
@@ -587,15 +722,18 @@
 
     // Settlements.
     const taken = [];
-    const icons = new Svg.Batch(), dark = new Svg.Batch();
+    const icons = new Svg.Batch(), dark = new Svg.Batch(), glow = new Svg.Batch();
     for (const s of m.settlements) {
-      if (s.type === 'capital') castle(icons, s.x, s.y);
+      if (setting === 'modern') modernIcon(icons, dark, s);
+      else if (setting === 'cyber') cyberIcon(icons, glow, s);
+      else if (s.type === 'capital') castle(icons, s.x, s.y);
       else if (s.type === 'town') { house(icons, s.x - 3, s.y + 1, 1); house(icons, s.x + 3, s.y - 1, 1.15); }
       else house(icons, s.x, s.y, 0.9);
-      if (s.type === 'capital') dark.circle(s.x, s.y + 7, 1.6);
+      if (s.type === 'capital' && setting === 'fantasy') dark.circle(s.x, s.y + 7, 1.6);
       taken.push({ x0: s.x - 9, x1: s.x + 9, y0: s.y - 10, y1: s.y + 6 });
     }
-    svg.path(icons.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 1, strokeLinejoin: 'round' });
+    if (setting === 'cyber') svg.path(glow.toString(), { fill: pal.accent, opacity: 0.22 });
+    svg.path(icons.toString(), { fill: pal.paper, stroke: setting === 'cyber' ? pal.accent : pal.ink, strokeWidth: 1, strokeLinejoin: 'round' });
     svg.path(dark.toString(), { fill: pal.ink });
     if (!o.preview) {
       for (const s of m.settlements) {
@@ -608,7 +746,7 @@
     // Lettering.
     if (o.labels !== false) {
       const titleSize = o.preview ? 44 : 34;
-      const titleText = t('realm.title.' + m.kind, { n: m.name });
+      const titleText = title(m);
       // Put the title where it covers the fewest features.
       const reserved = o.preview ? [] : [{ x0: 0, x1: 200, y0: H - 75, y1: H }, { x0: W - 110, x1: W, y0: H - 120, y1: H }];
       const tw = Draw.textBox(0, 0, titleText, titleSize, { title: true }).x1 * 2;
@@ -628,6 +766,13 @@
       Draw.label(svg, best[0], best[1], titleText, titleSize, pal, { title: true, spacing: 1.5, haloWidth: 0.3 });
       taken.push(Draw.textBox(best[0], best[1], titleText, titleSize, { title: true }));
       if (!o.preview) {
+        // The sans-serif and monospaced letterings run wider than the
+        // engraved one: keep long names inside the frame.
+        const inside = (x, tx, size, sp) => {
+          if (setting === 'fantasy') return x;
+          const hw = tx.length * (size * 0.6 + sp) / 2;
+          return Math.max(18 + hw, Math.min(W - 18 - hw, x));
+        };
         const labels = m.settlements.map((s) => ({
           x: s.x, y: s.y + (s.type === 'capital' ? 14 : 11), text: s.name,
           size: s.type === 'capital' ? 15 : s.type === 'town' ? 12.5 : 10.5,
@@ -641,7 +786,8 @@
             const tx = t('realm.sea.' + f.v, { n: f.name });
             for (const sp of f.spots || [f]) {
               const box = Draw.textBox(sp.x, sp.y, tx, 17, {});
-              box.x0 -= tx.length * 2; box.x1 += tx.length * 2;
+              const pad = setting === 'fantasy' ? 2 : 3.4;
+              box.x0 -= tx.length * pad; box.x1 += tx.length * pad;
               if (box.x0 < 20 || box.x1 > W - 20 || taken.some((b) => Draw.overlaps(b, box))) continue;
               Draw.label(svg, sp.x, sp.y, tx, 17, pal, { italic: true, spacing: 4, color: pal.waterInk, haloColor: pal.water, haloWidth: 0.2 });
               taken.push(box);
@@ -649,12 +795,14 @@
             }
           } else if (f.kind === 'mountains') {
             const tx = t('realm.mountains', { n: f.name });
-            const box = Draw.textBox(f.x, f.y, tx, 13, {});
-            if (!taken.some((b) => Draw.overlaps(b, box))) { Draw.label(svg, f.x, f.y, tx, 13, pal, { italic: true, spacing: 2.5 }); taken.push(box); }
+            const x = inside(f.x, tx, 13, 2.5);
+            const box = Draw.textBox(x, f.y, tx, 13, {});
+            if (!taken.some((b) => Draw.overlaps(b, box))) { Draw.label(svg, x, f.y, tx, 13, pal, { italic: true, spacing: 2.5 }); taken.push(box); }
           } else if (f.kind === 'forest') {
-            const tx = t('realm.forest', { n: f.name });
-            const box = Draw.textBox(f.x, f.y, tx, 12, {});
-            if (!taken.some((b) => Draw.overlaps(b, box))) { Draw.label(svg, f.x, f.y, tx, 12, pal, { italic: true, spacing: 2, color: pal.greenInk }); taken.push(box); }
+            const tx = t('realm.forest' + (f.v ? '.' + f.v : ''), { n: f.name });
+            const x = inside(f.x, tx, 12, 2);
+            const box = Draw.textBox(x, f.y, tx, 12, {});
+            if (!taken.some((b) => Draw.overlaps(b, box))) { Draw.label(svg, x, f.y, tx, 12, pal, { italic: true, spacing: 2, color: pal.greenInk }); taken.push(box); }
           }
         }
       }
@@ -662,7 +810,8 @@
     if (!o.preview) {
       // Compass in the emptiest bottom corner, scale bar opposite.
       Draw.compass(svg, W - 52, H - 62, 30, pal);
-      Draw.scaleBar(svg, 30, H - 40, 125, 10, t('realm.leagues'), pal, 5);
+      // Ten leagues, or the same span rounded to 50 km.
+      Draw.scaleBar(svg, 30, H - 40, 125, setting === 'fantasy' ? 10 : 50, t('realm.leagues'), pal, 5);
       // Graduated border, with a clean paper margin outside it.
       const m0 = 6;
       svg.rect(0, 0, W, H, { fill: 'none', stroke: pal.paper, strokeWidth: 2 * m0 });
@@ -702,6 +851,8 @@
     return { cols, rows, data, sea: 1 / 3, width: W, height: H, scale: 1.1, water: '#3f6f8a' };
   }
 
+  const title = (m) => t('realm.title.' + m.kind, { n: m.name, c: m.corp || m.name });
+
   // Towns open in the city generator, villages in the village generator.
   function settlementLink(s) {
     if (s.type === 'village') {
@@ -716,12 +867,15 @@
 
   function notes(m) {
     const esc = Svg.esc;
-    let h = '<h3>' + esc(t('realm.title.' + m.kind, { n: m.name })) + '</h3><p class="tag">' + esc(t('realm.open')) + '</p><ul>';
+    let h = '<h3>' + esc(title(m)) + '</h3><p class="tag">' + esc(t('realm.open')) + '</p><ul>';
     for (const s of m.settlements) {
       const link = settlementLink(s);
       h += '<li><a href="' + esc(link) + '">' + esc(s.name) + '</a> <span class="tag">' + esc(t('realm.' + s.type)) + '</span></li>';
     }
-    return h + '</ul>';
+    h += '</ul>';
+    // Present day and cyberpunk: what the two road styles mean.
+    if (m.roadMain && m.roads.length) h += '<p class="tag">━ ' + esc(t('realm.road.main')) + ' · ─ ' + esc(t('realm.road.local')) + '</p>';
+    return h;
   }
 
   Carto.register({
