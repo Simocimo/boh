@@ -62,6 +62,7 @@
   const chain = (kind) => chains[kind] || (chains[kind] = new Markov(CORPUS[kind] || CORPUS.place));
 
   Carto.Names = {
+    markov: (words, order = 2) => new Markov(words, order),
     place: (rng) => chain('place').generate(rng, 5, 10),
     person: (rng) => chain('person').generate(rng, 4, 8),
     // A set of distinct names.

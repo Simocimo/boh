@@ -32,6 +32,7 @@ function variants(gen) {
 
 // Minimum expectations, so a generator that silently produces empty maps fails too.
 const checks = {
+  world: (m) => m.burgs.length > 10 && m.states.length > 2 && m.rivers.length > 0,
   city: (m) => m.buildingCount > 60 && m.wards.length > 10,
   dungeon: (m) => m.rooms.length >= 5,
   realm: (m) => m.settlements.length >= 3 && m.coast.length > 0,

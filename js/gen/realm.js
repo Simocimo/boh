@@ -347,7 +347,7 @@
         for (const c of path) roadCell[c] = 1;
       }
       function route(from, to) {
-        const dist = new Float32Array(N).fill(Infinity);
+        const dist = new Float64Array(N).fill(Infinity);
         const prev = new Int32Array(N).fill(-1);
         const q = new Heap();
         dist[from] = 0;

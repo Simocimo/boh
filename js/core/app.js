@@ -131,7 +131,7 @@
     els.cards.innerHTML = '';
     for (const g of gens) {
       const card = document.createElement('article');
-      card.className = 'card';
+      card.className = 'card' + (g.featured ? ' featured' : '');
       card.innerHTML =
         '<a class="card-preview" data-gen="' + g.id + '" href="#' + g.id + '" tabindex="-1" aria-hidden="true"><span class="loading">…</span></a>' +
         '<div class="card-body">' +
@@ -206,8 +206,16 @@
     els.seed.value = String(state.seed);
     const form = els.options;
     form.innerHTML = '';
+    let group = null;
     for (const opt of g.options) {
       if (opt.hidden) continue;
+      if (opt.group && opt.group !== group) {
+        group = opt.group;
+        const hd = document.createElement('h3');
+        hd.className = 'opt-group';
+        hd.textContent = t(g.id + '.group.' + group);
+        form.appendChild(hd);
+      }
       const label = t(g.id + '.opt.' + opt.id);
       const id = 'opt-' + g.id + '-' + opt.id;
       let node;
@@ -318,6 +326,7 @@
       return;
     }
     state.svgString = svg;
+    hideInspector();
     els.viewport.innerHTML = svg;
     const el = els.viewport.querySelector('svg');
     state.svgEl = el;
@@ -441,6 +450,14 @@
       if (link) {
         e.preventDefault();
         location.hash = link.getAttribute('data-link');
+        return;
+      }
+      if (state.gen && state.gen.inspect && state.model && state.svgEl) {
+        const pt = state.svgEl.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const p = pt.matrixTransform(state.svgEl.getScreenCTM().inverse());
+        showInspector(state.gen.inspect(state.model, p.x, p.y, state.opts));
       }
     }, true);
     vp.addEventListener('wheel', (e) => {
@@ -468,6 +485,32 @@
     els.zoomIn.addEventListener('click', () => zoomAt(...center(), 1.5));
     els.zoomOut.addEventListener('click', () => zoomAt(...center(), 1 / 1.5));
     els.zoomFit.addEventListener('click', fit);
+  }
+
+  // -------------------------------------------------------------- inspector
+  function showInspector(res) {
+    hideInspector();
+    if (!res) return;
+    els.inspectorBody.innerHTML = res.html;
+    els.inspector.hidden = false;
+    // Outline what was picked, on top of the map.
+    let mark = '';
+    if (res.poly) mark = '<path d="' + Carto.Svg.d(res.poly) + '"/>';
+    else if (res.mark) mark = '<circle cx="' + res.mark.x + '" cy="' + res.mark.y + '" r="' + res.mark.r + '"/>';
+    if (mark && state.svgEl) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'pick');
+      g.setAttribute('fill', 'none');
+      g.setAttribute('stroke', '#c2412d');
+      g.setAttribute('stroke-width', '2');
+      g.innerHTML = mark;
+      state.svgEl.appendChild(g);
+    }
+  }
+  function hideInspector() {
+    if (!els || !els.inspector) return;
+    els.inspector.hidden = true;
+    if (state.svgEl) state.svgEl.querySelectorAll('.pick').forEach((n) => n.remove());
   }
 
   // ----------------------------------------------------------------- export
@@ -609,7 +652,10 @@
       viewport: $('viewport'), zoomIn: $('zoom-in'), zoomOut: $('zoom-out'), zoomFit: $('zoom-fit'),
       toast: $('toast'), link: $('btn-link'), langIt: $('lang-it'), langEn: $('lang-en'),
       overlay: $('save-overlay'), overlayImg: $('save-overlay-img'), overlayClose: $('save-overlay-close'),
+      inspector: $('inspector'), inspectorBody: $('inspector-body'),
     };
+    $('inspector-close').addEventListener('click', hideInspector);
+    els.inspectorBody.addEventListener('click', (e) => { if (e.target.closest('a')) hideInspector(); });
     applyLang();
     buildTabs();
     setupPanZoom();
