@@ -52,6 +52,85 @@
       'city.sub.large': 'città',
       'city.sub.huge': 'grande città',
       'city.sub.open': 'senza mura',
+      // Present day (2026).
+      'gen.city.desc@modern': 'Città di oggi: centro storico, quartieri, piazza, duomo, centro direzionale, porto e zone industriali.',
+      'city.opt.size.small@modern': 'Paese',
+      'city.opt.walls@modern': 'Mura storiche',
+      'city.opt.citadel@modern': 'Centro direzionale',
+      'city.opt.plaza@modern': 'Piazza principale',
+      'city.opt.temple@modern': 'Duomo',
+      'city.opt.farms@modern': 'Campagna coltivata',
+      'city.castle@modern': 'Centro direzionale',
+      'city.cathedral@modern': 'Duomo',
+      'city.market@modern': 'Piazza principale',
+      'city.harbour@modern': 'Porto commerciale',
+      'city.gates@modern': 'Strade di accesso',
+      'city.road': 'SP {n}',
+      'city.road.main': 'SS {n}',
+      'city.mayor': 'Sindaco',
+      'city.surroundings': 'Dintorni',
+      'ward.market@modern': 'Piazza principale',
+      'ward.temple@modern': 'Duomo',
+      'ward.castle@modern': 'Centro direzionale',
+      'ward.oldtown': 'Centro storico',
+      'ward.craftsmen@modern': 'Quartiere residenziale',
+      'ward.merchant@modern': 'Zona commerciale',
+      'ward.slum@modern': 'Case popolari',
+      'ward.patriciate@modern': 'Quartiere signorile',
+      'ward.administration@modern': 'Municipio',
+      'ward.military@modern': 'Caserma',
+      'ward.park@modern': 'Parco pubblico',
+      'ward.harbour@modern': 'Porto commerciale',
+      'ward.shanty@modern': 'Periferia',
+      'ward.farm@modern': 'Campagna',
+      'ward.wood': 'Boschi',
+      'ward.fair': 'Quartiere fieristico',
+      'ward.industrial': 'Zona industriale',
+      'city.sub.small@modern': 'paese',
+      'city.sub.medium@modern': 'cittadina',
+      'city.sub.large@modern': 'città',
+      'city.sub.huge@modern': 'metropoli',
+      'city.sub.walled': 'centro storico murato',
+      // Cyberpunk.
+      'gen.city.desc@cyber': 'Megalopoli cyberpunk: sprawl, arcologie corporative, mercati notturni, Combat Zone e porti per droni.',
+      'city.opt.size.small@cyber': 'Enclave',
+      'city.opt.size.medium@cyber': 'Distretto',
+      'city.opt.size.large@cyber': 'Sprawl',
+      'city.opt.size.huge@cyber': 'Megalopoli',
+      'city.opt.walls@cyber': 'Muro corporativo',
+      'city.opt.citadel@cyber': 'Arcologia',
+      'city.opt.plaza@cyber': 'Mercato notturno',
+      'city.opt.temple@cyber': 'Tempio dei dati',
+      'city.opt.farms@cyber': 'Fattorie verticali',
+      'city.castle@cyber': 'Arcologia',
+      'city.arcology': 'Arcologia {n}',
+      'city.cathedral@cyber': 'Tempio dei dati',
+      'city.market@cyber': 'Mercato notturno',
+      'city.harbour@cyber': 'Porto merci e droni',
+      'city.gates@cyber': 'Arterie di accesso',
+      'city.road@cyber': 'Arteria {n}',
+      'city.road.main@cyber': 'Sopraelevata {n}',
+      'city.corp': 'Corporazione dominante',
+      'ward.market@cyber': 'Mercato notturno',
+      'ward.temple@cyber': 'Tempio dei dati',
+      'ward.castle@cyber': 'Arcologia',
+      'ward.craftsmen@cyber': 'Sprawl',
+      'ward.merchant@cyber': 'Bazar elettronico',
+      'ward.slum@cyber': 'Combat Zone',
+      'ward.patriciate@cyber': 'Enclave dei dirigenti',
+      'ward.administration@cyber': 'Zona corporativa',
+      'ward.military@cyber': 'Caserme della sicurezza',
+      'ward.park@cyber': 'Parco sintetico',
+      'ward.harbour@cyber': 'Porto merci e droni',
+      'ward.shanty@cyber': 'Baraccopoli',
+      'ward.farm@cyber': 'Fattorie verticali',
+      'ward.wood@cyber': 'Terre desolate',
+      'ward.industrial@cyber': 'Fonderie automatizzate',
+      'city.sub.small@cyber': 'enclave',
+      'city.sub.medium@cyber': 'distretto urbano',
+      'city.sub.large@cyber': 'sprawl metropolitano',
+      'city.sub.huge@cyber': 'megalopoli',
+      'city.sub.walled@cyber': 'perimetro blindato',
     },
     en: {
       'gen.city.name': 'City',
@@ -98,6 +177,85 @@
       'city.sub.large': 'city',
       'city.sub.huge': 'great city',
       'city.sub.open': 'unwalled',
+      // Present day (2026).
+      'gen.city.desc@modern': 'Present-day towns: old town, neighbourhoods, main square, cathedral, business district, port and industrial estates.',
+      'city.opt.size.small@modern': 'Village',
+      'city.opt.walls@modern': 'Old town walls',
+      'city.opt.citadel@modern': 'Business district',
+      'city.opt.plaza@modern': 'Main square',
+      'city.opt.temple@modern': 'Cathedral',
+      'city.opt.farms@modern': 'Farmland',
+      'city.castle@modern': 'Business district',
+      'city.cathedral@modern': 'Cathedral',
+      'city.market@modern': 'Main square',
+      'city.harbour@modern': 'Container port',
+      'city.gates@modern': 'Access roads',
+      'city.road': 'Route {n}',
+      'city.road.main': 'Highway {n}',
+      'city.mayor': 'Mayor',
+      'city.surroundings': 'Surroundings',
+      'ward.market@modern': 'Main square',
+      'ward.temple@modern': 'Cathedral',
+      'ward.castle@modern': 'Business district',
+      'ward.oldtown': 'Old town',
+      'ward.craftsmen@modern': 'Residential quarter',
+      'ward.merchant@modern': 'Shopping district',
+      'ward.slum@modern': 'Housing estates',
+      'ward.patriciate@modern': 'Upmarket quarter',
+      'ward.administration@modern': 'Town hall',
+      'ward.military@modern': 'Army barracks',
+      'ward.park@modern': 'Public park',
+      'ward.harbour@modern': 'Container port',
+      'ward.shanty@modern': 'Suburbs',
+      'ward.farm@modern': 'Countryside',
+      'ward.wood': 'Woods',
+      'ward.fair': 'Exhibition district',
+      'ward.industrial': 'Industrial estate',
+      'city.sub.small@modern': 'village',
+      'city.sub.medium@modern': 'town',
+      'city.sub.large@modern': 'city',
+      'city.sub.huge@modern': 'metropolis',
+      'city.sub.walled': 'walled old town',
+      // Cyberpunk.
+      'gen.city.desc@cyber': 'Cyberpunk megacities: sprawl, corporate arcologies, night markets, Combat Zones and drone ports.',
+      'city.opt.size.small@cyber': 'Enclave',
+      'city.opt.size.medium@cyber': 'District',
+      'city.opt.size.large@cyber': 'Sprawl',
+      'city.opt.size.huge@cyber': 'Megacity',
+      'city.opt.walls@cyber': 'Corporate wall',
+      'city.opt.citadel@cyber': 'Arcology',
+      'city.opt.plaza@cyber': 'Night market',
+      'city.opt.temple@cyber': 'Data temple',
+      'city.opt.farms@cyber': 'Vertical farms',
+      'city.castle@cyber': 'Arcology',
+      'city.arcology': '{n} Arcology',
+      'city.cathedral@cyber': 'Data temple',
+      'city.market@cyber': 'Night market',
+      'city.harbour@cyber': 'Cargo and drone port',
+      'city.gates@cyber': 'Access arteries',
+      'city.road@cyber': 'Artery {n}',
+      'city.road.main@cyber': 'Skyway {n}',
+      'city.corp': 'Ruling corporation',
+      'ward.market@cyber': 'Night market',
+      'ward.temple@cyber': 'Data temple',
+      'ward.castle@cyber': 'Arcology',
+      'ward.craftsmen@cyber': 'Sprawl',
+      'ward.merchant@cyber': 'Electronics bazaar',
+      'ward.slum@cyber': 'Combat Zone',
+      'ward.patriciate@cyber': 'Executive enclave',
+      'ward.administration@cyber': 'Corporate zone',
+      'ward.military@cyber': 'Security barracks',
+      'ward.park@cyber': 'Synthetic park',
+      'ward.harbour@cyber': 'Cargo and drone port',
+      'ward.shanty@cyber': 'Shantytown',
+      'ward.farm@cyber': 'Vertical farms',
+      'ward.wood@cyber': 'Wasteland',
+      'ward.industrial@cyber': 'Automated foundries',
+      'city.sub.small@cyber': 'enclave',
+      'city.sub.medium@cyber': 'urban district',
+      'city.sub.large@cyber': 'metropolitan sprawl',
+      'city.sub.huge@cyber': 'megacity',
+      'city.sub.walled@cyber': 'armoured perimeter',
     },
   });
 
@@ -398,6 +556,9 @@
     harbour: { min: 140, chaos: 0.35, alleys: 0.25, empty: 0.06, court: 0.5 },
     shanty: { min: 48, chaos: 1, alleys: 0.3, empty: 0.3, court: 1 },
     temple: { min: 95, chaos: 0.5, alleys: 0.2, empty: 0.05, court: 0.6 },
+    // Present day and cyberpunk only: exhibition halls, sheds and foundries.
+    fair: { min: 700, chaos: 0.08, alleys: 0.5, empty: 0.12, court: 0.3 },
+    industrial: { min: 420, chaos: 0.12, alleys: 0.45, empty: 0.18, court: 0.2 },
   };
 
   function touchesBoundary(lot, block) {
@@ -484,6 +645,9 @@
     const hasRiver = water === 'river' || water === 'both';
     const hasCoast = water === 'coast' || water === 'both';
     const noise = new Carto.Noise(rng.fork('noise'));
+    // Present day and cyberpunk draw from their own stream, so fantasy maps never change.
+    const setting = Carto.Setting.current, fan = setting === 'fantasy';
+    const sr = rng.fork('setting');
 
     // 1. Seed points: a sunflower spiral inside, a looser scatter outside.
     const pr = rng.fork('points');
@@ -773,6 +937,24 @@
       else if (opts.farms) p.type = wr.bool(0.12) ? 'meadow' : 'farm';
       else p.type = forest > 0 ? 'wood' : 'meadow';
     }
+    // Present day and cyberpunk: an old town at the heart, a trade fair, and
+    // industrial estates along the roads out of town.
+    const extra = {};
+    if (!fan) {
+      const centre = (p) => G.len(G.centroid(p.verts)) / Rc;
+      if (setting === 'modern') {
+        for (const p of inner()) if (p.type === 'craftsmen' && centre(p) < 0.5) p.type = 'oldtown';
+        if (nInner >= 22) {
+          const fair = inner().filter((p) => ['craftsmen', 'slum', 'merchant'].includes(p.type) && centre(p) > 0.6 && G.area(p.verts) > CELL * 0.8);
+          if (fair.length) sr.pick(fair).type = 'fair';
+        }
+        extra.mayor = Carto.Names.person(sr);
+      } else extra.corp = Carto.Names.corp(sr);
+      const roadside = (p) => p.verts.some((v, i) => roadEdges.has(key(v, p.verts[(i + 1) % p.verts.length])));
+      const sites = topo.patches.filter((p) => !p.inner && !p.water && (p.type === 'farm' || p.type === 'meadow') && roadside(p) && centre(p) > 1.05 && centre(p) < 1.75);
+      sites.sort((a, b) => centre(a) - centre(b));
+      sites.forEach((p, i) => { if (i === 0 || sr.bool(0.35)) p.type = 'industrial'; });
+    }
 
     // 10. Geometry of each ward.
     const br = rng.fork('buildings');
@@ -855,6 +1037,7 @@
           }
           castle = { wall: block, gate: gi };
           landmarks.push({ key: 'city.castle', x: c.x, y: c.y + (keep ? side * 0.5 + 8 : 0) });
+          if (extra.corp) Object.assign(landmarks[landmarks.length - 1], { key: 'city.arcology', params: { n: extra.corp } });
           break;
         }
         case 'park': {
@@ -1022,13 +1205,29 @@
     }
     const sea = linkEdges(seaEdges).map((c) => ({ pts: c.pts.map((v) => ({ x: v.x, y: v.y })), closed: c.closed }));
 
+    // Present day and cyberpunk: district names and road numbers on the map.
+    if (!fan) {
+      const named = setting === 'modern'
+        ? ['oldtown', 'merchant', 'patriciate', 'administration', 'fair', 'slum', 'park', 'shanty', 'industrial']
+        : ['craftsmen', 'merchant', 'patriciate', 'administration', 'slum', 'military', 'shanty', 'industrial'];
+      for (const type of named) {
+        let best = null;
+        for (const p of topo.patches) if (p.type === type && (!best || G.area(p.verts) > G.area(best.verts))) best = p;
+        if (best) landmarks.push(Object.assign({ key: 'ward.' + type, district: true }, G.centroid(best.verts)));
+      }
+      roads.forEach((r, i) => {
+        const at = r.find((v) => Math.max(Math.abs(v.x), Math.abs(v.y)) > M * 0.8);
+        if (at) landmarks.push({ key: i ? 'city.road' : 'city.road.main', params: { n: i ? sr.int(10, 320) : sr.int(1, 99) }, x: at.x, y: at.y, road: true });
+      });
+    }
+
     const name = opts.name ? opts.name : Carto.Names.place(rng.fork('name'));
     const nb = wards.reduce((s2, w) => s2 + (w.inner ? w.buildings.length : 0), 0);
     const total = wards.reduce((s2, w) => s2 + w.buildings.length, 0);
     const census = {};
     for (const p of inner()) if (p.type && p.type !== 'empty') census[p.type] = (census[p.type] || 0) + 1;
 
-    return {
+    const model = {
       seed, name, size: opts.size, M, Rc, walls: opts.walls,
       wards, sea, river: river ? river.map((v) => ({ x: v.x, y: v.y })) : null,
       roads: roads.map((r) => r.map((v) => ({ x: v.x, y: v.y }))),
@@ -1036,6 +1235,16 @@
       population: Math.round((nb * 6.2 + (total - nb) * 4) / 50) * 50,
       buildingCount: total, gateCount: gates.length, census,
     };
+    if (!fan) {
+      // Flats and office blocks house many more people than medieval houses; megablocks even more.
+      model.population = Math.round(model.population * (setting === 'modern' ? 4.5 : 22) / 500) * 500;
+      extra.outer = {};
+      for (const p of topo.patches) {
+        if (!p.inner && ['shanty', 'industrial', 'farm', 'wood'].includes(p.type)) extra.outer[p.type] = (extra.outer[p.type] || 0) + 1;
+      }
+      model.extra = extra;
+    }
+    return model;
   }
 
   // ------------------------------------------------------------- rendering
@@ -1043,6 +1252,7 @@
   function render(m, o) {
     const pal = o.palette;
     const M = m.M, S = 2 * M;
+    const setting = Carto.Setting.current, fan = setting === 'fantasy', cyber = setting === 'cyber';
     const svg = new Svg(S, S);
     const clip = Carto.uid('cityclip');
     svg.defs('<clipPath id="' + clip + '"><rect x="' + -M + '" y="' + -M + '" width="' + S + '" height="' + S + '"/></clipPath>');
@@ -1106,6 +1316,18 @@
       piers.poly(G.rect(b.p.x, b.p.y, W.river + 9, b.w + 1.5, ang));
     }
     svg.path(piers.toString(), { fill: pal.road, stroke: pal.ink, strokeWidth: 0.9, strokeLinejoin: 'round' });
+    // Present day and cyberpunk: container cranes straddling the piers.
+    if (!fan) {
+      const cranes = new Svg.Batch();
+      for (const w of m.wards) {
+        if (!w.piers) continue;
+        for (const p of w.piers) {
+          const tip = G.lerp(G.mid(p[0], p[1]), G.mid(p[2], p[3]), 0.3), ang = Math.atan2(p[1].y - p[0].y, p[1].x - p[0].x);
+          cranes.poly(G.rect(tip.x, tip.y, 7.5, 2.2, ang));
+        }
+      }
+      svg.path(cranes.toString(), { fill: pal.accent, stroke: pal.ink, strokeWidth: 0.5 });
+    }
 
     // Squares, yards, parks and gardens.
     const squares = new Svg.Batch(), greens = new Svg.Batch(), gardens = new Svg.Batch();
@@ -1119,15 +1341,20 @@
     svg.path(gardens.toString(), { fill: pal.green, opacity: 0.75 });
 
     // Buildings.
-    const houses = new Svg.Batch(), special = new Svg.Batch(), farmhouses = new Svg.Batch();
+    const houses = new Svg.Batch(), special = new Svg.Batch(), farmhouses = new Svg.Batch(), stalls = new Svg.Batch();
     for (const w of m.wards) {
-      const target = w.inner ? houses : farmhouses;
+      const target = cyber && w.stalls ? stalls : w.inner ? houses : farmhouses;
       for (const b of w.buildings) target.poly(b);
       if (w.special) for (const s of w.special) special.poly(s);
     }
     svg.path(farmhouses.toString(), { fill: pal.building, stroke: pal.ink, strokeWidth: lw, strokeLinejoin: 'round' });
     svg.path(houses.toString(), { fill: pal.building, stroke: pal.ink, strokeWidth: lw, strokeLinejoin: 'round' });
-    svg.path(special.toString(), { fill: pal.buildingSpecial, stroke: pal.ink, strokeWidth: lw * 1.6, strokeLinejoin: 'round' });
+    if (cyber) {
+      // Neon: glowing landmarks and market stalls.
+      svg.path(special.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 5, strokeLinejoin: 'round', opacity: 0.3 });
+      svg.path(stalls.toString(), { fill: pal.accent, stroke: pal.ink, strokeWidth: lw * 0.6, strokeLinejoin: 'round', opacity: 0.85 });
+    }
+    svg.path(special.toString(), { fill: pal.buildingSpecial, stroke: cyber ? pal.accent : pal.ink, strokeWidth: lw * 1.6, strokeLinejoin: 'round' });
 
     // Fountains.
     for (const w of m.wards) {
@@ -1137,8 +1364,10 @@
       svg.circle(f.x, f.y, f.r, { fill: pal.water, stroke: pal.ink, strokeWidth: 0.6 });
     }
 
-    // Citadel walls.
-    if (m.castle) {
+    // Citadel walls; the arcology has a security fence instead, the business district nothing.
+    if (m.castle && cyber) {
+      svg.poly(m.castle.wall, { fill: 'none', stroke: pal.accent, strokeWidth: 1.4, strokeDasharray: '4 3', strokeLinejoin: 'round' });
+    } else if (m.castle && fan) {
       const cw = m.castle.wall, n = cw.length;
       const a = cw[m.castle.gate], b = cw[(m.castle.gate + 1) % n];
       const len = G.dist(a, b);
@@ -1156,7 +1385,22 @@
     }
 
     // City walls, towers and gatehouses.
-    if (m.wallLines.length) {
+    if (m.wallLines.length && !fan) {
+      // Old town walls (present day) or the corporate wall with its checkpoints (cyberpunk).
+      const wb = new Svg.Batch();
+      for (const l of m.wallLines) wb.poly(l, false);
+      const tb = new Svg.Batch();
+      if (cyber) {
+        svg.path(wb.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: W.wall * 2, strokeLinejoin: 'round', opacity: 0.25 });
+        svg.path(wb.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: W.wall * 0.6, strokeLinejoin: 'round' });
+        for (const tw of m.gateTowers) if (tw) tb.poly(G.rect(tw.x, tw.y, 6, 6, 0));
+        svg.path(tb.toString(), { fill: pal.paper, stroke: pal.accent, strokeWidth: 1.2 });
+      } else {
+        svg.path(wb.toString(), { fill: 'none', stroke: pal.inkSoft, strokeWidth: W.wall * 0.7, strokeLinejoin: 'round', strokeLinecap: 'butt' });
+        for (const tw of m.towers) tb.circle(tw.x, tw.y, 2.4);
+        svg.path(tb.toString(), { fill: pal.inkSoft });
+      }
+    } else if (m.wallLines.length) {
       const wb = new Svg.Batch();
       for (const l of m.wallLines) wb.poly(l, false);
       svg.path(wb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: W.wall, strokeLinejoin: 'round', strokeLinecap: 'butt' });
@@ -1178,20 +1422,26 @@
     if (o.labels !== false && !o.preview) {
       const fs = S * 0.016;
       const taken = [Draw.textBox(S / 2, S * 0.075, m.name, S * 0.048, { title: true })];
-      const labels = m.landmarks.map((l) => ({ x: l.x + M, y: l.y + M, text: t(l.key), size: fs, italic: true }));
+      const labels = m.landmarks.map((l) => {
+        const lab = { x: l.x + M, y: l.y + M, text: t(l.key, l.params), size: fs, italic: true };
+        // District names in small capitals, road numbers in plain type.
+        if (l.district) Object.assign(lab, { text: lab.text.toUpperCase(), size: fs * 0.72, italic: false, spacing: fs * 0.08, color: cyber ? pal.accent : pal.inkSoft });
+        if (l.road) Object.assign(lab, { size: fs * 0.75, italic: false });
+        return lab;
+      });
       Draw.placeLabels(svg, labels, pal, taken, { x0: S * 0.04, y0: S * 0.04, x1: S * 0.96, y1: S * 0.9 });
     }
     const margin = S * 0.014;
     if (!o.preview) {
       Draw.frame(svg, S, S, pal, margin);
       if (o.labels !== false) {
-        const sub = t('city.sub.' + (m.size || 'medium')) + (m.walls ? '' : ' · ' + t('city.sub.open'));
-        Draw.title(svg, S / 2, S * 0.075, m.name, S * 0.048, pal, sub);
+        const sub = t('city.sub.' + (m.size || 'medium')) + (fan ? (m.walls ? '' : ' · ' + t('city.sub.open')) : m.walls ? ' · ' + t('city.sub.walled') : '');
+        Draw.title(svg, S / 2, S * 0.075, pal.titleCase === 'upper' ? m.name.toUpperCase() : m.name, S * 0.048, pal, sub);
       }
       Draw.compass(svg, S - S * 0.075, S - S * 0.085, S * 0.032, pal);
       Draw.scaleBar(svg, S * 0.06, S - S * 0.07, 100, 100, 'm', pal);
     } else {
-      Draw.label(svg, S / 2, S * 0.08, m.name, S * 0.06, pal, { title: true, haloWidth: 0.35 });
+      Draw.label(svg, S / 2, S * 0.08, pal.titleCase === 'upper' ? m.name.toUpperCase() : m.name, S * 0.06, pal, { title: true, haloWidth: 0.35 });
     }
     return svg.toString();
   }
@@ -1202,9 +1452,15 @@
       '<dt>' + esc(t('city.population')) + '</dt><dd>' + m.population.toLocaleString(Carto.I18n.lang) + '</dd>' +
       '<dt>' + esc(t('city.buildings')) + '</dt><dd>' + m.buildingCount.toLocaleString(Carto.I18n.lang) + '</dd>' +
       '<dt>' + esc(t('city.gates')) + '</dt><dd>' + m.gateCount + '</dd></dl>';
-    const order = ['market', 'temple', 'castle', 'administration', 'merchant', 'patriciate', 'craftsmen', 'harbour', 'military', 'park', 'slum'];
+    const x = m.extra;
+    if (x && (x.mayor || x.corp)) {
+      h = h.replace(/<\/dl>$/, '<dt>' + esc(t(x.mayor ? 'city.mayor' : 'city.corp')) + '</dt><dd>' + esc(x.mayor || x.corp) + '</dd></dl>');
+    }
+    const order = ['market', 'temple', 'castle', 'administration', 'oldtown', 'merchant', 'patriciate', 'craftsmen', 'harbour', 'fair', 'military', 'park', 'slum'];
     const items = order.filter((k) => m.census[k]).map((k) => '<li>' + esc(t('ward.' + k)) + (m.census[k] > 1 ? ' <span class="tag">×' + m.census[k] + '</span>' : '') + '</li>');
     if (items.length) h += '<p class="tag">' + esc(t('city.districts')) + '</p><ul>' + items.join('') + '</ul>';
+    const outer = x && x.outer ? ['shanty', 'industrial', 'farm', 'wood'].filter((k) => x.outer[k]) : [];
+    if (outer.length) h += '<p class="tag">' + esc(t('city.surroundings')) + '</p><ul>' + outer.map((k) => '<li>' + esc(t('ward.' + k)) + '</li>').join('') + '</ul>';
     return h;
   }
 
@@ -1214,7 +1470,9 @@
     options: [
       { id: 'size', type: 'select', values: ['small', 'medium', 'large', 'huge'], def: 'medium' },
       { id: 'water', type: 'select', values: ['none', 'river', 'coast', 'both'], def: 'river' },
-      { id: 'walls', type: 'bool', def: true },
+      // Walls are medieval: off by default in the present day and in cyberpunk
+      // (`defs`: per-setting defaults, for an app that supports them).
+      { id: 'walls', type: 'bool', def: true, defs: { modern: false, cyber: false } },
       { id: 'citadel', type: 'bool', def: true },
       { id: 'plaza', type: 'bool', def: true },
       { id: 'temple', type: 'bool', def: true },
