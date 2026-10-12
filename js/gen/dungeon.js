@@ -2392,7 +2392,7 @@
     // Room numbers go in the middle, or in a corner when furniture is there.
     const spots = m.rooms.map((r) => {
       const cx = (r.x + r.w / 2) * CS, cy = (r.y + r.h / 2) * CS;
-      if ((r.features || []).some((f) => f.x !== undefined && Math.hypot(f.x * CS - cx, f.y * CS - cy) < CS * 1.1)) return { r, x: (r.x + 0.75) * CS, y: (r.y + 0.75) * CS };
+      if ((r.features || []).some((f) => f.x !== undefined && Math.hypot(f.x * CS - cx, f.y * CS - cy) < CS * 1.4)) return { r, x: (r.x + 0.75) * CS, y: (r.y + 0.75) * CS };
       return { r, x: cx, y: cy };
     });
     // Secret doors: an S beside the wall, clear of the numbers.

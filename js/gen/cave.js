@@ -263,6 +263,152 @@
   const GW = 120, GH = 90, CELL = 5;
   const W = GW * CELL, H = GH * CELL;
 
+  // Raise the field to a rectangle centred on (cx, cy), straight-sided.
+  function carveRect(f, cx, cy, hw, hh) {
+    for (let y = Math.max(0, Math.floor(cy - hh - 2)); y <= Math.min(GH - 1, Math.ceil(cy + hh + 2)); y++) {
+      for (let x = Math.max(0, Math.floor(cx - hw - 2)); x <= Math.min(GW - 1, Math.ceil(cx + hw + 2)); x++) {
+        const v = 1 - Math.max(Math.abs(x - cx) / hw, Math.abs(y - cy) / hh);
+        const i = x + y * GW;
+        if (v > f[i]) f[i] = v;
+      }
+    }
+  }
+
+  // Present day and cyberpunk plans of straight tunnels: half width of the
+  // tunnels (in squares of a metre), square or rounded ends, 45° crosscuts
+  // (mine), roughness of the rock and share of natural chambers.
+  const LATTICE = {
+    mine: { hw: 2.2, diag: true, rough: 0.05 },
+    drain: { hw: 2.4, square: true },
+    undercity: { hw: 2.2, square: true, natural: 0.35 },
+  };
+
+  // Chambers on a lattice, joined by a random tree of straight tunnels plus a
+  // few loops; the entrance tunnel runs straight off the sheet.
+  function latticePlan(cr, theme, n, noise, opts) {
+    const L = LATTICE[theme];
+    const cols = Math.max(2, Math.round(Math.sqrt((n * 1.4 * GW) / GH))), rows = Math.max(2, Math.ceil((n * 1.4) / cols));
+    // Clear of the title at the top and of the scale at the bottom.
+    const s = Math.min((GW - 28) / (cols - 1), (GH - 38) / (rows - 1));
+    const x0 = (GW - s * (cols - 1)) / 2, y0 = 22 + (GH - 30 - s * (rows - 1)) / 2;
+    // Drains and the undercity are not quite regular; a mine keeps its 45°.
+    const jit = L.diag ? 0 : s * 0.14;
+    const colX = Array.from({ length: cols }, (_, i) => Math.round(x0 + i * s + cr.float(-jit, jit)));
+    const rowY = Array.from({ length: rows }, (_, j) => Math.round(y0 + j * s + cr.float(-jit, jit)));
+    const pos = (k) => ({ x: colX[k % cols], y: rowY[Math.floor(k / cols)] });
+    const ij = (k) => [k % cols, Math.floor(k / cols)];
+
+    // Random tree from a node on the left or right column.
+    const start = cr.int(0, rows - 1) * cols + (cr.bool() ? 0 : cols - 1);
+    const order = [start], inTree = new Set(order), edges = [], diagUsed = new Set();
+    const diagKey = (a, b) => { const [i0, j0] = ij(a), [i1, j1] = ij(b); return Math.min(i0, i1) + ',' + Math.min(j0, j1); };
+    while (order.length < n) {
+      const cand = [];
+      for (const k of order) {
+        const [i, j] = ij(k);
+        for (let dj = -1; dj <= 1; dj++) {
+          for (let di = -1; di <= 1; di++) {
+            if ((!di && !dj) || (di && dj && !L.diag)) continue;
+            const a = i + di, b = j + dj;
+            if (a < 0 || b < 0 || a >= cols || b >= rows) continue;
+            const q = b * cols + a;
+            if (inTree.has(q) || (di && dj && diagUsed.has(diagKey(k, q)))) continue;
+            cand.push([[k, q], di && dj ? 0.35 : 1]);
+          }
+        }
+      }
+      if (!cand.length) break;
+      const [a, b] = cr.weighted(cand);
+      const [ia, ja] = ij(a), [ib, jb] = ij(b);
+      if (ia !== ib && ja !== jb) diagUsed.add(diagKey(a, b));
+      inTree.add(b);
+      order.push(b);
+      edges.push([a, b]);
+    }
+    // A few loops between neighbours on the lattice.
+    const extra = cr.int(1, Math.max(1, Math.floor(n / 3)));
+    for (let k = 0, tries = 0; k < extra && tries < 30; tries++) {
+      const a = cr.pick(order), [i, j] = ij(a);
+      const [di, dj] = cr.pick([[1, 0], [-1, 0], [0, 1], [0, -1]]);
+      const b = (j + dj) * cols + (i + di);
+      if (i + di < 0 || j + dj < 0 || i + di >= cols || j + dj >= rows || !inTree.has(b)) continue;
+      if (edges.some(([p, q]) => (p === a && q === b) || (p === b && q === a))) continue;
+      edges.push([a, b]);
+      k++;
+    }
+
+    // Chambers: rectangles, shafts in a mine, some natural caves in the undercity.
+    const lim = s * 0.4;
+    let nShafts = 0;
+    const chambers = order.map((k, i) => {
+      const c = pos(k);
+      if (theme === 'mine' && i > 0 && nShafts < 2 && cr.bool(0.3)) { c.hw = c.hh = 2.6; c.shaft = true; c.kind0 = 'chasm'; nShafts++; }
+      else if (L.natural && i > 0 && cr.bool(L.natural)) { c.natural = true; c.r = Math.min(lim, cr.float(6, 10)); }
+      else {
+        c.hw = Math.min(lim, cr.int(theme === 'drain' ? 4 : 5, theme === 'drain' ? 6 : 9));
+        c.hh = Math.min(lim, theme === 'mine' ? c.hw + cr.int(-2, 1) : cr.int(4, 8));
+      }
+      c.r = c.r || Math.min(c.hw, c.hh);
+      return c;
+    });
+    // A storm drain has one big retention basin.
+    if (theme === 'drain' && n > 3 && opts.water !== false) {
+      const c = chambers[cr.int(1, n - 1)];
+      c.hw = c.hh = c.r = Math.min(lim, 7);
+      c.kind0 = 'lake';
+    }
+    const idx = new Map(order.map((k, i) => [k, i]));
+    const d = (a, b) => Math.hypot(chambers[a].x - chambers[b].x, chambers[a].y - chambers[b].y);
+    const links = edges.map(([a, b]) => [idx.get(a), idx.get(b), d(idx.get(a), idx.get(b))]);
+    const e0 = chambers[0];
+    const edgeP = { x: start % cols === 0 ? -6 : GW + 6, y: e0.y };
+
+    // Carve the field: chambers, then the tunnels between them.
+    const f = new Float32Array(GW * GH).fill(-1);
+    for (const c of chambers) {
+      if (!c.natural) { carveRect(f, c.x, c.y, c.hw, c.hh); continue; }
+      const R = Math.ceil(c.r * 1.5);
+      for (let y = Math.max(0, Math.floor(c.y - R)); y <= Math.min(GH - 1, Math.ceil(c.y + R)); y++) {
+        for (let x = Math.max(0, Math.floor(c.x - R)); x <= Math.min(GW - 1, Math.ceil(c.x + R)); x++) {
+          const rr = c.r * (1 + 0.3 * noise.get(x * 0.15 + 7, y * 0.15 - 3));
+          const v = 1 - Math.hypot(x - c.x, y - c.y) / rr;
+          if (v > f[x + y * GW]) f[x + y * GW] = v;
+        }
+      }
+    }
+    const passages = [], segs = [];
+    // How far a tunnel runs inside a chamber before it reaches the wall.
+    const reach = (c, ux, uy) => (!c ? 0 : c.natural ? c.r * 0.85 : ux && uy ? Math.min(c.hw, c.hh) : ux ? c.hw : c.hh);
+    const tunnel = (a, b, ca, cb) => {
+      const len = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / len, uy = (b.y - a.y) / len;
+      const hw = L.hw;
+      const pad = hw + 2;
+      for (let y = Math.max(0, Math.floor(Math.min(a.y, b.y) - pad)); y <= Math.min(GH - 1, Math.ceil(Math.max(a.y, b.y) + pad)); y++) {
+        for (let x = Math.max(0, Math.floor(Math.min(a.x, b.x) - pad)); x <= Math.min(GW - 1, Math.ceil(Math.max(a.x, b.x) + pad)); x++) {
+          const along = (x - a.x) * ux + (y - a.y) * uy, perp = Math.abs((x - a.x) * uy - (y - a.y) * ux);
+          const ex = Math.max(0, -along, along - len);
+          const dd = L.square ? Math.max(ex, perp) : Math.hypot(ex, perp);
+          const v = 1 - dd / hw;
+          if (v > f[x + y * GW]) f[x + y * GW] = v;
+        }
+      }
+      const pts = [];
+      for (let t = 0; t <= len; t += 0.5) pts.push({ x: a.x + ux * t, y: a.y + uy * t });
+      passages.push(pts);
+      const ra = reach(ca, Math.abs(ux) > 0.1, Math.abs(uy) > 0.1), rb = reach(cb, Math.abs(ux) > 0.1, Math.abs(uy) > 0.1);
+      if (len - ra - rb > 1) segs.push({ x0: a.x + ux * ra, y0: a.y + uy * ra, x1: b.x - ux * rb, y1: b.y - uy * rb });
+    };
+    for (const [a, b] of links) tunnel(chambers[a], chambers[b], chambers[a], chambers[b]);
+    tunnel(e0, edgeP, e0, null);
+    if (L.rough) {
+      for (let i = 0; i < f.length; i++) {
+        const x = i % GW, y = (i - x) / GW;
+        f[i] += L.rough * noise.fbm(x * 0.2 + 100, y * 0.2, 2);
+      }
+    }
+    return { chambers, links, ent: 0, edgeP, f, passages, segs };
+  }
+
   function generate(seed, opts) {
     const rng = new Carto.Random(seed);
     const type = opts.type || 'cave';
@@ -276,86 +422,112 @@
 
     // Chambers.
     const cr = rng.fork('chambers');
-    // One chamber per cell of a coarse grid, so the cave spreads over the sheet.
-    const chambers = [];
-    const cols = Math.ceil(Math.sqrt((n * GW) / GH)), rows = Math.ceil(n / cols);
-    const slots = cr.shuffle(Array.from({ length: cols * rows }, (_, i) => i)).slice(0, n);
-    const sw = (GW - 12) / cols, sh = (GH - 16) / rows;
-    for (const slot of slots) {
-      const sx = slot % cols, sy = Math.floor(slot / cols);
-      for (let tries = 0; tries < 30; tries++) {
-        const r = Math.min(cr.float(type === 'glade' ? 6 : 5, type === 'glade' ? 11 : 10), Math.min(sw, sh) * 0.42);
-        const x = 6 + sx * sw + cr.float(r, sw - r), y = 10 + sy * sh + cr.float(r, sh - r);
-        if (chambers.some((c) => Math.hypot(c.x - x, c.y - y) < c.r + r + 4)) continue;
-        chambers.push({ x, y, r });
-        break;
-      }
-    }
-
-    // Passages: minimum spanning tree plus a few loops.
-    const links = [];
-    const inTree = [0];
-    const rest = chambers.map((_, i) => i).slice(1);
-    const d = (a, b) => Math.hypot(chambers[a].x - chambers[b].x, chambers[a].y - chambers[b].y);
-    while (rest.length) {
-      let best = null;
-      for (const a of inTree) for (const b of rest) if (!best || d(a, b) < best[2]) best = [a, b, d(a, b)];
-      links.push(best);
-      inTree.push(best[1]);
-      rest.splice(rest.indexOf(best[1]), 1);
-    }
-    const extra = cr.int(1, Math.max(1, Math.floor(n / 3)));
-    for (let k = 0; k < extra; k++) {
-      const a = cr.int(0, n - 1), b = cr.int(0, n - 1);
-      if (a === b || links.some((l) => (l[0] === a && l[1] === b) || (l[0] === b && l[1] === a)) || d(a, b) > 45) continue;
-      links.push([a, b, d(a, b)]);
-    }
-
-    // Entrance: the chamber nearest to an edge opens off the sheet.
-    let ent = 0, ed = Infinity, edgeP = null;
-    chambers.forEach((c, i) => {
-      const cand = [[c.x, -6], [c.x, GH + 6], [-6, c.y], [GW + 6, c.y]];
-      for (const [ex, ey] of cand) {
-        const dd = Math.hypot(ex - c.x, ey - c.y);
-        if (dd < ed) { ed = dd; ent = i; edgeP = { x: ex, y: ey }; }
-      }
-    });
-
-    // Carve a scalar field: cones for chambers, tubes for passages, plus noise.
-    const f = new Float32Array(GW * GH).fill(-1);
-    const carve = (cx, cy, r, wob) => {
-      const R = Math.ceil(r * 1.5);
-      for (let y = Math.max(0, Math.floor(cy - R)); y <= Math.min(GH - 1, Math.ceil(cy + R)); y++) {
-        for (let x = Math.max(0, Math.floor(cx - R)); x <= Math.min(GW - 1, Math.ceil(cx + R)); x++) {
-          const rr = r * (1 + wob * noise.get(x * 0.15 + 7, y * 0.15 - 3));
-          const v = 1 - Math.hypot(x - cx, y - cy) / rr;
-          const i = x + y * GW;
-          if (v > f[i]) f[i] = v;
+    let chambers, links, ent, edgeP, f, passages, segs = null;
+    // Present day and cyberpunk: mines, storm drains and the undercity are
+    // dug on a plan of straight tunnels.
+    if (LATTICE[theme]) ({ chambers, links, ent, edgeP, f, passages, segs } = latticePlan(cr, theme, n, noise, opts));
+    else {
+      // One chamber per cell of a coarse grid, so the cave spreads over the sheet.
+      chambers = [];
+      const cols = Math.ceil(Math.sqrt((n * GW) / GH)), rows = Math.ceil(n / cols);
+      const slots = cr.shuffle(Array.from({ length: cols * rows }, (_, i) => i)).slice(0, n);
+      const sw = (GW - 12) / cols, sh = (GH - 16) / rows;
+      for (const slot of slots) {
+        const sx = slot % cols, sy = Math.floor(slot / cols);
+        for (let tries = 0; tries < 30; tries++) {
+          const r = Math.min(cr.float(type === 'glade' ? 6 : 5, type === 'glade' ? 11 : 10), Math.min(sw, sh) * 0.42);
+          const x = 6 + sx * sw + cr.float(r, sw - r), y = 10 + sy * sh + cr.float(r, sh - r);
+          if (chambers.some((c) => Math.hypot(c.x - x, c.y - y) < c.r + r + 4)) continue;
+          chambers.push({ x, y, r });
+          break;
         }
       }
-    };
-    for (const c of chambers) carve(c.x, c.y, c.r, 0.3);
-    const passages = [];
-    const tube = (a, b, wide) => {
-      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      const len = Math.hypot(b.x - a.x, b.y - a.y);
-      const ctrl = G.add(mid, G.scale(G.norm(G.perp(G.sub(b, a))), cr.float(-0.35, 0.35) * len));
-      const pts = [];
-      const steps = Math.ceil(len * 2);
-      for (let s = 0; s <= steps; s++) {
-        const tt = s / steps;
-        const p = { x: (1 - tt) * (1 - tt) * a.x + 2 * (1 - tt) * tt * ctrl.x + tt * tt * b.x, y: (1 - tt) * (1 - tt) * a.y + 2 * (1 - tt) * tt * ctrl.y + tt * tt * b.y };
-        pts.push(p);
-        const r = wide * (0.8 + 0.4 * (noise.get(p.x * 0.2, p.y * 0.2 + 50) + 1) / 2);
-        carve(p.x, p.y, r, 0.1);
+
+      // Passages: minimum spanning tree plus a few loops.
+      links = [];
+      const inTree = [0];
+      const rest = chambers.map((_, i) => i).slice(1);
+      const d = (a, b) => Math.hypot(chambers[a].x - chambers[b].x, chambers[a].y - chambers[b].y);
+      while (rest.length) {
+        let best = null;
+        for (const a of inTree) for (const b of rest) if (!best || d(a, b) < best[2]) best = [a, b, d(a, b)];
+        links.push(best);
+        inTree.push(best[1]);
+        rest.splice(rest.indexOf(best[1]), 1);
       }
-      passages.push(pts);
-    };
-    for (const [a, b] of links) tube(chambers[a], chambers[b], cr.float(type === 'glade' ? 2.6 : 2.2, type === 'glade' ? 4 : 3.5));
-    tube(chambers[ent], edgeP, type === 'glade' ? 3 : 2.6);
-    for (let i = 0; i < f.length; i++) {
-      const x = i % GW, y = (i - x) / GW;
-      f[i] += 0.16 * noise.fbm(x * 0.11 + 100, y * 0.11, 3);
+      const extra = cr.int(1, Math.max(1, Math.floor(n / 3)));
+      for (let k = 0; k < extra; k++) {
+        const a = cr.int(0, n - 1), b = cr.int(0, n - 1);
+        if (a === b || links.some((l) => (l[0] === a && l[1] === b) || (l[0] === b && l[1] === a)) || d(a, b) > 45) continue;
+        links.push([a, b, d(a, b)]);
+      }
+
+      // Entrance: the chamber nearest to an edge opens off the sheet.
+      let ed = Infinity;
+      ent = 0;
+      edgeP = null;
+      chambers.forEach((c, i) => {
+        const cand = [[c.x, -6], [c.x, GH + 6], [-6, c.y], [GW + 6, c.y]];
+        for (const [ex, ey] of cand) {
+          const dd = Math.hypot(ex - c.x, ey - c.y);
+          if (dd < ed) { ed = dd; ent = i; edgeP = { x: ex, y: ey }; }
+        }
+      });
+
+      // Carve a scalar field: cones for chambers, tubes for passages, plus noise.
+      f = new Float32Array(GW * GH).fill(-1);
+      const carve = (cx, cy, r, wob) => {
+        const R = Math.ceil(r * 1.5);
+        for (let y = Math.max(0, Math.floor(cy - R)); y <= Math.min(GH - 1, Math.ceil(cy + R)); y++) {
+          for (let x = Math.max(0, Math.floor(cx - R)); x <= Math.min(GW - 1, Math.ceil(cx + R)); x++) {
+            const rr = r * (1 + wob * noise.get(x * 0.15 + 7, y * 0.15 - 3));
+            const v = 1 - Math.hypot(x - cx, y - cy) / rr;
+            const i = x + y * GW;
+            if (v > f[i]) f[i] = v;
+          }
+        }
+      };
+      // Cyberpunk smugglers' den: some chambers are rooms built into the cave,
+      // with straight walls that the noise leaves alone.
+      let soft = null;
+      if (theme === 'den') {
+        const rr = rng.fork('rooms');
+        soft = new Float32Array(GW * GH).fill(1);
+        chambers.forEach((c, i) => {
+          if (i === 0 || !rr.bool(0.6)) return;
+          c.room = { hw: Math.round(c.r * 0.85), hh: Math.round(c.r * 0.7) };
+        });
+      }
+      for (const c of chambers) {
+        if (!c.room) { carve(c.x, c.y, c.r, 0.3); continue; }
+        carveRect(f, c.x, c.y, c.room.hw, c.room.hh);
+        for (let y = Math.max(0, Math.floor(c.y - c.room.hh - 3)); y <= Math.min(GH - 1, Math.ceil(c.y + c.room.hh + 3)); y++) {
+          for (let x = Math.max(0, Math.floor(c.x - c.room.hw - 3)); x <= Math.min(GW - 1, Math.ceil(c.x + c.room.hw + 3)); x++) soft[x + y * GW] = 0;
+        }
+      }
+      passages = [];
+      const tube = (a, b, wide) => {
+        const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        const len = Math.hypot(b.x - a.x, b.y - a.y);
+        const ctrl = G.add(mid, G.scale(G.norm(G.perp(G.sub(b, a))), cr.float(-0.35, 0.35) * len));
+        const pts = [];
+        const steps = Math.ceil(len * 2);
+        for (let s = 0; s <= steps; s++) {
+          const tt = s / steps;
+          const p = { x: (1 - tt) * (1 - tt) * a.x + 2 * (1 - tt) * tt * ctrl.x + tt * tt * b.x, y: (1 - tt) * (1 - tt) * a.y + 2 * (1 - tt) * tt * ctrl.y + tt * tt * b.y };
+          pts.push(p);
+          const r = wide * (0.8 + 0.4 * (noise.get(p.x * 0.2, p.y * 0.2 + 50) + 1) / 2);
+          carve(p.x, p.y, r, 0.1);
+        }
+        passages.push(pts);
+      };
+      for (const [a, b] of links) tube(chambers[a], chambers[b], cr.float(type === 'glade' ? 2.6 : 2.2, type === 'glade' ? 4 : 3.5));
+      tube(chambers[ent], edgeP, type === 'glade' ? 3 : 2.6);
+      for (let i = 0; i < f.length; i++) {
+        const x = i % GW, y = (i - x) / GW;
+        if (soft) { if (soft[i]) f[i] += 0.16 * soft[i] * noise.fbm(x * 0.11 + 100, y * 0.11, 3); continue; }
+        f[i] += 0.16 * noise.fbm(x * 0.11 + 100, y * 0.11, 3);
+      }
     }
     const level = 0.12;
 
@@ -400,6 +572,7 @@
       const c = chambers[ci];
       c.num = k + 1;
       if (k === 0) c.kind = 'mouth';
+      else if (c.kind0) c.kind = c.kind0;
       else if (type === 'cave' && k === orderIdx.length - 1 && pr.bool(0.5)) c.kind = 'hoard';
       else {
         const avail = weights.filter(([kk]) => !used[kk] || kk === 'dripstone' || kk === 'thicket' || kk === 'camp');
@@ -412,6 +585,10 @@
     // Features.
     const fr = rng.fork('features');
     const water = [], rocks = [], spikes = [], marks = [], webs = [], crystals = [], shrooms = [], fires = [], stones = [], bigTrees = [], huts = [], mounds = [], chasms = [];
+    // Present day and cyberpunk: mine shafts, square pillars, drain grates.
+    const shafts = [], pillars = [], grates = [];
+    const built = !!LATTICE[theme];
+    const pools = theme === 'grotto' && opts.water !== false ? rng.fork('pools') : null;
     const floorAt = (x, y) => {
       const gx = Math.round(x / CELL - 0.5), gy = Math.round(y / CELL - 0.5);
       return gx >= 0 && gy >= 0 && gx < GW && gy < GH && mask[gx + gy * GW] && dist[gx + gy * GW] === 0;
@@ -432,6 +609,26 @@
           i++;
         }
       };
+      // Straight-walled chambers: a shaft, a square basin, a grid of pillars.
+      if (built && !c.natural) {
+        if (c.shaft) { shafts.push({ x: cx, y: cy, s: c.hw * CELL * 1.2 }); continue; }
+        const hw = c.hw * CELL, hh = c.hh * CELL;
+        if (theme === 'drain' && c.kind !== 'lake') grates.push({ x: cx + hw * 0.45, y: cy - hh * 0.45, s: 7 });
+        if (c.kind === 'lake' && opts.water !== false) {
+          const rx = hw * 0.62, ry = hh * 0.62;
+          water.push({ rect: true, pts: [{ x: cx - rx, y: cy - ry }, { x: cx + rx, y: cy - ry }, { x: cx + rx, y: cy + ry }, { x: cx - rx, y: cy + ry }] });
+          continue;
+        }
+        if (c.kind === 'dripstone') {
+          for (let px = -hw + 12; px <= hw - 11; px += 14) for (let py = -hh + 12; py <= hh - 11; py += 14) if (Math.hypot(px, py) > 9) pillars.push({ x: cx + px, y: cy + py });
+          continue;
+        }
+      }
+      // Toxic grotto: glowing puddles.
+      if (pools && c.num > 1 && pools.bool(0.5)) {
+        const a = pools.float(0, Math.PI * 2), d = R * pools.float(0.3, 0.55);
+        if (deep(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 1.5)) water.push({ toxic: true, pts: Draw.blob(pools, cx + Math.cos(a) * d, cy + Math.sin(a) * d, R * pools.float(0.14, 0.24), 9, 0.4) });
+      }
       switch (c.kind) {
         case 'lake': case 'pond': case 'spring':
           if (opts.water !== false) water.push({ pts: Draw.blob(fr, cx, cy, R * (c.kind === 'spring' ? 0.35 : 0.6), 12, 0.35) });
@@ -473,13 +670,13 @@
       edge: { x: (edgeP.x + 0.5) * CELL, y: (edgeP.y + 0.5) * CELL, from: { x: (chambers[ent].x + 0.5) * CELL, y: (chambers[ent].y + 0.5) * CELL } },
       water, rocks, spikes, marks, webs, crystals, shrooms, fires, stones, bigTrees, huts, mounds, chasms,
     };
-    if (setting !== 'fantasy') model.theme = theme;
+    if (setting !== 'fantasy') Object.assign(model, { theme, shafts, pillars, grates, segs });
     return model;
   }
 
   // Present day and cyberpunk: what runs along the passages (rails in a
-  // mine, a lit walkway with lamps in a show cave, the water channel of a
-  // drain, cables in the undercity).
+  // mine, a paved walkway with railings and lamps in a show cave, the water
+  // channel of a drain, pipes and cables in the undercity).
   function passageLines(svg, m, pal) {
     const lines = new Svg.Batch(), lamps = new Svg.Batch();
     for (const ps of m.passages) {
@@ -494,13 +691,37 @@
       svg.path(ls, Object.assign({ stroke: pal.ink, strokeWidth: 3.6 }, round));
       svg.path(ls, Object.assign({ stroke: pal.floor, strokeWidth: 2.2 }, round));
     } else if (m.theme === 'show') {
-      svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 4, opacity: 0.35 }, round));
-      svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 1, strokeDasharray: '4 3' }, round));
+      // Railings, then the paving with its joints, and a viewing platform
+      // in every chamber.
+      const decks = new Svg.Batch();
+      for (const c of m.chambers) decks.circle((c.x + 0.5) * CELL, (c.y + 0.5) * CELL, Math.min(10, c.r * CELL * 0.45));
+      const dd = decks.toString();
+      svg.path(ls, Object.assign({ stroke: pal.ink, strokeWidth: 12.5 }, round));
+      svg.path(dd, { fill: pal.rock, stroke: pal.ink, strokeWidth: 1.2 });
+      svg.path(ls, Object.assign({ stroke: pal.rock, strokeWidth: 10.5 }, round));
+      svg.path(ls, { stroke: pal.floor, strokeWidth: 10.5, strokeDasharray: '0.7 4.3', fill: 'none' });
       svg.path(lamps.toString(), { fill: pal.accent, stroke: pal.ink, strokeWidth: 0.5 });
     } else if (m.theme === 'drain') {
-      svg.path(ls, Object.assign({ stroke: pal.water, strokeWidth: 5 }, round));
-      svg.path(ls, Object.assign({ stroke: pal.waterInk, strokeWidth: 1, strokeDasharray: '6 4', opacity: 0.8 }, round));
-    } else if (m.theme === 'undercity' || m.theme === 'den') {
+      // A sunken channel between two kerbs.
+      svg.path(ls, { stroke: pal.waterInk, strokeWidth: 11, fill: 'none' });
+      svg.path(ls, { stroke: pal.water, strokeWidth: 9, fill: 'none' });
+      svg.path(ls, { stroke: pal.waterInk, strokeWidth: 0.8, strokeDasharray: '6 4', opacity: 0.8, fill: 'none' });
+    } else if (m.theme === 'undercity') {
+      // Two pipes along one wall, a bundle of cables along the other.
+      const pipes = new Svg.Batch(), flanges = new Svg.Batch(), cables = new Svg.Batch();
+      for (const q of m.segs) {
+        const a = { x: (q.x0 + 0.5) * CELL, y: (q.y0 + 0.5) * CELL }, b = { x: (q.x1 + 0.5) * CELL, y: (q.y1 + 0.5) * CELL };
+        const u = G.norm(G.sub(b, a)), v = G.perp(u), len = G.dist(a, b);
+        for (const k of [6, 8.4]) pipes.line(G.add(a, G.scale(v, k)), G.add(b, G.scale(v, k)));
+        for (let t = 6; t < len - 3; t += 16) flanges.line(G.add(G.add(a, G.scale(u, t)), G.scale(v, 5)), G.add(G.add(a, G.scale(u, t)), G.scale(v, 9.6)));
+        cables.line(G.add(a, G.scale(v, -7)), G.add(b, G.scale(v, -7)));
+      }
+      svg.path(pipes.toString(), { stroke: pal.inkSoft, strokeWidth: 1.6, fill: 'none' });
+      svg.path(flanges.toString(), { stroke: pal.ink, strokeWidth: 0.8, fill: 'none' });
+      svg.path(cables.toString(), { stroke: pal.accent, strokeWidth: 3, opacity: 0.2, fill: 'none' });
+      svg.path(cables.toString(), { stroke: pal.accent, strokeWidth: 0.8, fill: 'none' });
+      svg.path(lamps.toString(), { fill: pal.ink, opacity: 0.9 });
+    } else if (m.theme === 'den') {
       svg.path(ls, Object.assign({ stroke: pal.accent, strokeWidth: 3, opacity: 0.2 }, round));
       svg.path(ls, Object.assign({ stroke: pal.accent, strokeWidth: 0.8 }, round));
       svg.path(lamps.toString(), { fill: pal.ink, opacity: 0.9 });
@@ -521,7 +742,12 @@
     svg.open({ clipPath: 'url(#' + clip + ')' });
 
     const shape = new Svg.Batch();
-    for (const l of m.outline) shape.smooth(G.chaikin(l.points, 2, l.closed), l.closed);
+    // Tunnels dug on a plan keep their straight walls.
+    const built = !!LATTICE[m.theme], concrete = m.theme === 'drain' || m.theme === 'undercity';
+    for (const l of m.outline) {
+      if (built) shape.poly(l.points, l.closed);
+      else shape.smooth(G.chaikin(l.points, 2, l.closed), l.closed);
+    }
     const sd = shape.toString();
     const floorClip = Carto.uid('floor');
     svg.defs('<clipPath id="' + floorClip + '"><path d="' + sd + '" clip-rule="evenodd"/></clipPath>');
@@ -531,7 +757,16 @@
       return m.dist[gx + gy * GW];
     };
 
-    if (!glade) {
+    if (concrete) {
+      // Concrete: a light poché round the walls instead of rock hatching.
+      svg.path(sd, { fill: 'none', stroke: pal.paperShade, strokeWidth: 26, strokeLinejoin: 'round' });
+      if (m.theme === 'undercity') {
+        const glow = Carto.uid('cglow');
+        svg.defs('<filter id="' + glow + '" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>');
+        svg.path(sd, { fill: 'none', stroke: pal.ink, strokeWidth: 5, opacity: 0.6, filter: 'url(#' + glow + ')' });
+      }
+      svg.path(sd, { fill: pal.floor, stroke: pal.ink, strokeWidth: 4.2, fillRule: 'evenodd', strokeLinejoin: 'miter' });
+    } else if (!glade) {
       // Rock hatching hugging the walls.
       const hatch = new Svg.Batch();
       for (let y = 0; y < H; y += 7) {
@@ -557,6 +792,19 @@
       for (let y = 0; y <= H; y += 15) grid.line({ x: 0, y }, { x: W, y });
       svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: 0.5, fill: 'none' });
     }
+    if (m.theme === 'den') {
+      // Rooms built into the smugglers' cave: a darker floor with a grid.
+      const rooms = new Svg.Batch(), grid = new Svg.Batch();
+      for (const c of m.chambers) {
+        if (!c.room) continue;
+        const x = (c.x + 0.5) * CELL, y = (c.y + 0.5) * CELL, hw = c.room.hw * CELL * 0.88, hh = c.room.hh * CELL * 0.88;
+        rooms.poly(G.rect(x, y, hw * 2, hh * 2));
+        for (let gx = x - hw + 6; gx < x + hw; gx += 6) grid.line({ x: gx, y: y - hh }, { x: gx, y: y + hh });
+        for (let gy = y - hh + 6; gy < y + hh; gy += 6) grid.line({ x: x - hw, y: gy }, { x: x + hw, y: gy });
+      }
+      svg.path(rooms.toString(), { fill: pal.paperShade });
+      svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: 0.6, fill: 'none' });
+    }
     if (m.theme && !glade) passageLines(svg, m, pal);
     if (glade) {
       // Grass tufts and the trodden paths.
@@ -573,13 +821,44 @@
     }
     // Water.
     const wb = new Svg.Batch(), wr = new Svg.Batch();
-    for (const w of m.water) { wb.smooth(w.pts, true); wr.smooth(G.scalePoly(w.pts, 0.72), true); wr.smooth(G.scalePoly(w.pts, 0.45), true); }
+    const toxic = new Svg.Batch();
+    for (const w of m.water) {
+      // Square basins in a plan; the toxic grotto's water glows.
+      if (w.rect) { wb.poly(w.pts); wr.poly(G.scalePoly(w.pts, 0.72)); wr.poly(G.scalePoly(w.pts, 0.45)); continue; }
+      if (m.theme === 'grotto') { toxic.smooth(w.pts, true); continue; }
+      wb.smooth(w.pts, true); wr.smooth(G.scalePoly(w.pts, 0.72), true); wr.smooth(G.scalePoly(w.pts, 0.45), true);
+    }
     svg.path(wb.toString(), { fill: pal.water, stroke: pal.waterInk, strokeWidth: 1 });
     svg.path(wr.toString(), { fill: 'none', stroke: pal.waterInk, strokeWidth: 0.6, opacity: 0.6 });
+    const td = toxic.toString();
+    if (td) {
+      const glow = Carto.uid('tglow');
+      svg.defs('<filter id="' + glow + '" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>');
+      svg.path(td, { fill: pal.greenInk, stroke: pal.greenInk, strokeWidth: 6, opacity: 0.55, filter: 'url(#' + glow + ')' });
+      svg.path(td, { fill: pal.greenInk, fillOpacity: 0.55, stroke: pal.greenInk, strokeWidth: 1 });
+    }
     // Chasms.
     const ch = new Svg.Batch();
     for (const c of m.chasms) ch.smooth(c, true);
     svg.path(ch.toString(), { fill: pal.ink, stroke: pal.ink, strokeWidth: 1 });
+    if (m.theme) {
+      // Shafts with their ladder, square pillars and drain grates.
+      const dark = new Svg.Batch(), lines = new Svg.Batch(), pil = new Svg.Batch(), gr = new Svg.Batch();
+      for (const q of m.shafts) {
+        dark.poly(G.rect(q.x, q.y, q.s, q.s));
+        for (const k of [-0.18, 0.18]) lines.line({ x: q.x + k * q.s, y: q.y - q.s * 0.42 }, { x: q.x + k * q.s, y: q.y + q.s * 0.42 });
+        for (let k = -0.3; k <= 0.31; k += 0.15) lines.line({ x: q.x - q.s * 0.18, y: q.y + k * q.s }, { x: q.x + q.s * 0.18, y: q.y + k * q.s });
+      }
+      for (const q of m.pillars) pil.poly(G.rect(q.x, q.y, 5, 5));
+      for (const q of m.grates) {
+        gr.poly(G.rect(q.x, q.y, q.s, q.s));
+        for (let k = -0.3; k <= 0.31; k += 0.2) gr.add('M' + Svg.num(q.x + k * q.s) + ' ' + Svg.num(q.y - q.s / 2) + 'V' + Svg.num(q.y + q.s / 2));
+      }
+      svg.path(dark.toString(), { fill: pal.ink, stroke: pal.ink, strokeWidth: 1 });
+      svg.path(lines.toString(), { stroke: pal.floor, strokeWidth: 0.7, fill: 'none' });
+      svg.path(pil.toString(), { fill: pal.inkSoft, stroke: pal.ink, strokeWidth: 0.8 });
+      svg.path(gr.toString(), { fill: pal.paperShade, stroke: pal.ink, strokeWidth: 0.7 });
+    }
     svg.close();
 
     // Furniture of the places.
