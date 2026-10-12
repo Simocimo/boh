@@ -14,7 +14,7 @@
     // Text with a halo in the paper colour so it stays readable over lines.
     label(svg, x, y, text, size, pal, o = {}) {
       svg.text(x, y, text, {
-        fontFamily: o.title ? FONT_TITLE : FONT_LABEL,
+        fontFamily: o.title ? pal.fontTitle || FONT_TITLE : pal.fontLabel || FONT_LABEL,
         fontSize: size,
         fontStyle: o.italic ? 'italic' : null,
         textAnchor: o.anchor || 'middle',

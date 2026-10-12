@@ -7,7 +7,32 @@
   const gens = [];
   const byId = {};
 
+  // Every generator gets the setting option, and works with the setting of
+  // the map in hand (Carto.Setting.current) so names, texts and links follow it.
+  const S = Carto.Setting;
+  const settingOf = (m) => (m && m.setting) || 'fantasy';
+  function withSetting(gen) {
+    if (!gen.options.some((o) => o.id === 'setting')) gen.options.unshift(S.option());
+    const wrap = (name, pick) => {
+      const fn = gen[name];
+      if (typeof fn !== 'function') return;
+      gen[name] = function (...args) {
+        const prev = S.current;
+        S.use(pick(args));
+        try {
+          const out = fn.apply(this, args);
+          if (name === 'generate' && out && typeof out === 'object') out.setting = S.current;
+          return out;
+        } finally { S.use(prev); }
+      };
+    };
+    wrap('generate', (a) => a[1] && a[1].setting);
+    for (const name of ['render', 'notes', 'inspect', 'act', 'fileName', 'saveData', 'model3d', 'heightfield']) wrap(name, (a) => settingOf(a[0]));
+    return gen;
+  }
+
   Carto.register = function (gen) {
+    withSetting(gen);
     gens.push(gen);
     byId[gen.id] = gen;
     gens.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -76,9 +101,10 @@
     }
     return '#' + s;
   }
+  // Links between maps keep the setting of the map they come from.
   Carto.linkTo = (id, seed, opts = {}) => {
     const gen = byId[id];
-    return gen ? buildHash(gen, seed, Object.assign(defaults(gen), opts)) : '#';
+    return gen ? buildHash(gen, seed, Object.assign(defaults(gen), { setting: S.current }, opts)) : '#';
   };
 
   // ------------------------------------------------------------------- DOM
@@ -90,12 +116,21 @@
     seed: 1,
     opts: {},
     model: null,
-    palette: Carto.Palettes[store.get('carto.palette')] ? store.get('carto.palette') : 'parchment',
+    palette: 'parchment',
     mapW: 100,
     mapH: 100,
     view: { cx: 50, cy: 50, z: 1 },
     svgEl: null,
   };
+
+  // Each setting remembers its own map style.
+  function paletteFor(setting) {
+    const saved = store.get('carto.palette.' + setting) || (setting === 'fantasy' ? store.get('carto.palette') : null);
+    return Carto.Palettes[saved] ? saved : S.defaultPalette(setting);
+  }
+  const curSetting = () => (state.opts && state.opts.setting) || 'fantasy';
+  // Palette object for rendering, with the setting's lettering.
+  const palOf = (id, setting) => S.style(Carto.Palettes[id], setting);
 
   function toast(html, ms = 2600) {
     const el = els.toast;
@@ -177,7 +212,8 @@
     box.href = href;
     card.querySelector('[data-open]').href = href;
     try {
-      box.innerHTML = g.render(p.model, { palette: Carto.Palettes[state.palette], paletteId: state.palette, preview: true });
+      const pid = paletteFor(p.opts.setting || 'fantasy');
+      box.innerHTML = g.render(p.model, { palette: palOf(pid, p.opts.setting), paletteId: pid, preview: true });
       const svg = box.querySelector('svg');
       svg.removeAttribute('width');
       svg.removeAttribute('height');
@@ -216,7 +252,9 @@
         hd.textContent = t(g.id + '.group.' + group);
         form.appendChild(hd);
       }
-      const label = t(g.id + '.opt.' + opt.id);
+      // Shared options (the setting) fall back to generic labels.
+      const optKey = (suffix) => (I18n.has(g.id + '.opt.' + opt.id + suffix) ? g.id + '.opt.' : 'opt.') + opt.id + suffix;
+      const label = t(optKey(''));
       const id = 'opt-' + g.id + '-' + opt.id;
       let node;
       if (opt.type === 'select') {
@@ -226,7 +264,7 @@
         for (const v of opt.values) {
           html += '<label><input type="radio" name="' + id + '" id="' + id + '-' + v + '" value="' + v + '"' +
             (state.opts[opt.id] === v ? ' checked' : '') + '><span>' +
-            Carto.Svg.esc(t(g.id + '.opt.' + opt.id + '.' + v)) + '</span></label>';
+            Carto.Svg.esc(t(optKey('.' + v))) + '</span></label>';
         }
         node.innerHTML = html + '</div>';
         node.addEventListener('change', (e) => setOption(opt.id, e.target.value));
@@ -278,7 +316,7 @@
 
   function setPalette(id) {
     state.palette = id;
-    store.set('carto.palette', id);
+    store.set('carto.palette.' + (els.gen.hidden ? 'fantasy' : curSetting()), id);
     els.palettes.querySelectorAll('.swatch').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.palette === id)));
     if (!els.gen.hidden && state.model) renderMap(true);
     if (!els.hub.hidden) renderAllPreviews(false);
@@ -286,6 +324,7 @@
 
   function setOption(id, value) {
     state.opts[id] = value;
+    if (id === 'setting') { state.palette = paletteFor(value); buildSwatches(); }
     // Options that only change the drawing do not need a new model.
     const opt = state.gen.options.find((o) => o.id === id);
     if (opt && opt.renderOnly) {
@@ -384,7 +423,7 @@
     if (!state.model) return;
     let svg;
     try {
-      svg = g.render(state.model, Object.assign({ palette: Carto.Palettes[state.palette], paletteId: state.palette }, state.opts));
+      svg = g.render(state.model, Object.assign({ palette: palOf(state.palette, curSetting()), paletteId: state.palette }, state.opts));
     } catch (err) {
       console.error(err);
       els.viewport.innerHTML = '<p class="map-error">' + Carto.Svg.esc(t('ui.error')) + '</p>';
@@ -669,7 +708,7 @@
   }
 
   function exportableSvg() {
-    const svg = state.gen.render(state.model, Object.assign({ palette: Carto.Palettes[state.palette], paletteId: state.palette, exporting: true }, state.opts));
+    const svg = state.gen.render(state.model, Object.assign({ palette: palOf(state.palette, curSetting()), paletteId: state.palette, exporting: true }, state.opts));
     return svg.replace(/^<svg([^>]*)>/, (m, a) => '<svg' + a + '><style>' + Carto.FONT_CSS + '</style>');
   }
 
@@ -765,8 +804,8 @@
         return;
       }
       const renderPng = (extra) => {
-        const o = Object.assign({ palette: Carto.Palettes.parchment, paletteId: 'parchment', exporting: true }, state.opts, extra);
-        if (!extra.bare) { o.palette = Carto.Palettes[state.palette]; o.paletteId = state.palette; }
+        const o = Object.assign({ palette: palOf('parchment', curSetting()), paletteId: 'parchment', exporting: true }, state.opts, extra);
+        if (!extra.bare) { o.palette = palOf(state.palette, curSetting()); o.paletteId = state.palette; }
         const svg = g.render(state.model, o).replace(/^<svg([^>]*)>/, (m, a) => '<svg' + a + '><style>' + Carto.FONT_CSS + '</style>');
         return svgToPng(svg, state.mapW, state.mapH);
       };
@@ -815,6 +854,7 @@
     els.gen.hidden = false;
     state.gen = r.gen;
     state.opts = r.opts;
+    state.palette = paletteFor(curSetting());
     state.seed = r.seed || Carto.randomSeed();
     // Opening a saved map keeps track of it, so later changes update the save.
     const pend = state.pendingSave;

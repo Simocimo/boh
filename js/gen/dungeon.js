@@ -1020,8 +1020,8 @@
                 const headEnd = blk.head.length;
                 const first = line.length > headEnd ? line.slice(0, headEnd) : line;
                 const rest = line.length > headEnd ? line.slice(headEnd) : '';
-                svg.raw('<text x="' + Svg.num(x) + '" y="' + Svg.num(cy) + '" font-family="' + Draw.FONT_LABEL + '" font-size="' + fs + '" fill="' + pal.label + '">' +
-                  '<tspan font-family="' + Draw.FONT_TITLE + '">' + Svg.esc(first) + '</tspan>' + Svg.esc(rest) + '</text>');
+                svg.raw('<text x="' + Svg.num(x) + '" y="' + Svg.num(cy) + '" font-family="' + (pal.fontLabel || Draw.FONT_LABEL) + '" font-size="' + fs + '" fill="' + pal.label + '">' +
+                  '<tspan font-family="' + (pal.fontTitle || Draw.FONT_TITLE) + '">' + Svg.esc(first) + '</tspan>' + Svg.esc(rest) + '</text>');
               } else {
                 Draw.label(svg, x, cy, line, fs, pal, { anchor: 'start', halo: false, baseline: 'auto' });
               }

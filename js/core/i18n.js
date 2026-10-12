@@ -46,7 +46,7 @@
   I18n.add({
     it: {
       'brand': 'Il Cartografo Errante',
-      'tagline': 'Generatori di mappe fantasy. Ogni mappa nasce da un seme: cambialo e ottieni un luogo nuovo, sempre riproducibile.',
+      'tagline': 'Generatori di mappe fantasy, moderne e cyberpunk. Ogni mappa nasce da un seme: cambialo e ottieni un luogo nuovo, sempre riproducibile.',
       'hub.pick': 'Che cosa disegniamo oggi?',
       'hub.open': 'Apri',
       'hub.reroll': 'Altra anteprima',
@@ -87,6 +87,8 @@
       'palette.ink': 'Inchiostro',
       'palette.night': 'Notte',
       'palette.blueprint': 'Cianografia',
+      'palette.modern': 'Mappa moderna',
+      'palette.neon': 'Neon',
       'opt.on': 'Sì',
       'opt.off': 'No',
       'opt.labels': 'Etichette',
@@ -95,7 +97,7 @@
     },
     en: {
       'brand': 'The Wandering Cartographer',
-      'tagline': 'Fantasy map generators. Every map grows from a seed: change it and you get a new place, always reproducible.',
+      'tagline': 'Fantasy, present-day and cyberpunk map generators. Every map grows from a seed: change it and you get a new place, always reproducible.',
       'hub.pick': 'What shall we draw today?',
       'hub.open': 'Open',
       'hub.reroll': 'Another preview',
@@ -136,6 +138,8 @@
       'palette.ink': 'Ink',
       'palette.night': 'Night',
       'palette.blueprint': 'Blueprint',
+      'palette.modern': 'Modern map',
+      'palette.neon': 'Neon',
       'opt.on': 'Yes',
       'opt.off': 'No',
       'opt.labels': 'Labels',

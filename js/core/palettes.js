@@ -35,7 +35,25 @@
       road: '#22577f', sand: '#2a5e8a', floor: '#235a86', grid: '#3b6f9c',
       hatch: '#cfe2f3', label: '#ffffff', accent: '#ffd479', rock: '#2b6391', mountain: '#265c88',
     },
+    // Present day: a clean road-map look.
+    modern: {
+      paper: '#f2f1ec', paperShade: '#e6e4dc', ink: '#3d4247', inkSoft: '#8b9096',
+      building: '#d9d5cc', buildingSpecial: '#c9b9a6', roof: '#cfcac0',
+      water: '#a9cfe6', waterInk: '#5b93b5', green: '#cfe3b8', greenInk: '#7fa463',
+      tree: '#b5d39a', field: '#ecebd9', fieldAlt: '#e3e6cf', fieldInk: '#c2c2a6',
+      road: '#ffffff', sand: '#efe6c8', floor: '#fbfbf8', grid: '#e1e1dc',
+      hatch: '#6b7177', label: '#262a2e', accent: '#d9534f', rock: '#dcdad3', mountain: '#e9e4d6',
+    },
+    // Cyberpunk: dark streets and neon.
+    neon: {
+      paper: '#0d1020', paperShade: '#141936', ink: '#3ff0ff', inkSoft: '#3a6f8f',
+      building: '#1b2347', buildingSpecial: '#3a1d4f', roof: '#222c58',
+      water: '#060a18', waterInk: '#1f7fa8', green: '#12302c', greenInk: '#2fbf8f',
+      tree: '#163a33', field: '#121831', fieldAlt: '#151c38', fieldInk: '#2a3766',
+      road: '#232b52', sand: '#1a1f3a', floor: '#151a33', grid: '#24306a',
+      hatch: '#2d3f80', label: '#f2f7ff', accent: '#ff3fa4', rock: '#1d2445', mountain: '#202a52',
+    },
   };
 
-  Carto.PaletteOrder = ['parchment', 'ink', 'night', 'blueprint'];
+  Carto.PaletteOrder = ['parchment', 'ink', 'night', 'blueprint', 'modern', 'neon'];
 })(window.Carto = window.Carto || {});
