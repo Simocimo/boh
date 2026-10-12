@@ -29,6 +29,46 @@
       'village.sub.hamlet': 'casale',
       'village.sub.village': 'villaggio',
       'village.sub.large': 'paese',
+      // Present day (2026).
+      'gen.village.desc@modern': "Paesi di campagna di oggi: chiesa, bar, municipio, distributore, fermata dell'autobus, campo sportivo e campi.",
+      'village.opt.size.hamlet@modern': 'Frazione',
+      'village.opt.size.village@modern': 'Paese',
+      'village.opt.size.large@modern': 'Capoluogo',
+      'village.opt.water.pond@modern': 'Laghetto',
+      'village.temple@modern': 'Chiesa',
+      'village.inn@modern': 'Bar',
+      'village.mill@modern': 'Vecchio mulino',
+      'village.well@modern': 'Fontana',
+      'village.townhall': 'Municipio',
+      'village.fuel': 'Distributore',
+      'village.bus': "Fermata dell'autobus",
+      'village.pitch': 'Campo sportivo',
+      'village.mayor': 'Sindaco',
+      'village.sub.hamlet@modern': 'frazione',
+      'village.sub.village@modern': 'paese',
+      'village.sub.large@modern': 'capoluogo di comune',
+      // Cyberpunk.
+      'gen.village.desc@cyber': 'Insediamenti di frontiera e baraccopoli di recuperatori: depuratore, sfasciacarrozze, campo solare e piattaforma per droni.',
+      'village.opt.size.hamlet@cyber': 'Accampamento',
+      'village.opt.size.village@cyber': 'Insediamento',
+      'village.opt.size.large@cyber': 'Città di frontiera',
+      'village.opt.water.stream@cyber': 'Canale',
+      'village.opt.water.pond@cyber': 'Pozza tossica',
+      'village.opt.forest@cyber': 'Boscaglia',
+      'village.opt.fields@cyber': 'Orti e serre',
+      'village.temple@cyber': 'Santuario della Rete',
+      'village.inn@cyber': 'Bettola',
+      'village.mill@cyber': 'Turbina idroelettrica',
+      'village.well@cyber': "Depuratore d'acqua",
+      'village.townhall@cyber': 'Clinica clandestina',
+      'village.fuel@cyber': 'Sfasciacarrozze',
+      'village.bus@cyber': 'Piattaforma per droni',
+      'village.pitch@cyber': 'Campo solare',
+      'village.mayor@cyber': 'Capobanda',
+      'village.houses@cyber': 'Baracche',
+      'village.sub.hamlet@cyber': 'accampamento',
+      'village.sub.village@cyber': 'insediamento di recuperatori',
+      'village.sub.large@cyber': 'città di frontiera',
     },
     en: {
       'gen.village.name': 'Village',
@@ -53,6 +93,41 @@
       'village.sub.hamlet': 'hamlet',
       'village.sub.village': 'village',
       'village.sub.large': 'large village',
+      // Present day (2026).
+      'gen.village.desc@modern': 'Present-day country villages: church, café, town hall, petrol station, bus stop, sports ground and fields.',
+      'village.opt.size.large@modern': 'Small town',
+      'village.temple@modern': 'Church',
+      'village.inn@modern': 'Café',
+      'village.mill@modern': 'Old mill',
+      'village.well@modern': 'Fountain',
+      'village.townhall': 'Town hall',
+      'village.fuel': 'Petrol station',
+      'village.bus': 'Bus stop',
+      'village.pitch': 'Sports ground',
+      'village.mayor': 'Mayor',
+      'village.sub.large@modern': 'small town',
+      // Cyberpunk.
+      'gen.village.desc@cyber': 'Frontier towns and scavenger shantytowns: water purifier, chop shop, solar farm and drone pad.',
+      'village.opt.size.hamlet@cyber': 'Camp',
+      'village.opt.size.village@cyber': 'Settlement',
+      'village.opt.size.large@cyber': 'Frontier town',
+      'village.opt.water.stream@cyber': 'Channel',
+      'village.opt.water.pond@cyber': 'Toxic pool',
+      'village.opt.forest@cyber': 'Scrubland',
+      'village.opt.fields@cyber': 'Plots and greenhouses',
+      'village.temple@cyber': 'Net shrine',
+      'village.inn@cyber': 'Dive bar',
+      'village.mill@cyber': 'Water turbine',
+      'village.well@cyber': 'Water purifier',
+      'village.townhall@cyber': 'Back-alley clinic',
+      'village.fuel@cyber': 'Chop shop',
+      'village.bus@cyber': 'Drone pad',
+      'village.pitch@cyber': 'Solar farm',
+      'village.mayor@cyber': 'Gang boss',
+      'village.houses@cyber': 'Shacks',
+      'village.sub.hamlet@cyber': 'camp',
+      'village.sub.village@cyber': 'scavenger settlement',
+      'village.sub.large@cyber': 'frontier town',
     },
   });
 
@@ -229,6 +304,43 @@
       }
     }
 
+    // Present day and cyberpunk, from their own stream so fantasy maps never change:
+    // town hall (clinic), bus stop (drone pad), petrol station (chop shop) and
+    // sports ground (solar farm).
+    const setting = Carto.Setting.current, fan = setting === 'fantasy';
+    const extra = {};
+    if (!fan) {
+      const sr = rng.fork('setting');
+      const mark = (h, kind, center, dy = 0) => { if (h) landmarks.push({ key: 'village.' + kind, x: center.x, y: center.y + dy }); return h; };
+      for (let k = 0; k < 14; k++) {
+        const off = square.r + 7 + k * 2.5;
+        const center = G.add(G.add(square, G.scale(nrm, -off)), G.scale(mainAt.dir, -18 - (k % 2 ? 1 : -1) * k * 3));
+        if (mark(place(center, mainAng, 14, 10, 'townhall'), 'townhall', center)) break;
+      }
+      const stop = setting === 'cyber' ? 11 : 2.4;
+      for (let k = 0; k < 16; k++) {
+        const side = k % 2 ? 1 : -1;
+        const at = closestOnLine(main, G.add(square, G.scale(mainAt.dir, side * (square.r + 14 + k * 4))));
+        const center = G.add(at.p, G.scale(G.perp(at.dir), side * (3.5 + 1.5 + stop / 2)));
+        if (mark(place(center, Math.atan2(at.dir.y, at.dir.x), stop === 11 ? 11 : 5.5, stop, 'bus'), 'bus', center)) break;
+      }
+      const start = sr.int(0, main.length - 1);
+      for (let k = 0; k < main.length; k++) {
+        const i = (start + k) % main.length;
+        const dc = G.dist(main[i], c);
+        if (dc < cfg.R * 0.8 || dc > cfg.R * 1.25 || i < 1 || i >= main.length - 1) continue;
+        const dir = G.norm(G.sub(main[i + 1], main[i - 1])), side = sr.sign();
+        const center = G.add(main[i], G.scale(G.perp(dir), side * (3.5 + 2 + 6)));
+        if (mark(place(center, Math.atan2(dir.y, dir.x), 17, 12, 'fuel'), 'fuel', center)) break;
+      }
+      const [pw, pd] = setting === 'cyber' ? [58, 40] : cfg.R < 90 ? [42, 27] : [58, 37];
+      for (let k = 0; k < 120; k++) {
+        const center = G.add(c, G.fromAngle(sr.float(0, Math.PI * 2), cfg.R * sr.float(0.9, 1.5)));
+        if (mark(place(center, sr.float(0, Math.PI), pw, pd, 'pitch'), 'pitch', center, -11)) break;
+      }
+      extra.mayor = Carto.Names.person(sr);
+    }
+
     // Mill on the stream, close to the village.
     let mill = null;
     if (stream) {
@@ -369,14 +481,21 @@
     }
 
     const name = opts.name || Carto.Names.place(rng.fork('name'));
-    return {
+    const model = {
       seed, name, size: opts.size, c, roads, stream, pond, bridges, square, houses, mill, fields, woods, trees, landmarks,
       population: Math.round(houses.filter((h) => h.kind === 'house').length * 4.6 / 5) * 5,
     };
+    if (!fan) {
+      // Smaller households today; shacks crammed full on the frontier.
+      model.population = Math.round(houses.filter((h) => h.kind === 'house').length * (setting === 'modern' ? 2.4 : 7) / 5) * 5;
+      model.extra = extra;
+    }
+    return model;
   }
 
   function render(m, o) {
     const pal = o.palette;
+    const setting = Carto.Setting.current, fan = setting === 'fantasy', cyber = setting === 'cyber';
     const svg = new Svg(S, S);
     const clip = Carto.uid('vclip');
     svg.defs('<clipPath id="' + clip + '"><rect x="0" y="0" width="' + S + '" height="' + S + '"/></clipPath>');
@@ -419,23 +538,63 @@
         });
       }
     }
+    // Present day: a dashed centre line on the through road.
+    if (setting === 'modern') {
+      for (const r of m.roads) if (r.kind === 'main') svg.path(Svg.smooth(r.pts, false), { fill: 'none', stroke: pal.inkSoft, strokeWidth: 0.5, strokeDasharray: '4 4' });
+    }
     svg.circle(m.square.x, m.square.y, m.square.r, { fill: pal.road, stroke: 'none' });
     const bridges = new Svg.Batch();
     for (const b of m.bridges) bridges.poly(G.rect(b.p.x, b.p.y, b.len, b.w + 2, Math.atan2(b.dir.y, b.dir.x)));
     svg.path(bridges.toString(), { fill: pal.road, stroke: pal.ink, strokeWidth: 0.9 });
 
-    // Well.
-    svg.circle(m.square.x, m.square.y, 2.6, { fill: pal.water, stroke: pal.ink, strokeWidth: 1 });
+    // Well (a water purifier tank in cyberpunk).
+    if (cyber) svg.poly(G.rect(m.square.x, m.square.y, 6, 6, 0), { fill: pal.water, stroke: pal.accent, strokeWidth: 1.2 });
+    else svg.circle(m.square.x, m.square.y, 2.6, { fill: pal.water, stroke: pal.ink, strokeWidth: 1 });
 
-    // Mill wheel.
+    // Mill wheel (a turbine in cyberpunk).
     if (m.mill) {
       const r = G.rect(m.mill.x, m.mill.y, 9, 2.6, m.mill.ang);
-      svg.poly(r, { fill: pal.buildingSpecial, stroke: pal.ink, strokeWidth: 0.8 });
+      svg.poly(r, { fill: cyber ? pal.accent : pal.buildingSpecial, stroke: pal.ink, strokeWidth: 0.8 });
     }
+
+    // Present day and cyberpunk grounds: sports ground or solar farm, petrol
+    // station forecourt, drone pad.
+    if (!fan) {
+      for (const h of m.houses) {
+        const u = G.fromAngle(h.ang), ctr = G.centroid(h.box);
+        if (h.kind === 'pitch' && cyber) {
+          svg.poly(h.box, { fill: pal.paperShade, stroke: pal.accent, strokeWidth: 0.8 });
+          const rows = new Svg.Batch();
+          for (const sg of G.stripes(G.insetConvex(h.box, 2.5), u, 4.5, 0.5)) rows.line(sg[0], sg[1]);
+          svg.path(rows.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 2.2, opacity: 0.75 });
+        } else if (h.kind === 'pitch') {
+          svg.poly(h.box, { fill: pal.green, stroke: pal.greenInk, strokeWidth: 0.8 });
+          const lines = { fill: 'none', stroke: pal.road, strokeWidth: 0.8 };
+          svg.poly(G.scalePoly(h.box, 0.88), lines);
+          const v = G.scale(G.perp(u), h.d * 0.44);
+          svg.poly([G.add(ctr, v), G.sub(ctr, v)], lines, false);
+          svg.circle(ctr.x, ctr.y, h.d * 0.15, lines);
+        } else if (h.kind === 'fuel' && !cyber) {
+          svg.poly(h.box, { fill: pal.road, stroke: pal.inkSoft, strokeWidth: 0.7 });
+          svg.poly(G.rect(ctr.x - u.x * 2, ctr.y - u.y * 2, h.w * 0.5, h.d * 0.55, h.ang), { fill: pal.accent, stroke: pal.ink, strokeWidth: 0.7, opacity: 0.9 });
+          const k = G.add(ctr, G.scale(u, h.w / 2 - 2.6));
+          svg.poly(G.rect(k.x, k.y, 4, h.d * 0.6, h.ang), { fill: pal.buildingSpecial, stroke: pal.ink, strokeWidth: 0.8 });
+        } else if (h.kind === 'bus' && cyber) {
+          svg.circle(ctr.x, ctr.y, 5, { fill: pal.paperShade, stroke: pal.accent, strokeWidth: 1.2 });
+          const hh = new Svg.Batch();
+          hh.line({ x: ctr.x - 1.8, y: ctr.y - 2.4 }, { x: ctr.x - 1.8, y: ctr.y + 2.4 });
+          hh.line({ x: ctr.x + 1.8, y: ctr.y - 2.4 }, { x: ctr.x + 1.8, y: ctr.y + 2.4 });
+          hh.line({ x: ctr.x - 1.8, y: ctr.y }, { x: ctr.x + 1.8, y: ctr.y });
+          svg.path(hh.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 0.9 });
+        }
+      }
+    }
+    const grounds = (h) => !fan && (h.kind === 'pitch' || (h.kind === 'fuel' && !cyber) || (h.kind === 'bus' && cyber));
 
     // Houses with roof ridges.
     const hb = new Svg.Batch(), sb = new Svg.Batch(), ridges = new Svg.Batch();
     for (const h of m.houses) {
+      if (grounds(h)) continue;
       (h.kind === 'house' ? hb : sb).poly(h.poly);
       const u = G.fromAngle(h.ang);
       const ctr = G.centroid(h.box);
@@ -461,16 +620,16 @@
     if (!o.preview) {
       const taken = [];
       if (o.labels !== false) {
-        Draw.title(svg, S / 2, 40, m.name, 26, pal, t('village.sub.' + (m.size || 'village')));
+        Draw.title(svg, S / 2, 40, pal.titleCase === 'upper' ? m.name.toUpperCase() : m.name, 26, pal, t('village.sub.' + (m.size || 'village')));
         taken.push(Draw.textBox(S / 2, 40, m.name, 26, { title: true }), Draw.textBox(S / 2, 62, 'x'.repeat(14), 11, {}));
-        const labels = m.landmarks.map((l) => ({ x: l.x, y: l.y + 11, text: t(l.key), size: 10, italic: true }));
+        const labels = m.landmarks.map((l) => ({ x: l.x, y: l.y + 11, text: t(l.key), size: fan ? 10 : 9, italic: true }));
         Draw.placeLabels(svg, labels, pal, taken, { x0: 10, y0: 10, x1: S - 10, y1: S - 40 });
       }
       Draw.frame(svg, S, S, pal, 6);
       Draw.compass(svg, S - 36, S - 42, 17, pal);
       Draw.scaleBar(svg, 22, S - 30, 50, 50, 'm', pal);
     } else {
-      Draw.label(svg, S / 2, 40, m.name, 30, pal, { title: true, haloWidth: 0.35 });
+      Draw.label(svg, S / 2, 40, pal.titleCase === 'upper' ? m.name.toUpperCase() : m.name, 30, pal, { title: true, haloWidth: 0.35 });
     }
     return svg.toString();
   }
@@ -480,7 +639,8 @@
     const n = m.houses.filter((h) => h.kind === 'house').length;
     let h = '<h3>' + esc(m.name) + '</h3><dl>' +
       '<dt>' + esc(t('village.population')) + '</dt><dd>' + m.population + '</dd>' +
-      '<dt>' + esc(t('village.houses')) + '</dt><dd>' + n + '</dd></dl><ul>';
+      '<dt>' + esc(t('village.houses')) + '</dt><dd>' + n + '</dd>' +
+      (m.extra && m.extra.mayor ? '<dt>' + esc(t('village.mayor')) + '</dt><dd>' + esc(m.extra.mayor) + '</dd>' : '') + '</dl><ul>';
     for (const l of m.landmarks) h += '<li>' + esc(t(l.key)) + '</li>';
     h += '<li>' + esc(t('village.well')) + '</li>';
     return h + '</ul>';
