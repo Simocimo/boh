@@ -250,6 +250,7 @@
       'world.opt.towns@modern': 'Città', 'world.opt.towns@cyber': 'Sprawl',
       'world.opt.view.religions@cyber': 'Culti',
       'world.opt.view.provinces@cyber': 'Distretti',
+      'world.opt.relief@modern': 'Rilievo ombreggiato', 'world.opt.relief@cyber': 'Curve di livello',
       'world.opt.roads@modern': 'Strade e traghetti', 'world.opt.roads@cyber': 'Reti di trasporto',
       'world.opt.burgs@modern': 'Città', 'world.opt.burgs@cyber': 'Sprawl e arcologie',
       'world.opt.markers@modern': 'Punti d’interesse', 'world.opt.markers@cyber': 'Punti caldi',
@@ -355,6 +356,7 @@
       'world.opt.towns@modern': 'Cities', 'world.opt.towns@cyber': 'Sprawls',
       'world.opt.view.religions@cyber': 'Cults',
       'world.opt.view.provinces@cyber': 'Districts',
+      'world.opt.relief@modern': 'Shaded relief', 'world.opt.relief@cyber': 'Contour lines',
       'world.opt.roads@modern': 'Roads and ferries', 'world.opt.roads@cyber': 'Transport network',
       'world.opt.burgs@modern': 'Cities', 'world.opt.burgs@cyber': 'Sprawls and arcologies',
       'world.opt.markers@cyber': 'Hot spots',
@@ -672,6 +674,127 @@
     return '#ffffff';
   }
 
+  // ------------------------------------------------------------------ present-day relief
+
+  // Land heights on a regular grid (a node every FCELL map units): 0 at sea
+  // level, 1 on the highest possible summit. Kept per model.
+  const FCELL = 4;
+  const FIELD = new WeakMap();
+  function heightGrid(m) {
+    let g = FIELD.get(m);
+    if (g) return g;
+    const cols = Math.ceil(m.W / FCELL) + 1, rows = Math.ceil(m.H / FCELL) + 1;
+    const { data } = Carto.Relief3D.fromPoints(m.grid.x, m.grid.y, m.h, m.grid.n, 1 / FCELL, 1 / FCELL, cols, rows, m.grid.find);
+    const raw = Carto.Contour.blur(data, cols, rows, 1, 2);
+    const f = Float32Array.from(raw, (v) => Math.max(0, (v - m.SEA) / (100 - m.SEA)));
+    g = { f, raw, cols, rows };
+    FIELD.set(m, g);
+    return g;
+  }
+  // Relative height of an altitude in metres (world.js: elevation from h).
+  const levelOf = (m, z) => (18 + 82 * Math.pow(z / 5200, 1 / 1.9) - m.SEA) / (100 - m.SEA);
+  const FOREST = ['temperateDeciduous', 'tropicalSeasonal', 'tropicalRainforest', 'temperateRainforest', 'taiga'];
+
+  /* Present day: hillshade lit from the north-west, contour lines and flat
+     woods instead of the drawn mountains and trees. Cyberpunk: glowing
+     isolines and hatched toxic land. Drawn inside the land clip. */
+  function presentRelief(svg, m, o, pal, view) {
+    const T = Carto.Terrain, cyber = Carto.Setting.current === 'cyber';
+    const dark = T.luma(pal.paper) < 0.5;
+    const { f, cols, rows } = heightGrid(m);
+    const grid = m.grid;
+    if (view !== 'biomes' && view !== 'heightmap') {
+      const wood = new Set(FOREST.map((id) => World.BIOMES.findIndex((b) => b.id === id)));
+      const isWood = (i) => !m.isWater(i) && wood.has(m.biome[i]);
+      const loops = regionLoops(grid, (i) => (isWood(i) ? 1 : 0), (v) => v === 1).get(1) || [];
+      const b = new Svg.Batch();
+      for (const l of loops) b.smooth(G.chaikin(loopPts(grid, l), 1, true), true);
+      if (cyber) {
+        // Dead forests and swamps: toxic land, hatched.
+        const tox = dark ? '#b6f23a' : pal.greenInk;
+        const wet = World.BIOMES.findIndex((q) => q.id === 'wetland');
+        const sw = regionLoops(grid, (i) => (!m.isWater(i) && m.biome[i] === wet ? 1 : 0), (v) => v === 1).get(1) || [];
+        const sb = new Svg.Batch();
+        for (const l of sw) sb.smooth(G.chaikin(loopPts(grid, l), 1, true), true);
+        svg.path(b.toString(), { fill: tox, opacity: 0.06, fillRule: 'evenodd' });
+        svg.path(sb.toString(), { fill: T.hatchPattern(svg, tox, 4, 0.7, 45), opacity: 0.55, fillRule: 'evenodd' });
+        svg.path(sb.toString(), { fill: 'none', stroke: tox, strokeWidth: 0.6, strokeDasharray: '3 2', opacity: 0.6 });
+      } else svg.path(b.toString(), { fill: dark ? pal.green : T.mix(pal.tree, '#6f9f55', 0.3), opacity: dark ? 0.45 : 0.35, fillRule: 'evenodd' });
+    }
+    T.hillshade(svg, f, cols, rows, FCELL, 0, 0, cyber ? { z: 80, dark: '#000000', opacity: dark ? 0.16 : 0.07, blur: 1.6 } :
+      { z: 80, dark: dark ? '#000000' : '#3d3a52', light: dark ? null : '#ffffff', opacity: dark ? 0.16 : view === 'heightmap' ? 0.14 : 0.09, blur: 1.6 });
+    const levels = cyber ? [250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500] : [200, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500];
+    const lines = T.contours(f, cols, rows, FCELL, 0, 0, levels.map((z) => levelOf(m, z)));
+    if (cyber) {
+      const high = lines.filter((l) => l.level > 0.4).map((l) => l.d).join('');
+      svg.path(high, { fill: 'none', stroke: pal.ink, strokeWidth: 2, opacity: 0.3, filter: T.glowFilter(svg, 1.5) });
+      lines.forEach((l, k) => svg.path(l.d, { fill: 'none', stroke: pal.ink, strokeWidth: levels[k] % 1000 ? 0.45 : 0.8, opacity: Math.min(1, 0.12 + 0.95 * Math.pow(k / (levels.length - 1), 1.2)) }));
+    } else {
+      const ink = dark ? pal.inkSoft : '#9a7a58';
+      svg.path(lines.filter((_, k) => levels[k] % 1000).map((l) => l.d).join(''), { fill: 'none', stroke: ink, strokeWidth: 0.4, opacity: 0.5 });
+      svg.path(lines.filter((_, k) => !(levels[k] % 1000)).map((l) => l.d).join(''), { fill: 'none', stroke: ink, strokeWidth: 0.75, opacity: 0.65 });
+    }
+  }
+
+  // Built-up areas of the capitals and big cities, and the cyberpunk dead
+  // zones around toxic sites, crash sites and war zones.
+  function presentZones(svg, m, o, pal) {
+    const T = Carto.Terrain, cyber = Carto.Setting.current === 'cyber';
+    if (cyber && o.markers !== false && !o.preview) {
+      const zb = new Svg.Batch();
+      for (const mk of m.markers) if (mk.type === 'springs' || mk.type === 'crashed' || mk.type === 'battlefield') zb.smooth(Draw.blob(new Carto.Random(mk.seed + ':zone'), mk.x, mk.y, 18, 10, 0.35), true);
+      const d = zb.toString();
+      svg.path(d, { fill: pal.accent, opacity: 0.1 });
+      svg.path(d, { fill: T.hatchPattern(svg, pal.accent, 4, 0.8, -45), opacity: 0.5 });
+      svg.path(d, { fill: 'none', stroke: pal.accent, strokeWidth: 0.7, strokeDasharray: '3 2', opacity: 0.8 });
+    }
+    if (o.burgs === false) return;
+    const big = new Svg.Batch();
+    for (const b of m.burgs) {
+      if (!b) continue;
+      const k = basePop(m, b);
+      if (!b.capital && k < 10) continue;
+      T.urbanBlob(big, new Carto.Random(b.seed + ':urban'), b.x, b.y, Math.min(13, 2.5 + Math.sqrt(k) * (cyber ? 1.15 : 0.95)));
+    }
+    const d = big.toString();
+    if (cyber) {
+      svg.path(d, { fill: pal.accent, opacity: 0.6, filter: T.glowFilter(svg, 2.5) });
+      svg.path(d, { fill: T.mix(pal.paper, pal.accent, 0.4), stroke: pal.accent, strokeWidth: 0.6 });
+    } else {
+      const dark = T.luma(pal.paper) < 0.5;
+      const fill = dark ? T.mix(pal.paper, pal.building, 0.8) : T.mix(pal.building, '#e9dcc4', 0.35);
+      svg.path(d, { fill, stroke: T.mix(fill, pal.ink, 0.35), strokeWidth: 0.5, opacity: 0.95 });
+    }
+  }
+
+  // Road-atlas town symbols: a square for capitals, rings and dots for the
+  // rest; neon diamonds and nodes in the cyberpunk future.
+  function presentBurgs(svg, m, o, pal, taken) {
+    const cyber = Carto.Setting.current === 'cyber';
+    const caps = new Svg.Batch(), big = new Svg.Batch(), small = new Svg.Batch(), dots = new Svg.Batch();
+    const s = o.preview ? 1.3 : 1;
+    for (const b of m.burgs) {
+      if (!b) continue;
+      if (b.capital) {
+        if (cyber) caps.poly(G.rect(b.x, b.y, 5.6 * s, 5.6 * s, Math.PI / 4));
+        else caps.poly(G.rect(b.x, b.y, 6 * s, 6 * s, 0));
+        dots.poly(G.rect(b.x, b.y, 2 * s, 2 * s, cyber ? Math.PI / 4 : 0));
+      } else if (basePop(m, b) > 10) { big.circle(b.x, b.y, 2.5 * s); dots.circle(b.x, b.y, 0.9 * s); }
+      else small.circle(b.x, b.y, 1.5 * s);
+      taken.push({ x0: b.x - 4, x1: b.x + 4, y0: b.y - 4, y1: b.y + 4 });
+    }
+    if (cyber) {
+      svg.path(caps.toString(), { fill: pal.accent, opacity: 0.7, filter: Carto.Terrain.glowFilter(svg, 2) });
+      svg.path(caps.toString(), { fill: pal.paper, stroke: pal.accent, strokeWidth: 1.1 });
+      svg.path(big.toString() + small.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 0.8 });
+      svg.path(dots.toString(), { fill: pal.accent });
+    } else {
+      svg.path(small.toString(), { fill: pal.ink });
+      svg.path(caps.toString() + big.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 1 });
+      svg.path(dots.toString(), { fill: pal.ink });
+    }
+  }
+
   function render(m, o) {
     const pal = o.palette;
     const grid = m.grid, n = grid.n, W = m.W, H = m.H;
@@ -687,7 +810,14 @@
     const fillOpacity = o.paletteId === 'ink' ? 0.3 : o.paletteId === 'night' || o.paletteId === 'blueprint' ? 0.38 : o.paletteId === 'neon' ? 0.3 : 0.46;
 
     // Ocean depth in the relief view, ripples along the shore otherwise.
-    if (view === 'heightmap') {
+    if (view === 'heightmap' && !fantasy() && !o.bare) {
+      // Present day and cyberpunk: smooth depth tints.
+      const { raw, cols, rows } = heightGrid(m);
+      const deep = Carto.Setting.current === 'cyber' ? pal.water : ramp(2);
+      svg.rect(0, 0, W, H, { fill: deep });
+      [6, 10, 14, 17.5].forEach((lv, k) => svg.path(Carto.Terrain.smoothRings(Carto.Contour.trace(raw, cols, rows, lv, FCELL, 0, 0)),
+        { fill: Carto.Terrain.mix(deep, Carto.Setting.current === 'cyber' ? pal.ink : ramp(19), (k + 1) * (Carto.Setting.current === 'cyber' ? 0.01 : 0.2)), fillRule: 'evenodd' }));
+    } else if (view === 'heightmap') {
       const depth = regionLoops(grid, (i) => (m.h[i] < 20 && !m.lake[i] ? Math.min(3, Math.floor(m.h[i] / 5)) : -1), (v) => v >= 0);
       for (const [v, loops] of depth) {
         const b = new Svg.Batch();
@@ -697,7 +827,17 @@
     }
     const landLoops = regionLoops(grid, (i) => (water(i) && !m.lake[i] ? 0 : 1), (v) => v === 1).get(1) || [];
     const landD = (() => { const b = new Svg.Batch(); for (const l of landLoops) b.smooth(G.chaikin(loopPts(grid, l), 1, true), true); return b.toString(); })();
-    if (view !== 'heightmap') {
+    if (view !== 'heightmap' && !fantasy() && Carto.Setting.current === 'modern' && !o.bare) {
+      // Present day: the sea pales towards the shore.
+      const T = Carto.Terrain;
+      svg.rect(0, 0, W, H, { fill: T.mix(pal.water, pal.waterInk, 0.22) });
+      for (const [k, s] of [[3, 0.14], [2, 0.08], [1, 0.03]]) {
+        const loops = regionLoops(grid, (i) => (!water(i) || (m.coast[i] < 0 && m.coast[i] >= -k) ? 1 : 0), (v) => v === 1).get(1) || [];
+        const b = new Svg.Batch();
+        for (const l of loops) b.smooth(G.chaikin(loopPts(grid, l), 1, true), true);
+        svg.path(b.toString(), { fill: T.mix(pal.water, pal.waterInk, s), fillRule: 'evenodd' });
+      }
+    } else if (view !== 'heightmap') {
       for (const [k, op] of [[3, 0.12], [2, 0.22], [1, 0.4]]) {
         const loops = regionLoops(grid, (i) => (m.coast[i] >= -k || (!water(i)) ? 1 : 0), (v) => v === 1).get(1) || [];
         const b = new Svg.Batch();
@@ -726,7 +866,16 @@
     else if (view === 'cultures') fillRegions((i) => m.culture[i], (v) => m.cultures[v].color, fillOpacity);
     else if (view === 'religions') fillRegions((i) => m.religion[i], (v) => m.religions[v].color, fillOpacity);
     else if (view === 'biomes') fillRegions((i) => (water(i) ? 0 : m.biome[i]), (v) => World.BIOMES[v].color, parchment ? 0.85 : 0.55);
-    else if (view === 'heightmap') fillRegions((i) => (water(i) ? 0 : 1 + Math.min(15, Math.floor((m.h[i] - 20) / 5))), (v) => ramp(20 + (v - 1) * 5 + 2.5), 1);
+    else if (view === 'heightmap' && (fantasy() || o.bare)) fillRegions((i) => (water(i) ? 0 : 1 + Math.min(15, Math.floor((m.h[i] - 20) / 5))), (v) => ramp(20 + (v - 1) * 5 + 2.5), 1);
+    if (!fantasy() && !o.bare) {
+      // Present day and cyberpunk: smooth hypsometric tints, shaded relief.
+      if (view === 'heightmap') {
+        const { f, cols, rows } = heightGrid(m);
+        Carto.Terrain.tints(svg, f, cols, rows, FCELL, 0, 0, Carto.Terrain.hypso(pal, Carto.Setting.current), 16);
+      }
+      if (o.relief !== false) presentRelief(svg, m, o, pal, view);
+      presentZones(svg, m, o, pal);
+    }
     svg.close();
 
     // Lakes.
@@ -759,13 +908,25 @@
         const pchains = borderChains(grid, (i) => m.province[i], (a, b, i, j) => a && b && m.state[i] === m.state[j]);
         const pb = new Svg.Batch();
         for (const ch of pchains) pb.poly(G.chaikin(loopPts(grid, ch), 1, false), false);
-        svg.path(pb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.6, strokeDasharray: '2 2', opacity: 0.55 });
+        if (fantasy() || o.bare) svg.path(pb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.6, strokeDasharray: '2 2', opacity: 0.55 });
+        else if (Carto.Setting.current === 'modern') svg.path(pb.toString(), { fill: 'none', stroke: pal.inkSoft, strokeWidth: 0.5, strokeDasharray: '3 2', opacity: 0.9 });
+        else svg.path(pb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.5, strokeDasharray: '1 2.5', opacity: 0.6, strokeLinecap: 'round' });
       }
       const chains = borderChains(grid, (i) => m.state[i], (a, b, i, j) => !water(i) && !water(j));
       const sb = new Svg.Batch();
       for (const ch of chains) sb.poly(G.chaikin(loopPts(grid, ch), 1, false), false);
-      svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 2.6, opacity: 0.18, strokeLinejoin: 'round' });
-      svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 1, strokeDasharray: '5 2 1 2', opacity: 0.8, strokeLinejoin: 'round' });
+      if (fantasy() || o.bare) {
+        svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 2.6, opacity: 0.18, strokeLinejoin: 'round' });
+        svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 1, strokeDasharray: '5 2 1 2', opacity: 0.8, strokeLinejoin: 'round' });
+      } else if (Carto.Setting.current === 'modern') {
+        // International borders: a solid grey line on a pale band.
+        svg.path(sb.toString(), { fill: 'none', stroke: pal.paper, strokeWidth: 3.4, opacity: 0.55, strokeLinejoin: 'round' });
+        svg.path(sb.toString(), { fill: 'none', stroke: Carto.Terrain.mix(pal.inkSoft, pal.ink, 0.35), strokeWidth: 1.2, strokeLinejoin: 'round' });
+      } else {
+        // Corporate frontiers: bright dashes over a glow.
+        svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 3.5, opacity: 0.35, strokeLinejoin: 'round', filter: Carto.Terrain.glowFilter(svg, 2) });
+        svg.path(sb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 1.1, strokeDasharray: '6 3', strokeLinejoin: 'round' });
+      }
     }
 
     // Routes.
@@ -798,7 +959,7 @@
     }
 
     // Relief icons, back to front.
-    if (o.relief !== false && view !== 'heightmap') {
+    if (o.relief !== false && view !== 'heightmap' && (fantasy() || o.bare)) {
       const sp = Math.max(8, grid.spacing * 0.62);
       const pts = G.poissonDisc(rng, 6, 10, W - 12, H - 14, sp);
       const items = [];
@@ -834,6 +995,9 @@
       }
     }
 
+    // Cyberpunk: a faint hexagonal overlay on the whole sheet.
+    if (!fantasy() && !o.bare && Carto.Setting.current === 'cyber') svg.path(Carto.Terrain.hexGrid(W, H, 20), { fill: 'none', stroke: pal.ink, strokeWidth: 0.5, opacity: 0.08 });
+
     // Graticule.
     if (o.grid) {
       const gb = new Svg.Batch();
@@ -841,7 +1005,8 @@
       const lonToX = (lo) => ((lo - m.lons[0]) / (m.lons[1] - m.lons[0])) * W;
       for (let la = Math.ceil(m.lats[1] / 10) * 10; la <= m.lats[0]; la += 10) gb.line({ x: 0, y: latToY(la) }, { x: W, y: latToY(la) });
       for (let lo = Math.ceil(m.lons[0] / 10) * 10; lo <= m.lons[1]; lo += 10) gb.line({ x: lonToX(lo), y: 0 }, { x: lonToX(lo), y: H });
-      svg.path(gb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.5, strokeDasharray: '1 4', opacity: 0.6 });
+      if (fantasy() || o.bare) svg.path(gb.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.5, strokeDasharray: '1 4', opacity: 0.6 });
+      else svg.path(gb.toString(), { fill: 'none', stroke: Carto.Setting.current === 'cyber' ? pal.ink : pal.waterInk, strokeWidth: 0.5, opacity: Carto.Setting.current === 'cyber' ? 0.3 : 0.6 });
       for (let la = Math.ceil(m.lats[1] / 10) * 10; la <= m.lats[0]; la += 10) {
         Draw.label(svg, 16, latToY(la) - 5, Math.abs(la) + '°' + (la >= 0 ? 'N' : 'S'), 9, pal, { anchor: 'start', italic: true, haloColor: pal.water });
       }
@@ -857,7 +1022,10 @@
     if (showLabels && !o.preview) {
       const groupLabel = (cell, text, size) => {
         if (cell < 0 || cell === undefined) return;
-        Draw.label(svg, grid.x[cell], grid.y[cell], text.toUpperCase(), size, pal, { title: true, spacing: size * 0.25, opacity: 0.7, haloWidth: 0.12 });
+        let x = grid.x[cell];
+        // The modern letterings run wider: keep them inside the frame.
+        if (!fantasy()) { const hw = (text.length * size * 0.87) / 2; x = Math.max(16 + hw, Math.min(W - 16 - hw, x)); }
+        Draw.label(svg, x, grid.y[cell], text.toUpperCase(), size, pal, { title: true, spacing: size * 0.25, opacity: 0.7, haloWidth: 0.12 });
       };
       if (view === 'political' || view === 'provinces') {
         for (const s of m.states) {
@@ -888,7 +1056,8 @@
     }
 
     // Towns.
-    if (o.burgs !== false) {
+    if (o.burgs !== false && !fantasy() && !o.bare) presentBurgs(svg, m, o, pal, taken);
+    else if (o.burgs !== false) {
       const towns = new Svg.Batch(), caps = new Svg.Batch(), dots = new Svg.Batch();
       for (const b of m.burgs) {
         if (!b) continue;
@@ -899,6 +1068,8 @@
       svg.path(towns.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 0.8 });
       svg.path(caps.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 1.1 });
       svg.path(dots.toString(), { fill: pal.ink });
+    }
+    if (o.burgs !== false) {
       if (showLabels && !o.preview) {
         const labels = m.burgs.filter((b) => b).sort((a, b) => b.capital - a.capital || !!b.added - !!a.added || b.population - a.population).map((b) => ({
           x: b.x, y: b.y, text: b.name, size: b.capital ? 11.5 : basePop(m, b) > 10 ? 9 : 7.5, title: b.capital,
@@ -1101,7 +1272,7 @@
       { id: 'burgs', type: 'bool', group: 'view', def: true, renderOnly: true },
       { id: 'markers', type: 'bool', group: 'view', def: true, renderOnly: true },
       { id: 'labels', type: 'bool', group: 'view', def: true, renderOnly: true },
-      { id: 'grid', type: 'bool', group: 'view', def: false, renderOnly: true },
+      { id: 'grid', type: 'bool', group: 'view', def: false, defs: { modern: true, cyber: true }, renderOnly: true },
     ],
     previewOptions: { cells: 'low' },
     generate: World.generate,
