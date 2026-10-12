@@ -911,7 +911,8 @@
     // Points of interest.
     const mr = rng.fork('markers');
     const markers = [];
-    const freeCell = (c) => !burgAt[c] && !markers.some((m) => Math.hypot(m.x - grid.x[c], m.y - grid.y[c]) < 30);
+    const freeCell = (c) => !burgAt[c] && grid.x[c] > 40 && grid.x[c] < W - 40 && grid.y[c] > 50 && grid.y[c] < H - 40 &&
+      !markers.some((m) => Math.hypot(m.x - grid.x[c], m.y - grid.y[c]) < 30);
     const addMarker = (type, c, extra) => {
       if (c === undefined || c < 0 || !freeCell(c)) return;
       markers.push(Object.assign({ id: markers.length + 1, type, cell: c, x: grid.x[c], y: grid.y[c], seed: Carto.hashString(seed + ':m:' + markers.length), v: mr.int(0, 2), name: Carto.NameBases.name((cultures[culture[c]] || cultures[1]).base, mr, 4, 9) }, extra || {}));

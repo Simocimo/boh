@@ -1,10 +1,12 @@
 # Il Cartografo Errante
 
-Generatori procedurali di mappe fantasy, ispirati a [Watabou's Procgen Arcana](https://watabou.github.io).
+Generatori procedurali di mappe fantasy, ispirati a [Watabou's Procgen Arcana](https://watabou.github.io)
+e ad [Azgaar's Fantasy Map Generator](https://azgaar.github.io/Fantasy-Map-Generator/).
 Tutto gira nel browser: niente server, niente installazione, niente build.
 
 | Generatore | Cosa disegna |
 |---|---|
+| **Mondo** | Interi continenti, ispirati a [Azgaar's Fantasy Map Generator](https://azgaar.github.io/Fantasy-Map-Generator/): rilievo da 7 modelli (continenti, Pangea, arcipelago, isola, mediterraneo, penisola, vulcano), clima, 13 biomi, fiumi e laghi, culture con lingue diverse, stati con forma di governo e diplomazia, province, religioni, città e porti, strade e rotte marittime, luoghi notevoli. Sei viste (politica, biomi, rilievo, culture, religioni, province), livelli attivabili e un ispettore: clicca un punto per leggerne clima, stato e cultura, clicca una città o un dungeon per aprirne la mappa. |
 | **Regno** | Mappa regionale: coste, montagne, colline, foreste, fiumi che scendono al mare, laghi, insediamenti e strade. Clicca una città o un villaggio per aprirne la pianta. |
 | **Città** | Borghi e città murate (diagramma di Voronoi): quartieri, porte, torri, cittadella, cattedrale, piazza del mercato, fiume con ponti, costa con porto, campagna. |
 | **Villaggio** | Case lungo strade tortuose, piazza col pozzo, tempio, locanda, mulino sul ruscello, campi, frutteti e boschi. |
@@ -45,6 +47,8 @@ js/core/              libreria condivisa
   noise.js            rumore simplex e frattale
   geom.js             geometria: poligoni, ritagli, campionamento di Poisson
   voronoi.js          triangolazione di Delaunay e diagramma di Voronoi
+  delaunator.js       triangolazione veloce per decine di migliaia di punti (mondo)
+  namebases.js        "lingue" per i nomi delle culture
   contour.js          marching squares, sfocatura, campi di distanza
   svg.js, draw.js     costruzione SVG, scritte, rosa dei venti, scala, alberi
   names.js            nomi fantasy con catene di Markov
@@ -72,6 +76,7 @@ Carto.register({
   generate(seed, opts) { /* restituisce il modello, senza toccare il DOM */ },
   render(model, opts)  { /* restituisce una stringa <svg>; opts.palette contiene i colori */ },
   notes(model)         { /* facoltativo: HTML per la legenda */ },
+  inspect(model, x, y) { /* facoltativo: { html } per il clic sulla mappa */ },
   fileName(model)      { /* facoltativo: nome del file esportato */ },
 });
 ```
@@ -89,14 +94,14 @@ node tools/build-fonts.js       # rigenera js/core/fonts.js dai file in fonts/
 
 ## Crediti
 
-- Idea e stile ispirati ai generatori di Oleg Dolya ([watabou](https://watabou.github.io)). Il codice di questo progetto è scritto da zero.
+- Idea e stile ispirati ai generatori di Oleg Dolya ([watabou](https://watabou.github.io)) e al Fantasy Map Generator di Max Haniyeu ([Azgaar](https://github.com/Azgaar/Fantasy-Map-Generator)). Il codice di questo progetto è scritto da zero; la triangolazione veloce segue l'algoritmo della libreria Delaunator (Mapbox, licenza ISC).
 - Font delle mappe: IM FELL English, di Igino Marini, con licenza SIL Open Font License (vedi `fonts/OFL.txt`).
 - Font dell'interfaccia: Alegreya Sans, da Google Fonts.
 
 ---
 
 **English summary.** *The Wandering Cartographer* is a set of procedural fantasy map generators
-(realm, city, village, cave/glade, dungeon, dwelling) that run entirely in the browser. Open
+(world, realm, city, village, cave/glade, dungeon, dwelling) that run entirely in the browser. Open
 `index.html`, press **New map**, tweak the options, and export to PNG or SVG. Seeds and options live
 in the URL, so maps are reproducible and shareable. The interface and the generated text are
 available in Italian and English.
