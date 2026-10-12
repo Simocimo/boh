@@ -6,6 +6,7 @@
   const G = Carto.G, Svg = Carto.Svg, Draw = Carto.Draw, t = Carto.t, I18n = Carto.I18n;
   const World = Carto.World;
   const L = () => (I18n.lang === 'it' ? 0 : 1);
+  const fantasy = () => !Carto.Setting || Carto.Setting.current === 'fantasy';
 
   I18n.add({
     it: {
@@ -236,6 +237,218 @@
     },
   });
 
+  // Present day ("@modern") and cyberpunk ("@cyber"): overrides of the keys
+  // above, plus the forms, routes and landmarks only those settings have.
+  I18n.add({
+    it: {
+      'gen.world.desc@modern': 'Continenti di oggi: nazioni con capitali e metropoli, regioni, religioni, autostrade, aeroporti, centrali e basi militari. Clicca la mappa per esplorarla.',
+      'gen.world.desc@cyber': 'Continenti spartiti tra megacorporazioni e zone libere: arcologie, sprawl, culti dell’IA, spazioporti e zone tossiche. Clicca la mappa per esplorarla.',
+      'world.group.people@modern': 'Popoli e nazioni',
+      'world.group.people@cyber': 'Popoli e corporazioni',
+      'world.opt.states@modern': 'Nazioni', 'world.opt.states@cyber': 'Territori',
+      'world.opt.religions@cyber': 'Culti e credi',
+      'world.opt.towns@modern': 'Città', 'world.opt.towns@cyber': 'Sprawl',
+      'world.opt.view.religions@cyber': 'Culti',
+      'world.opt.view.provinces@cyber': 'Distretti',
+      'world.opt.roads@modern': 'Strade e traghetti', 'world.opt.roads@cyber': 'Reti di trasporto',
+      'world.opt.burgs@modern': 'Città', 'world.opt.burgs@cyber': 'Sprawl e arcologie',
+      'world.opt.markers@modern': 'Punti d’interesse', 'world.opt.markers@cyber': 'Punti caldi',
+      'world.hint@modern': 'Clicca un punto della mappa per sapere cosa c’è: nazione, regione, città, clima.',
+      'world.hint@cyber': 'Clicca un punto della mappa per sapere chi lo controlla: territorio, distretto, sprawl, clima.',
+      'world.states@modern': 'Nazioni', 'world.states@cyber': 'Territori',
+      'world.state@modern': 'Nazione', 'world.state@cyber': 'Territorio',
+      'world.religions@cyber': 'Culti e credi', 'world.religion@cyber': 'Credo',
+      'world.province@modern': 'Area amministrativa', 'world.province@cyber': 'Distretto',
+      'world.burgs@modern': 'Città più popolose', 'world.burgs@cyber': 'Sprawl principali',
+      'world.markers@modern': 'Punti d’interesse', 'world.markers@cyber': 'Punti caldi',
+      'world.diplomacy@modern': 'Relazioni internazionali', 'world.diplomacy@cyber': 'Rapporti tra poteri',
+      'world.capital@cyber': 'Arcologia',
+      'world.town@modern': 'Città', 'world.village@modern': 'Cittadina', 'world.town@cyber': 'Sprawl', 'world.village@cyber': 'Insediamento',
+      'world.free@modern': 'Territori non rivendicati', 'world.free@cyber': 'Zone fuori controllo',
+      'world.openCity@modern': 'Apri la pianta della città', 'world.openCity@cyber': 'Apri la mappa dello sprawl',
+      'world.openVillage@modern': 'Apri la pianta della cittadina', 'world.openVillage@cyber': 'Apri la mappa dell’insediamento',
+      'world.openDungeon@modern': 'Apri la pianta dei sotterranei', 'world.openDungeon@cyber': 'Apri la pianta interna',
+      'world.openCave@modern': 'Apri la mappa della grotta', 'world.openCave@cyber': 'Apri la mappa dei tunnel',
+      'world.openMine': 'Apri la mappa delle gallerie', 'world.openGlade': 'Apri la mappa della radura',
+      'world.openGlade@modern': 'Apri la mappa del parco', 'world.openGlade@cyber': 'Apri la mappa della bioriserva',
+      'world.sub.political@modern': 'carta politica · 2026', 'world.sub.political@cyber': 'territori corporativi',
+      'world.sub.religions@cyber': 'carta dei culti', 'world.sub.provinces@cyber': 'carta dei distretti',
+      'world.folk@modern': 'Fede tradizionale di {n}', 'world.folk@cyber': 'Vecchi dèi di {n}',
+      'world.routes': 'Trasporti',
+      'route.road': 'strade', 'route.trail': 'sentieri', 'route.sea': 'rotte marittime',
+      'route.road@modern': 'autostrade e ferrovie', 'route.trail@modern': 'strade statali', 'route.sea@modern': 'linee di traghetti',
+      'route.road@cyber': 'superstrade maglev', 'route.trail@cyber': 'strade di servizio', 'route.sea@cyber': 'rotte dei cargo automatici',
+      // Forms of government, as titles and as kinds.
+      'form.fedrepublic': 'Repubblica federale di {n}', 'form.constmonarchy': 'Regno di {n}', 'form.federation': 'Federazione di {n}',
+      'form.union': 'Unione di {n}', 'form.confederation': 'Confederazione di {n}', 'form.peoplesrepublic': 'Repubblica popolare di {n}',
+      'form.corporation': 'Territorio {n}', 'form.conglomerate': 'Dominio {n}', 'form.protectorate': 'Protettorato di {n}',
+      'form.freezone': 'Zona libera di {n}', 'form.machinerepublic': 'Repubblica delle macchine di {n}',
+      'ftype.republic': 'repubblica', 'ftype.fedrepublic': 'repubblica federale', 'ftype.constmonarchy': 'monarchia costituzionale',
+      'ftype.federation': 'federazione', 'ftype.union': 'unione di stati', 'ftype.confederation': 'confederazione',
+      'ftype.peoplesrepublic': 'repubblica popolare', 'ftype.principality': 'principato', 'ftype.emirate': 'emirato',
+      'ftype.corporation': 'corporazione', 'ftype.conglomerate': 'conglomerato', 'ftype.protectorate': 'protettorato corporativo',
+      'ftype.freezone': 'zona libera', 'ftype.machinerepublic': 'repubblica delle macchine',
+      'prov.1@modern': 'Regione di {n}', 'prov.2@modern': 'Distretto di {n}', 'prov.3@modern': 'Contea di {n}', 'prov.4@modern': 'Dipartimento di {n}',
+      'prov.0@cyber': 'Settore {n}', 'prov.1@cyber': 'Distretto {n}', 'prov.2@cyber': 'Zona {n}', 'prov.3@cyber': 'Blocco {n}', 'prov.4@cyber': 'Quadrante {n}',
+      'rel.1@modern': 'Comunità di {n}', 'rel.3@modern': 'Confessione di {n}', 'rel.4@modern': 'Chiesa riformata di {n}', 'rel.5@modern': 'Movimento di {n}',
+      'cult.0@modern': 'Setta di {n}', 'cult.1@modern': 'Nuova Era di {n}', 'cult.2@modern': 'Missione di {n}', 'cult.3@modern': 'Fondazione {n}',
+      'cult.4@modern': 'Famiglia di {n}', 'cult.5@modern': 'Cerchio di {n}',
+      'rel.0@cyber': 'Chiesa del Codice di {n}', 'rel.1@cyber': 'Credo aziendale {n}', 'rel.2@cyber': 'Via del Silicio di {n}', 'rel.3@cyber': 'Ordine della Rete di {n}',
+      'rel.4@cyber': 'Luce binaria di {n}', 'rel.5@cyber': 'Figli della macchina {n}', 'rel.6@cyber': 'Tempio digitale di {n}',
+      'cult.0@cyber': 'Culto dell’IA {n}', 'cult.1@cyber': 'Setta dei Potenziati di {n}', 'cult.2@cyber': 'Misteri del Codice {n}',
+      'cult.4@cyber': 'Fratellanza cromata di {n}', 'cult.5@cyber': 'Vincolo neurale di {n}', 'cult.6@cyber': 'Voce nella Rete di {n}',
+      'ctype.highland@modern': 'montana', 'ctype.nomadic@modern': 'pastorale', 'ctype.hunting@modern': 'forestale', 'ctype.generic@modern': 'urbana',
+      'ctype.naval@cyber': 'portuale', 'ctype.highland@cyber': 'd’altura', 'ctype.hunting@cyber': 'di frontiera', 'ctype.generic@cyber': 'metropolitana',
+      'rtype.organized@modern': 'confessione', 'rtype.cult@modern': 'nuovo movimento religioso',
+      'rtype.folk@cyber': 'fede ancestrale', 'rtype.organized@cyber': 'credo', 'rtype.cult@cyber': 'culto dell’IA',
+      'relation.ally@modern': 'alleanza', 'relation.friendly@modern': 'accordo commerciale', 'relation.suspicion@modern': 'sanzioni',
+      'relation.rival@modern': 'rivalità', 'relation.war@modern': 'in guerra',
+      'relation.ally@cyber': 'fusione', 'relation.friendly@cyber': 'patto di non aggressione', 'relation.suspicion@cyber': 'spionaggio industriale',
+      'relation.rival@cyber': 'scalata ostile', 'relation.war@cyber': 'guerra corporativa',
+      // Landmarks of today.
+      'marker.volcano@modern': 'Vulcano attivo', 'marker.springs@modern': 'Terme', 'marker.ruins@modern': 'Sito archeologico',
+      'marker.dungeon@modern': 'Bunker abbandonato', 'marker.cave@modern': 'Grotta turistica', 'marker.grove@modern': 'Parco nazionale',
+      'marker.battlefield@modern': 'Base militare', 'marker.monster@modern': 'Piattaforma offshore',
+      'marker.airport': 'Aeroporto', 'marker.powerplant': 'Centrale elettrica', 'marker.nuclear': 'Centrale nucleare',
+      'note.volcano.0@modern': 'Monte {n}: vulcano attivo, sorvegliato giorno e notte dall’osservatorio.', 'note.volcano.1@modern': 'Il vulcano {n} è chiuso ai turisti dall’ultima eruzione.', 'note.volcano.2@modern': 'Sulle pendici di {n} i vigneti arrivano fino alle colate di lava.',
+      'note.springs.0@modern': 'Terme di {n}: alberghi di lusso e piscine all’aperto.', 'note.springs.1@modern': 'Bagni di {n}, sorgenti calde frequentate dai pensionati.', 'note.springs.2@modern': 'Terme di {n}, chiuse per fallimento: la piscina è ancora piena.',
+      'note.mine.0@modern': 'Miniera di {n}: rame estratto a cielo aperto, il giacimento più grande del paese.', 'note.mine.1@modern': 'Miniera abbandonata di {n}: le gallerie sono in parte crollate.', 'note.mine.2@modern': 'Cava di {n}: da qui viene il marmo della capitale.',
+      'note.ruins.0@modern': 'Sito archeologico di {n}: scavi in corso, ingresso a pagamento.', 'note.ruins.1@modern': 'Necropoli di {n}, scoperta durante i lavori dell’autostrada.', 'note.ruins.2@modern': 'Rovine di {n}, patrimonio dell’umanità.',
+      'note.dungeon.0@modern': 'Bunker di {n}: rifugio antiatomico della Guerra fredda, abbandonato.', 'note.dungeon.1@modern': 'Ex deposito militare di {n}, sigillato e sorvegliato dalle telecamere.', 'note.dungeon.2@modern': 'Gallerie di {n}: un ospedale sotterraneo dimenticato.',
+      'note.cave.0@modern': 'Grotte di {n}: visite guidate ogni ora.', 'note.cave.1@modern': 'Grotta di {n}, meta di speleologi: tre sono dispersi da giorni.', 'note.cave.2@modern': 'Abisso di {n}: il fondo non è ancora stato esplorato.',
+      'note.grove.0@modern': 'Parco nazionale di {n}: lupi, orsi e sentieri segnati.', 'note.grove.1@modern': 'Riserva naturale di {n}: vietato uscire dai sentieri.', 'note.grove.2@modern': 'Foresta di {n}, dove i telefoni perdono il segnale.',
+      'note.lighthouse.0@modern': 'Faro di {n}, automatizzato da vent’anni.', 'note.lighthouse.1@modern': 'Faro di {n}, oggi un bed & breakfast.', 'note.lighthouse.2@modern': 'Faro di {n}: la luce si è spenta senza motivo.',
+      'note.battlefield.0@modern': 'Base militare di {n}: zona interdetta, droni in volo.', 'note.battlefield.1@modern': 'Base aerea di {n}, a ridosso del confine conteso.', 'note.battlefield.2@modern': 'Poligono di tiro di {n}: esercitazioni ogni notte.',
+      'note.monster.0@modern': 'Piattaforma petrolifera {n}: trecento operai in mezzo all’oceano.', 'note.monster.1@modern': 'Parco eolico offshore di {n}.', 'note.monster.2@modern': 'Piattaforma {n}: dismessa, eppure qualcuno vi accende ancora le luci.',
+      'note.wreck.0@modern': 'Relitto della {n}: petroliera affondata, meta di sub.', 'note.wreck.1@modern': 'Relitto della {n}, mercantile con un carico mai dichiarato.', 'note.wreck.2@modern': 'Relitto della {n}, affondata durante la guerra.',
+      'note.airport.0': 'Aeroporto internazionale di {n}.', 'note.airport.1': 'Aeroporto di {n}: voli low cost e un terminal mai finito.', 'note.airport.2': 'Aeroporto di {n}, scalo merci aperto giorno e notte.',
+      'note.powerplant.0': 'Centrale idroelettrica di {n}, con la diga sul fiume.', 'note.powerplant.1': 'Centrale termoelettrica di {n}: le ciminiere si vedono da lontano.', 'note.powerplant.2': 'Centrale di {n}, contestata dagli ambientalisti.',
+      'note.nuclear.0': 'Centrale nucleare di {n}: tre reattori e vigilanza armata.', 'note.nuclear.1': 'Centrale nucleare di {n}, in smantellamento da quindici anni.', 'note.nuclear.2': 'Centrale nucleare di {n}: un incidente mai chiarito ha svuotato i paesi vicini.',
+      // Landmarks of the sprawl age.
+      'marker.volcano@cyber': 'Impianto geotermico', 'marker.springs@cyber': 'Zona tossica', 'marker.mine@cyber': 'Miniera automatizzata',
+      'marker.ruins@cyber': 'Rovine pre-Collasso', 'marker.dungeon@cyber': 'Fortezza dati', 'marker.cave@cyber': 'Mercato nero',
+      'marker.grove@cyber': 'Bioriserva', 'marker.lighthouse@cyber': 'Torre radar', 'marker.battlefield@cyber': 'Zona di guerra',
+      'marker.monster@cyber': 'Piattaforma galleggiante', 'marker.wreck@cyber': 'Relitto di cargo',
+      'marker.spaceport': 'Spazioporto', 'marker.arcology': 'Arcologia', 'marker.crashed': 'Orbitale precipitato',
+      'note.volcano.0@cyber': 'Impianto geotermico {n}: il vulcano alimenta mezzo continente.', 'note.volcano.1@cyber': 'Il vulcano {n} è proprietà privata, sorvegliata da droni armati.', 'note.volcano.2@cyber': 'Pozzi geotermici di {n}, dove i tecnici lavorano in esoscheletro.',
+      'note.springs.0@cyber': 'Zona tossica di {n}: acque fumanti color ruggine, contatori Geiger impazziti.', 'note.springs.1@cyber': 'Paludi chimiche di {n}, discarica di tre corporazioni.', 'note.springs.2@cyber': 'Zona rossa di {n}: ci vivono solo scavenger e mutanti.',
+      'note.mine.0@cyber': 'Miniera automatizzata di {n}: nessun umano ci scende da dieci anni.', 'note.mine.1@cyber': 'Gallerie di {n}: i robot minatori hanno smesso di rispondere.', 'note.mine.2@cyber': 'Estrazione di terre rare a {n}, sotto contratto militare.',
+      'note.ruins.0@cyber': 'Rovine di {n}, una città morta prima del Collasso.', 'note.ruins.1@cyber': 'Torri crollate di {n}, coperte di rampicanti e antenne.', 'note.ruins.2@cyber': 'Vecchio centro di {n}: i nomadi lo spogliano del rame.',
+      'note.dungeon.0@cyber': 'Fortezza dati di {n}: server blindati sotto la montagna.', 'note.dungeon.1@cyber': 'Laboratorio nero di {n}, che ufficialmente non è mai esistito.', 'note.dungeon.2@cyber': 'Caveau di {n}: un’IA custodisce ciò che resta di una banca.',
+      'note.cave.0@cyber': 'Mercato nero di {n}: impianti di seconda mano, nessuna domanda.', 'note.cave.1@cyber': 'Tunnel di {n}: contrabbando di armi e farmaci.', 'note.cave.2@cyber': 'Bazar sotterraneo di {n}, dove i netrunner vendono i loro segreti.',
+      'note.grove.0@cyber': 'Bioriserva di {n}: l’ultima foresta vera, sotto una cupola.', 'note.grove.1@cyber': 'Serre di {n}: colture geneticamente modificate.', 'note.grove.2@cyber': 'Bosco di {n}: alberi sintetici che respirano per la città.',
+      'note.lighthouse.0@cyber': 'Torre radar di {n}: traccia tutto il traffico navale.', 'note.lighthouse.1@cyber': 'Antenna di {n}, ripetitore della rete pirata.', 'note.lighthouse.2@cyber': 'Faro di {n}: trasmette ancora un segnale che nessuno sa decifrare.',
+      'note.battlefield.0@cyber': 'Zona di guerra di {n}: due corporazioni si contendono il confine.', 'note.battlefield.1@cyber': 'Campo minato di {n}, disseminato di droni abbattuti.', 'note.battlefield.2@cyber': 'Avamposto di {n}, presidiato da mercenari.',
+      'note.monster.0@cyber': 'Piattaforma {n}: città galleggiante fuori da ogni giurisdizione.', 'note.monster.1@cyber': 'Server farm sommersa di {n}, raffreddata dall’oceano.', 'note.monster.2@cyber': 'Piattaforma pirata {n}: rifugio di hacker e contrabbandieri.',
+      'note.wreck.0@cyber': 'Relitto della {n}: portacontainer carica di impianti illegali.', 'note.wreck.1@cyber': 'Scafo della {n}, nave autonoma andata alla deriva.', 'note.wreck.2@cyber': 'Relitto della {n}: la sua IA chiede ancora aiuto via radio.',
+      'note.spaceport.0': 'Spazioporto di {n}: navette orbitali ogni sei ore.', 'note.spaceport.1': 'Spazioporto di {n}, porta d’accesso alle stazioni orbitali.', 'note.spaceport.2': 'Rampe di lancio di {n}, ferme per una guerra di tariffe.',
+      'note.arcology.0': 'Arcologia {n}: un milione di persone che non escono mai.', 'note.arcology.1': 'Arcologia {n}, sede di una corporazione in ascesa.', 'note.arcology.2': 'Arcologia {n}, incompiuta: le bande occupano i piani alti.',
+      'note.crashed.0': 'Orbitale precipitato di {n}: la stazione è caduta dieci anni fa.', 'note.crashed.1': 'Rottami di {n}: un satellite militare, ancora armato.', 'note.crashed.2': 'Cratere di {n}, dove giace un modulo orbitale che le corporazioni si contendono.',
+    },
+    en: {
+      'gen.world.desc@modern': 'Present-day continents: nations with capitals and big cities, regions, religions, motorways, airports, power plants and military bases. Click the map to explore it.',
+      'gen.world.desc@cyber': 'Continents carved up between megacorporations and free zones: arcologies, sprawls, AI cults, spaceports and toxic zones. Click the map to explore it.',
+      'world.group.people@modern': 'Peoples and nations',
+      'world.group.people@cyber': 'Peoples and corporations',
+      'world.opt.states@modern': 'Nations', 'world.opt.states@cyber': 'Territories',
+      'world.opt.religions@cyber': 'Cults and creeds',
+      'world.opt.towns@modern': 'Cities', 'world.opt.towns@cyber': 'Sprawls',
+      'world.opt.view.religions@cyber': 'Cults',
+      'world.opt.view.provinces@cyber': 'Districts',
+      'world.opt.roads@modern': 'Roads and ferries', 'world.opt.roads@cyber': 'Transport network',
+      'world.opt.burgs@modern': 'Cities', 'world.opt.burgs@cyber': 'Sprawls and arcologies',
+      'world.opt.markers@cyber': 'Hot spots',
+      'world.hint@modern': 'Click any point of the map to see what is there: nation, region, city, climate.',
+      'world.hint@cyber': 'Click any point of the map to see who controls it: territory, district, sprawl, climate.',
+      'world.states@modern': 'Nations', 'world.states@cyber': 'Territories',
+      'world.state@modern': 'Nation', 'world.state@cyber': 'Territory',
+      'world.religions@cyber': 'Cults and creeds', 'world.religion@cyber': 'Creed',
+      'world.province@modern': 'Administrative area', 'world.province@cyber': 'District',
+      'world.burgs@modern': 'Largest cities', 'world.burgs@cyber': 'Main sprawls',
+      'world.markers@cyber': 'Hot spots',
+      'world.diplomacy@modern': 'International relations', 'world.diplomacy@cyber': 'Balance of power',
+      'world.capital@cyber': 'Arcology',
+      'world.town@modern': 'City', 'world.village@modern': 'Small town', 'world.town@cyber': 'Sprawl', 'world.village@cyber': 'Settlement',
+      'world.free@modern': 'Unclaimed land', 'world.free@cyber': 'Lawless zones',
+      'world.openCity@modern': 'Open the city map', 'world.openCity@cyber': 'Open the sprawl map',
+      'world.openVillage@modern': 'Open the town map', 'world.openVillage@cyber': 'Open the settlement map',
+      'world.openDungeon@modern': 'Open the underground plan', 'world.openDungeon@cyber': 'Open the floor plan',
+      'world.openCave@cyber': 'Open the tunnel map',
+      'world.openMine': 'Open the map of the tunnels', 'world.openGlade': 'Open the glade map',
+      'world.openGlade@modern': 'Open the park map', 'world.openGlade@cyber': 'Open the bio-reserve map',
+      'world.sub.political@modern': 'political map · 2026', 'world.sub.political@cyber': 'corporate territories',
+      'world.sub.religions@cyber': 'map of cults', 'world.sub.provinces@cyber': 'map of districts',
+      'world.folk@modern': 'Traditional faith of {n}', 'world.folk@cyber': 'Old gods of {n}',
+      'world.routes': 'Transport',
+      'route.road': 'roads', 'route.trail': 'trails', 'route.sea': 'sea lanes',
+      'route.road@modern': 'motorways and railways', 'route.trail@modern': 'main roads', 'route.sea@modern': 'ferry lines',
+      'route.road@cyber': 'maglev highways', 'route.trail@cyber': 'service roads', 'route.sea@cyber': 'drone freighter lanes',
+      'form.fedrepublic': 'Federal Republic of {n}', 'form.constmonarchy': 'Kingdom of {n}', 'form.federation': 'Federation of {n}',
+      'form.union': '{n} Union', 'form.confederation': '{n} Confederation', 'form.peoplesrepublic': 'People’s Republic of {n}',
+      'form.corporation': '{n} Territory', 'form.conglomerate': '{n} Dominion', 'form.protectorate': 'Protectorate of {n}',
+      'form.freezone': 'Free Zone of {n}', 'form.machinerepublic': 'Machine Republic of {n}',
+      'ftype.republic': 'republic', 'ftype.fedrepublic': 'federal republic', 'ftype.constmonarchy': 'constitutional monarchy',
+      'ftype.federation': 'federation', 'ftype.union': 'union of states', 'ftype.confederation': 'confederation',
+      'ftype.peoplesrepublic': 'people’s republic', 'ftype.principality': 'principality', 'ftype.emirate': 'emirate',
+      'ftype.corporation': 'corporation', 'ftype.conglomerate': 'conglomerate', 'ftype.protectorate': 'corporate protectorate',
+      'ftype.freezone': 'free zone', 'ftype.machinerepublic': 'machine republic',
+      'prov.1@modern': '{n} Region', 'prov.2@modern': '{n} District', 'prov.3@modern': '{n} County', 'prov.4@modern': 'Department of {n}',
+      'prov.0@cyber': '{n} Sector', 'prov.1@cyber': '{n} District', 'prov.2@cyber': '{n} Zone', 'prov.3@cyber': '{n} Block', 'prov.4@cyber': '{n} Quadrant',
+      'rel.1@modern': 'Community of {n}', 'rel.3@modern': 'Confession of {n}', 'rel.4@modern': 'Reformed Church of {n}', 'rel.5@modern': '{n} Movement',
+      'cult.0@modern': 'Sect of {n}', 'cult.1@modern': 'New Age of {n}', 'cult.2@modern': 'Mission of {n}', 'cult.3@modern': '{n} Foundation',
+      'cult.4@modern': 'Family of {n}', 'cult.5@modern': 'Circle of {n}',
+      'rel.0@cyber': 'Church of the Code of {n}', 'rel.1@cyber': '{n} Corporate Creed', 'rel.2@cyber': 'Silicon Way of {n}', 'rel.3@cyber': 'Order of the Net of {n}',
+      'rel.4@cyber': 'Binary Light of {n}', 'rel.5@cyber': 'Children of the Machine {n}', 'rel.6@cyber': 'Digital Temple of {n}',
+      'cult.0@cyber': 'Cult of the AI {n}', 'cult.1@cyber': 'Sect of the Augmented of {n}', 'cult.2@cyber': 'Mysteries of the Code {n}',
+      'cult.4@cyber': 'Chrome Brotherhood of {n}', 'cult.5@cyber': 'Neural Bond of {n}', 'cult.6@cyber': 'Voice in the Net of {n}',
+      'ctype.highland@modern': 'mountain', 'ctype.nomadic@modern': 'pastoral', 'ctype.hunting@modern': 'forest', 'ctype.generic@modern': 'urban',
+      'ctype.naval@cyber': 'dockside', 'ctype.hunting@cyber': 'frontier', 'ctype.generic@cyber': 'metropolitan',
+      'rtype.organized@modern': 'denomination', 'rtype.cult@modern': 'new religious movement',
+      'rtype.folk@cyber': 'ancestral faith', 'rtype.organized@cyber': 'creed', 'rtype.cult@cyber': 'AI cult',
+      'relation.ally@modern': 'alliance', 'relation.friendly@modern': 'trade agreement', 'relation.suspicion@modern': 'sanctions',
+      'relation.rival@modern': 'rivalry', 'relation.war@modern': 'at war',
+      'relation.ally@cyber': 'merger', 'relation.friendly@cyber': 'non-aggression pact', 'relation.suspicion@cyber': 'industrial espionage',
+      'relation.rival@cyber': 'hostile takeover', 'relation.war@cyber': 'corporate war',
+      'marker.volcano@modern': 'Active volcano', 'marker.springs@modern': 'Thermal spa', 'marker.ruins@modern': 'Archaeological site',
+      'marker.dungeon@modern': 'Abandoned bunker', 'marker.cave@modern': 'Show cave', 'marker.grove@modern': 'National park',
+      'marker.battlefield@modern': 'Military base', 'marker.monster@modern': 'Offshore platform',
+      'marker.airport': 'Airport', 'marker.powerplant': 'Power plant', 'marker.nuclear': 'Nuclear power plant',
+      'note.volcano.0@modern': 'Mount {n}: an active volcano, watched day and night by the observatory.', 'note.volcano.1@modern': 'The volcano {n} has been closed to tourists since the last eruption.', 'note.volcano.2@modern': 'On the slopes of {n}, vineyards reach right up to the lava flows.',
+      'note.springs.0@modern': '{n} Spa: luxury hotels and open-air pools.', 'note.springs.1@modern': 'Baths of {n}, hot springs popular with pensioners.', 'note.springs.2@modern': '{n} Spa, closed after going bankrupt: the pool is still full.',
+      'note.mine.0@modern': 'Mine of {n}: an open-pit copper mine, the largest in the country.', 'note.mine.1@modern': 'Abandoned mine of {n}: the tunnels have partly collapsed.', 'note.mine.2@modern': 'Quarry of {n}: the capital’s marble comes from here.',
+      'note.ruins.0@modern': 'Archaeological site of {n}: digs in progress, paid entry.', 'note.ruins.1@modern': 'Necropolis of {n}, found while building the motorway.', 'note.ruins.2@modern': 'Ruins of {n}, a World Heritage site.',
+      'note.dungeon.0@modern': 'Bunker of {n}: an abandoned Cold War fallout shelter.', 'note.dungeon.1@modern': 'Former military depot of {n}, sealed and watched by cameras.', 'note.dungeon.2@modern': 'Tunnels of {n}: a forgotten underground hospital.',
+      'note.cave.0@modern': 'Caves of {n}: guided tours every hour.', 'note.cave.1@modern': 'Cave of {n}, popular with cavers: three have been missing for days.', 'note.cave.2@modern': 'Abyss of {n}: its bottom has not been explored yet.',
+      'note.grove.0@modern': '{n} National Park: wolves, bears and marked trails.', 'note.grove.1@modern': '{n} Nature Reserve: no straying from the trails.', 'note.grove.2@modern': 'Forest of {n}, where phones lose their signal.',
+      'note.lighthouse.0@modern': 'Lighthouse of {n}, automated twenty years ago.', 'note.lighthouse.1@modern': 'Lighthouse of {n}, now a bed & breakfast.', 'note.lighthouse.2@modern': 'Lighthouse of {n}: its light went out for no reason.',
+      'note.battlefield.0@modern': '{n} Military Base: restricted area, drones overhead.', 'note.battlefield.1@modern': '{n} Air Base, right by the disputed border.', 'note.battlefield.2@modern': '{n} Firing Range: exercises every night.',
+      'note.monster.0@modern': '{n} oil rig: three hundred workers in the middle of the ocean.', 'note.monster.1@modern': '{n} offshore wind farm.', 'note.monster.2@modern': '{n} platform: decommissioned, yet someone still turns on the lights.',
+      'note.wreck.0@modern': 'Wreck of the {n}: a sunken tanker, popular with divers.', 'note.wreck.1@modern': 'Wreck of the {n}, a freighter with an undeclared cargo.', 'note.wreck.2@modern': 'Wreck of the {n}, sunk during the war.',
+      'note.airport.0': '{n} International Airport.', 'note.airport.1': '{n} Airport: budget flights and a terminal never finished.', 'note.airport.2': '{n} Airport, a cargo hub open day and night.',
+      'note.powerplant.0': '{n} hydroelectric plant, with its dam on the river.', 'note.powerplant.1': '{n} power station: its chimneys can be seen from afar.', 'note.powerplant.2': '{n} power plant, opposed by environmentalists.',
+      'note.nuclear.0': '{n} nuclear power plant: three reactors and armed security.', 'note.nuclear.1': '{n} nuclear plant, fifteen years into its decommissioning.', 'note.nuclear.2': '{n} nuclear plant: an unexplained accident emptied the nearby towns.',
+      'marker.volcano@cyber': 'Geothermal plant', 'marker.springs@cyber': 'Toxic zone', 'marker.mine@cyber': 'Automated mine',
+      'marker.ruins@cyber': 'Pre-Collapse ruins', 'marker.dungeon@cyber': 'Data fortress', 'marker.cave@cyber': 'Black market',
+      'marker.grove@cyber': 'Bio-reserve', 'marker.lighthouse@cyber': 'Radar tower', 'marker.battlefield@cyber': 'War zone',
+      'marker.monster@cyber': 'Floating platform', 'marker.wreck@cyber': 'Cargo wreck',
+      'marker.spaceport': 'Spaceport', 'marker.arcology': 'Arcology', 'marker.crashed': 'Crashed orbital',
+      'note.volcano.0@cyber': '{n} geothermal plant: the volcano powers half the continent.', 'note.volcano.1@cyber': 'The volcano {n} is private property, guarded by armed drones.', 'note.volcano.2@cyber': '{n} geothermal wells, where technicians work in exoskeletons.',
+      'note.springs.0@cyber': '{n} toxic zone: rust-coloured steaming waters, Geiger counters gone wild.', 'note.springs.1@cyber': 'Chemical marshes of {n}, a dump for three corporations.', 'note.springs.2@cyber': 'Red zone of {n}: only scavengers and mutants live here.',
+      'note.mine.0@cyber': '{n} automated mine: no human has gone down in ten years.', 'note.mine.1@cyber': 'Tunnels of {n}: the mining robots stopped answering.', 'note.mine.2@cyber': 'Rare-earth extraction at {n}, under military contract.',
+      'note.ruins.0@cyber': 'Ruins of {n}, a city that died before the Collapse.', 'note.ruins.1@cyber': 'Fallen towers of {n}, covered in creepers and antennas.', 'note.ruins.2@cyber': 'Old downtown of {n}: nomads strip it for copper.',
+      'note.dungeon.0@cyber': '{n} data fortress: armoured servers under the mountain.', 'note.dungeon.1@cyber': '{n} black lab, which officially never existed.', 'note.dungeon.2@cyber': '{n} vault: an AI guards what is left of a bank.',
+      'note.cave.0@cyber': '{n} black market: second-hand implants, no questions asked.', 'note.cave.1@cyber': 'Tunnels of {n}: weapons and drugs smuggled through.', 'note.cave.2@cyber': '{n} underground bazaar, where netrunners sell their secrets.',
+      'note.grove.0@cyber': '{n} bio-reserve: the last real forest, under a dome.', 'note.grove.1@cyber': '{n} greenhouses: genetically modified crops.', 'note.grove.2@cyber': 'Woods of {n}: synthetic trees that breathe for the city.',
+      'note.lighthouse.0@cyber': '{n} radar tower: it tracks all the shipping.', 'note.lighthouse.1@cyber': '{n} antenna, a relay for the pirate net.', 'note.lighthouse.2@cyber': 'Lighthouse of {n}: it still sends a signal no one can decode.',
+      'note.battlefield.0@cyber': '{n} war zone: two corporations fight over the border.', 'note.battlefield.1@cyber': '{n} minefield, littered with downed drones.', 'note.battlefield.2@cyber': '{n} outpost, held by mercenaries.',
+      'note.monster.0@cyber': '{n} platform: a floating city outside any jurisdiction.', 'note.monster.1@cyber': '{n} submerged server farm, cooled by the ocean.', 'note.monster.2@cyber': '{n} pirate platform: a haven for hackers and smugglers.',
+      'note.wreck.0@cyber': 'Wreck of the {n}: a container ship full of illegal implants.', 'note.wreck.1@cyber': 'Hull of the {n}, a self-driving ship that drifted away.', 'note.wreck.2@cyber': 'Wreck of the {n}: its AI still calls for help on the radio.',
+      'note.spaceport.0': '{n} spaceport: orbital shuttles every six hours.', 'note.spaceport.1': '{n} spaceport, gateway to the orbital stations.', 'note.spaceport.2': '{n} launch pads, idle because of a tariff war.',
+      'note.arcology.0': '{n} arcology: a million people who never go outside.', 'note.arcology.1': '{n} arcology, headquarters of a rising corporation.', 'note.arcology.2': '{n} arcology, unfinished: gangs hold the upper floors.',
+      'note.crashed.0': 'Crashed orbital of {n}: the station fell ten years ago.', 'note.crashed.1': 'Wreckage of {n}: a military satellite, still armed.', 'note.crashed.2': 'Crater of {n}, holding an orbital module the corporations are fighting over.',
+    },
+  });
+
   // ------------------------------------------------------------------ names
 
   const stateName = (s) => t('form.' + s.form, { n: s.name });
@@ -243,6 +456,9 @@
   const relName = (m, r) => r.customName || (r.kind === 'folk' ? t('world.folk', { n: m.cultures[r.culture].name }) : t((r.kind === 'cult' ? 'cult.' : 'rel.') + r.form, { n: r.deity }));
   const markerNote = (mk) => mk.note || t('note.' + mk.type + '.' + mk.v, { n: mk.name });
   const fmt = (v) => Math.round(v).toLocaleString(I18n.lang);
+  // A town's size on the fantasy scale (thousands): present-day and cyberpunk
+  // towns are bigger, but their kind and their plan follow this.
+  const basePop = (m, b) => (m ? b.population / (m.popScale || 1) : b.population);
   const popText = (v) => (v >= 1e6 ? (v / 1e6).toLocaleString(I18n.lang, { maximumFractionDigits: 1 }) + (L() === 0 ? ' mln' : ' M') : fmt(v));
 
   // ------------------------------------------------------------------ geometry
@@ -369,6 +585,12 @@
     }
   }
 
+  // Glyphs that change with the setting (a battlefield becomes a military base…).
+  const GLYPH = {
+    modern: { battlefield: 'base', monster: 'platform' },
+    cyber: { battlefield: 'base', monster: 'platform', springs: 'toxic', dungeon: 'datafort' },
+  };
+
   function markerGlyph(svg, mk, pal) {
     const x = mk.x, y = mk.y, r = 6.5;
     // A pin: circle on a short stem.
@@ -376,7 +598,9 @@
       { fill: pal.paper, stroke: pal.accent, strokeWidth: 1.2 });
     const cx = x, cy = y - 12.5;
     const d = new Svg.Batch();
-    switch (mk.type) {
+    const type = fantasy() ? mk.type : GLYPH[Carto.Setting.current][mk.type] || mk.type;
+    const N = Svg.num, P2 = (dx, dy) => ({ x: cx + dx, y: cy + dy });
+    switch (type) {
       case 'volcano': d.poly([{ x: cx - 3.5, y: cy + 2.5 }, { x: cx - 1, y: cy - 2.5 }, { x: cx + 1, y: cy - 2.5 }, { x: cx + 3.5, y: cy + 2.5 }]); break;
       case 'springs': for (const dx of [-2, 0, 2]) d.add('M' + Svg.num(cx + dx) + ' ' + Svg.num(cy + 3) + 'q-1 -1.5 0 -3 t0 -3'); break;
       case 'mine': d.line({ x: cx - 3, y: cy + 3 }, { x: cx + 3, y: cy - 3 }); d.line({ x: cx - 3, y: cy - 3 }, { x: cx + 3, y: cy + 3 }); break;
@@ -388,14 +612,27 @@
       case 'battlefield': d.line({ x: cx - 3, y: cy - 3 }, { x: cx + 3, y: cy + 3 }); d.line({ x: cx + 3, y: cy - 3 }, { x: cx - 3, y: cy + 3 }); d.line({ x: cx - 1, y: cy + 3.2 }, { x: cx - 3.3, y: cy + 1 }); break;
       case 'monster': d.add('M' + Svg.num(cx - 4) + ' ' + Svg.num(cy + 1) + 'q2 -4 4 0 t4 0'); break;
       case 'wreck': d.line({ x: cx, y: cy - 3.5 }, { x: cx, y: cy + 2.5 }); d.add('M' + Svg.num(cx - 3.5) + ' ' + Svg.num(cy + 1) + 'Q' + Svg.num(cx) + ' ' + Svg.num(cy + 4.5) + ' ' + Svg.num(cx + 3.5) + ' ' + Svg.num(cy + 1)); break;
+      // Present day and cyberpunk.
+      case 'airport': d.line(P2(0, -3.8), P2(0, 3.2)); d.poly([P2(-3.8, 1), P2(0, -1.2), P2(3.8, 1)], false); d.line(P2(-1.6, 3.4), P2(1.6, 3.4)); break;
+      case 'powerplant': d.poly([P2(1.2, -3.8), P2(-1.8, 0.4), P2(0.8, 0.4), P2(-1, 3.8)], false); break;
+      case 'nuclear': d.circle(cx, cy, 3.4); for (const a of [-Math.PI / 2, Math.PI / 6, (5 * Math.PI) / 6]) d.line(P2(Math.cos(a) * 0.9, Math.sin(a) * 0.9), P2(Math.cos(a) * 3.4, Math.sin(a) * 3.4)); break;
+      case 'base': d.line(P2(-2.2, 3.6), P2(-2.2, -3.6)); d.poly([P2(-2.2, -3.6), P2(3, -2), P2(-2.2, -0.4)]); break;
+      case 'platform': d.line(P2(-3.6, 0.4), P2(3.6, 0.4)); d.line(P2(-2.6, 0.4), P2(-2.6, 3.6)); d.line(P2(2.6, 0.4), P2(2.6, 3.6)); d.poly([P2(-1.3, 0.4), P2(0, -3.8), P2(1.3, 0.4)], false); break;
+      case 'toxic': d.poly([P2(0, -3.8), P2(3.8, 3), P2(-3.8, 3)]); d.line(P2(0, -1.2), P2(0, 0.9)); d.line(P2(0, 1.9), P2(0, 2)); break;
+      case 'datafort': d.poly([P2(-3, -3.4), P2(3, -3.4), P2(3, 3.4), P2(-3, 3.4)]); d.line(P2(-1.6, -1.2), P2(1.6, -1.2)); d.line(P2(-1.6, 1.2), P2(1.6, 1.2)); break;
+      case 'spaceport':
+        d.add('M' + N(cx) + ' ' + N(cy - 4) + 'Q' + N(cx + 2.2) + ' ' + N(cy - 1) + ' ' + N(cx + 1.4) + ' ' + N(cy + 2) + 'H' + N(cx - 1.4) + 'Q' + N(cx - 2.2) + ' ' + N(cy - 1) + ' ' + N(cx) + ' ' + N(cy - 4) + 'Z');
+        d.line(P2(-1.4, 1), P2(-2.8, 3.6)); d.line(P2(1.4, 1), P2(2.8, 3.6)); break;
+      case 'arcology': d.poly([P2(-3.6, 3.6), P2(-3.6, 1), P2(-2, 1), P2(-2, -1.6), P2(-0.8, -1.6), P2(-0.8, -4), P2(0.8, -4), P2(0.8, -1.6), P2(2, -1.6), P2(2, 1), P2(3.6, 1), P2(3.6, 3.6)]); break;
+      case 'crashed': d.circle(cx + 1, cy + 1, 2.2); d.line(P2(-3.8, -3.8), P2(-0.8, -0.8)); d.line(P2(-1.4, -4), P2(0.2, -2)); d.line(P2(-4, -1.4), P2(-2, 0.2)); break;
     }
     svg.path(d.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 1.1, strokeLinecap: 'round', strokeLinejoin: 'round' });
   }
 
   // ------------------------------------------------------------------ links
 
-  function burgLink(b) {
-    const k = b.population;
+  function burgLink(b, m) {
+    const k = basePop(m, b);
     if (k >= 6) {
       const size = k >= 60 ? 'huge' : k >= 22 ? 'large' : k >= 10 ? 'medium' : 'small';
       return Carto.linkTo('city', b.seed, { size, water: b.port ? (b.river ? 'both' : 'coast') : b.river ? 'river' : 'none', citadel: b.capital || k > 20, name: b.name });
@@ -406,7 +643,15 @@
     if (mk.type === 'dungeon') return Carto.linkTo('dungeon', mk.seed, {});
     if (mk.type === 'cave') return Carto.linkTo('cave', mk.seed, {});
     if (mk.type === 'grove') return Carto.linkTo('cave', mk.seed, { type: 'glade' });
+    // Today's and tomorrow's mines and crash sites can be explored too.
+    if (!fantasy() && mk.type === 'mine') return Carto.linkTo('dungeon', mk.seed, { theme: 'mine' });
+    if (!fantasy() && mk.type === 'crashed') return Carto.linkTo('dungeon', mk.seed, {});
     return null;
+  }
+  // Label of the button that opens a point of interest.
+  function markerOpen(mk) {
+    if (fantasy()) return t(mk.type === 'dungeon' ? 'world.openDungeon' : 'world.openCave');
+    return t(mk.type === 'dungeon' || mk.type === 'crashed' ? 'world.openDungeon' : mk.type === 'mine' ? 'world.openMine' : mk.type === 'grove' ? 'world.openGlade' : 'world.openCave');
   }
 
   // ------------------------------------------------------------------ render
@@ -439,7 +684,7 @@
     const rng = new Carto.Random(m.seed + 31);
     const water = (i) => m.isWater(i);
     const parchment = o.paletteId === 'parchment' || !o.paletteId;
-    const fillOpacity = o.paletteId === 'ink' ? 0.3 : o.paletteId === 'night' || o.paletteId === 'blueprint' ? 0.38 : 0.46;
+    const fillOpacity = o.paletteId === 'ink' ? 0.3 : o.paletteId === 'night' || o.paletteId === 'blueprint' ? 0.38 : o.paletteId === 'neon' ? 0.3 : 0.46;
 
     // Ocean depth in the relief view, ripples along the shore otherwise.
     if (view === 'heightmap') {
@@ -536,8 +781,20 @@
         (r.type === 'road' ? road : r.type === 'trail' ? trail : sea).add(d);
       }
       svg.path(sea.toString(), { fill: 'none', stroke: pal.waterInk, strokeWidth: 0.8, strokeDasharray: '3 3', opacity: 0.85 });
-      svg.path(road.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 1, opacity: 0.75, strokeLinecap: 'round' });
-      svg.path(trail.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 0.7, strokeDasharray: '2 2', opacity: 0.7 });
+      if (fantasy()) {
+        svg.path(road.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 1, opacity: 0.75, strokeLinecap: 'round' });
+        svg.path(trail.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 0.7, strokeDasharray: '2 2', opacity: 0.7 });
+      } else if (Carto.Setting.current === 'modern') {
+        // Paved roads, and motorways with their casing.
+        svg.path(trail.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 0.6, opacity: 0.6, strokeLinecap: 'round' });
+        svg.path(road.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 2.2, opacity: 0.85, strokeLinecap: 'round', strokeLinejoin: 'round' });
+        svg.path(road.toString(), { fill: 'none', stroke: pal.road, strokeWidth: 0.8, strokeLinecap: 'round', strokeLinejoin: 'round' });
+      } else {
+        // Service roads, and maglev highways with a glow.
+        svg.path(trail.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: 0.6, strokeDasharray: '4 1.5', opacity: 0.55 });
+        svg.path(road.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 3, opacity: 0.22, strokeLinecap: 'round', strokeLinejoin: 'round' });
+        svg.path(road.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: 1, opacity: 0.95, strokeLinecap: 'round', strokeLinejoin: 'round' });
+      }
     }
 
     // Relief icons, back to front.
@@ -636,7 +893,7 @@
       for (const b of m.burgs) {
         if (!b) continue;
         if (b.capital) { caps.circle(b.x, b.y, o.preview ? 4.5 : 3.6); dots.circle(b.x, b.y, 1.3); }
-        else towns.circle(b.x, b.y, b.population > 10 ? 2.1 : 1.6);
+        else towns.circle(b.x, b.y, basePop(m, b) > 10 ? 2.1 : 1.6);
         taken.push({ x0: b.x - 4, x1: b.x + 4, y0: b.y - 4, y1: b.y + 4 });
       }
       svg.path(towns.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 0.8 });
@@ -644,7 +901,7 @@
       svg.path(dots.toString(), { fill: pal.ink });
       if (showLabels && !o.preview) {
         const labels = m.burgs.filter((b) => b).sort((a, b) => b.capital - a.capital || !!b.added - !!a.added || b.population - a.population).map((b) => ({
-          x: b.x, y: b.y, text: b.name, size: b.capital ? 11.5 : b.population > 10 ? 9 : 7.5, title: b.capital,
+          x: b.x, y: b.y, text: b.name, size: b.capital ? 11.5 : basePop(m, b) > 10 ? 9 : 7.5, title: b.capital,
           offsets: [[1, 0], [-1, 0], [0, -1.5], [0, 1.5]], gap: b.capital ? 7.5 : 5.5,
         }));
         Draw.placeLabels(svg, labels, pal, taken, { x0: 8, y0: 8, x1: W - 8, y1: H - 8 });
@@ -660,7 +917,9 @@
     } else if (!o.preview) {
       const title = m.name;
       const sub = t('world.sub.' + view);
-      const tw = Draw.textBox(0, 0, title, 30, { title: true }).x1 * 2;
+      let tw = Draw.textBox(0, 0, title, 30, { title: true }).x1 * 2;
+      // Sans-serif and monospace subtitles run wider than the engraved face.
+      if (!fantasy()) tw = Math.max(tw, sub.length * 12 * 0.62);
       svg.rect(18, 18, Math.max(tw, 150) + 30, 64, { fill: pal.paper, stroke: pal.ink, strokeWidth: 1, opacity: 0.92 });
       svg.rect(22, 22, Math.max(tw, 150) + 22, 56, { fill: 'none', stroke: pal.ink, strokeWidth: 0.5 });
       Draw.label(svg, 33 + Math.max(tw, 150) / 2, 46, title, 30, pal, { title: true, halo: false });
@@ -681,6 +940,8 @@
   const esc = Svg.esc;
   const swatch = (c) => '<i class="swatch-dot" style="background:' + c + '"></i>';
 
+  const TELL_FORM = ['constmonarchy', 'corporation', 'conglomerate', 'protectorate'];
+
   function notes(m) {
     const totalPop = m.states.reduce((s, x) => s + (x && x.id ? x.pop : 0), 0);
     let h = '<h3>' + esc(m.name) + '</h3><p class="tag">' + esc(t('world.hint')) + '</p>';
@@ -689,7 +950,9 @@
     h += '<details open><summary>' + esc(t('world.states')) + '</summary><ul class="legend">';
     for (const s of states) {
       const cap = m.burgs[s.capital];
-      h += '<li>' + swatch(s.color) + '<span><strong>' + esc(stateName(s)) + '</strong><br><span class="tag">' + esc(t('world.capital')) + ': <a href="' + esc(burgLink(cap)) + '">' + esc(cap.name) + '</a> · ' +
+      // Some titles do not tell the form ("Regno di…" is a constitutional monarchy).
+      const form = !fantasy() && TELL_FORM.includes(s.form) ? esc(t('ftype.' + s.form)) + ' · ' : '';
+      h += '<li>' + swatch(s.color) + '<span><strong>' + esc(stateName(s)) + '</strong><br><span class="tag">' + form + esc(t('world.capital')) + ': <a href="' + esc(burgLink(cap, m)) + '">' + esc(cap.name) + '</a> · ' +
         fmt(s.area) + ' km² · ' + popText(s.pop) + '</span></span></li>';
     }
     h += '</ul></details>';
@@ -704,9 +967,19 @@
     for (const r of m.religions) if (r && r.cells) h += '<li>' + swatch(r.color) + '<span>' + esc(relName(m, r)) + ' <span class="tag">' + esc(t('rtype.' + r.kind)) + '</span></span></li>';
     h += '</ul></details><details><summary>' + esc(t('world.burgs')) + '</summary><ol>';
     for (const b of m.burgs.filter((x) => x).sort((a, c) => c.population - a.population).slice(0, 20)) {
-      h += '<li><a href="' + esc(burgLink(b)) + '">' + esc(b.name) + '</a> <span class="tag">' + esc(t('world.inhabitants', { n: fmt(b.population * 1000) })) + '</span></li>';
+      const people = fantasy() ? fmt(b.population * 1000) : popText(b.population * 1000);
+      h += '<li><a href="' + esc(burgLink(b, m)) + '">' + esc(b.name) + '</a> <span class="tag">' + esc(t('world.inhabitants', { n: people })) + '</span></li>';
     }
-    h += '</ol></details><details><summary>' + esc(t('world.markers')) + '</summary><ul>';
+    h += '</ol></details>';
+    if (!fantasy() && m.routes.length) {
+      // Transport network: length of each kind of route.
+      const len = { road: 0, trail: 0, sea: 0 };
+      for (const r of m.routes) for (let i = 1; i < r.cells.length; i++) len[r.type] += Math.hypot(m.grid.x[r.cells[i]] - m.grid.x[r.cells[i - 1]], m.grid.y[r.cells[i]] - m.grid.y[r.cells[i - 1]]) * m.KM;
+      h += '<details><summary>' + esc(t('world.routes')) + '</summary><ul>';
+      for (const k of ['road', 'trail', 'sea']) if (len[k]) h += '<li>' + esc(t('route.' + k)) + ' <span class="tag">' + fmt(len[k]) + ' km</span></li>';
+      h += '</ul></details>';
+    }
+    h += '<details><summary>' + esc(t('world.markers')) + '</summary><ul>';
     for (const mk of m.markers) {
       const link = markerLink(mk);
       const text = markerNote(mk);
@@ -722,15 +995,15 @@
     if (mk) {
       const link = markerLink(mk);
       return {
-        html: '<h3>' + esc(t('marker.' + mk.type)) + '</h3><p>' + esc(markerNote(mk)) + '</p>' + (link ? '<p><a class="btn primary" href="' + esc(link) + '">' + esc(t(mk.type === 'dungeon' ? 'world.openDungeon' : 'world.openCave')) + '</a></p>' : ''),
+        html: '<h3>' + esc(t('marker.' + mk.type)) + '</h3><p>' + esc(markerNote(mk)) + '</p>' + (link ? '<p><a class="btn primary" href="' + esc(link) + '">' + esc(markerOpen(mk)) + '</a></p>' : ''),
         mark: { x: mk.x, y: mk.y - 12, r: 9 },
       };
     }
     const b = m.burgs.filter((q) => q && near(q, q.capital ? 9 : 7)).sort((p, q) => Math.hypot(p.x - x, p.y - y) - Math.hypot(q.x - x, q.y - y))[0];
     if (b) {
       const s = m.states[b.state || 0];
-      const kind = b.capital ? t('world.capital') : b.population >= 6 ? t('world.town') : t('world.village');
-      const big = b.population >= 6;
+      const big = basePop(m, b) >= 6;
+      const kind = b.capital ? t('world.capital') : big ? t('world.town') : t('world.village');
       return {
         html: '<h3>' + esc(b.name) + '</h3><p class="tag">' + esc(kind) + (b.port ? ' · ' + esc(t('world.port')) : '') + '</p><dl>' +
           '<dt>' + esc(t('world.population')) + '</dt><dd>' + fmt(b.population * 1000) + '</dd>' +
@@ -738,7 +1011,7 @@
           (b.province ? '<dt>' + esc(t('world.province')) + '</dt><dd>' + esc(provName(m, m.provinces[b.province])) + '</dd>' : '') +
           '<dt>' + esc(t('world.culture')) + '</dt><dd>' + esc((m.cultures[b.culture] || { name: '–' }).name) + '</dd>' +
           (b.religion ? '<dt>' + esc(t('world.religion')) + '</dt><dd>' + esc(relName(m, m.religions[b.religion])) + '</dd>' : '') +
-          '</dl><p><a class="btn primary" href="' + esc(burgLink(b)) + '">' + esc(t(big ? 'world.openCity' : 'world.openVillage')) + '</a></p>',
+          '</dl><p><a class="btn primary" href="' + esc(burgLink(b, m)) + '">' + esc(t(big ? 'world.openCity' : 'world.openVillage')) + '</a></p>',
         mark: { x: b.x, y: b.y, r: 7 },
       };
     }
