@@ -74,19 +74,22 @@
   const chain = (k) => chains[k] || (chains[k] = Carto.Names.markov(CORPUS[k], ORDER[k] || 2));
   const fantasyPlace = Carto.Names.place, fantasyPerson = Carto.Names.person;
 
+  // Prefixes only: suffixes like "City" or "Sprawl" would clash with the
+  // settlement types the generators add ("Capoluogo", "Arcologia").
   function modernPlace(rng) {
     const base = chain('modernPlace').generate(rng, 5, 10);
     const it = Carto.I18n.lang === 'it';
     const forms = it
       ? [[base, 6], ['San ' + base, 1], ['Porto ' + base, 1], ['Monte ' + base, 0.6], [base + ' Marina', 0.5], ['Villa ' + base, 0.5]]
-      : [[base, 6], ['Port ' + base, 1], ['New ' + base, 1], [base + ' City', 0.8], ['Mount ' + base, 0.5], [base + ' Heights', 0.5]];
+      : [[base, 6], ['Port ' + base, 1], ['New ' + base, 1], ['Fort ' + base, 0.8], ['Mount ' + base, 0.5], ['Lake ' + base, 0.5]];
     return rng.weighted(forms);
   }
   function cyberPlace(rng) {
     const base = chain('cyberPlace').generate(rng, 4, 9);
+    const it = Carto.I18n.lang === 'it';
     return rng.weighted([
-      [base, 4], ['Neo-' + base, 2], [base + '-' + rng.int(2, 99), 1.5], [base + ' Sprawl', 1],
-      [base + ' Arcology', 0.8], [base + ' Grid', 0.8], [base + ' Spire', 0.6], [rng.pick(['Sector', 'Zone', 'Block']) + ' ' + rng.int(1, 40), 1],
+      [base, 4], ['Neo-' + base, 2], [base + '-' + rng.int(2, 99), 1.5], ['Nova ' + base, 1],
+      [base + ' Prime', 0.8], ['Kuro-' + base, 0.8], [base + ' Zero', 0.6], [rng.pick(it ? ['Settore', 'Zona', 'Blocco'] : ['Sector', 'Zone', 'Block']) + ' ' + rng.int(1, 40), 0.4],
     ]);
   }
   const fullName = (rng, a, b) => rng.pick(CORPUS[a]) + ' ' + rng.pick(CORPUS[b]);
