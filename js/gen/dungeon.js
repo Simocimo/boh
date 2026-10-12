@@ -43,8 +43,11 @@
       'dungeon.opt.theme.sanctum@modern': 'Laboratorio',
       'dungeon.secret@modern': 'Un pannello nasconde una porta segreta in una parete.',
       'dungeon.locked@modern': 'Una porta blindata è chiusa a chiave.',
-      'dungeon.legend@modern': 'S: porta segreta · ■: porta chiusa a chiave · ⋮: cancello a sbarre',
+      'dungeon.legend@modern': 'S: porta segreta · ■: porta chiusa a chiave · ⋮: cancello a sbarre · ⋮▪: posto di controllo · ▬: porta blindata',
       'dungeon.3d.rock@modern': 'Muri',
+      'dungeon.3d.ducts': 'Condotti di ventilazione',
+      'dungeon.3d.tracks': 'Binari',
+      'dungeon.duct': 'Dietro una grata, un condotto di ventilazione porta altrove.',
       'dungeon.3d.iron@modern': 'Sbarre e serrature',
       'dungeon.3d.secret@modern': 'Pannelli nascosti',
       // Cyberpunk.
@@ -56,7 +59,7 @@
       'dungeon.opt.theme.sanctum@cyber': 'Centro dati',
       'dungeon.secret@cyber': 'Un pannello olografico nasconde un passaggio in una parete.',
       'dungeon.locked@cyber': 'Una porta è sigillata da una serratura elettronica.',
-      'dungeon.legend@cyber': 'S: passaggio nascosto · ■: serratura elettronica · ⋮: barriera di sicurezza',
+      'dungeon.legend@cyber': 'S: passaggio nascosto · ┄: condotto di ventilazione · ■: serratura elettronica · ⋮: barriera di sicurezza · ⋮▪: scanner di controllo · ▬: porta blindata',
       'dungeon.3d.rock@cyber': 'Pareti',
       'dungeon.3d.iron@cyber': 'Barriere e serrature',
       'dungeon.3d.secret@cyber': 'Passaggi nascosti',
@@ -98,8 +101,11 @@
       'dungeon.opt.theme.sanctum@modern': 'Laboratory',
       'dungeon.secret@modern': 'A panel hides a secret door in one wall.',
       'dungeon.locked@modern': 'A steel door is locked.',
-      'dungeon.legend@modern': 'S: secret door · ■: locked door · ⋮: barred gate',
+      'dungeon.legend@modern': 'S: secret door · ■: locked door · ⋮: barred gate · ⋮▪: security checkpoint · ▬: blast door',
       'dungeon.3d.rock@modern': 'Walls',
+      'dungeon.3d.ducts': 'Ventilation ducts',
+      'dungeon.3d.tracks': 'Tracks',
+      'dungeon.duct': 'Behind a grille, a ventilation duct leads elsewhere.',
       'dungeon.3d.secret@modern': 'Hidden panels',
       // Cyberpunk.
       'dungeon.opt.theme.tomb@cyber': 'Clinic',
@@ -110,7 +116,7 @@
       'dungeon.opt.theme.sanctum@cyber': 'Server farm',
       'dungeon.secret@cyber': 'A holographic panel hides a passage in one wall.',
       'dungeon.locked@cyber': 'One door is sealed by a maglock.',
-      'dungeon.legend@cyber': 'S: hidden passage · ■: maglock · ⋮: security bars',
+      'dungeon.legend@cyber': 'S: hidden passage · ┄: ventilation duct · ■: maglock · ⋮: security bars · ⋮▪: scanner checkpoint · ▬: blast door',
       'dungeon.3d.rock@cyber': 'Walls',
       'dungeon.3d.iron@cyber': 'Barriers and locks',
       'dungeon.3d.secret@cyber': 'Hidden passages',
@@ -344,6 +350,7 @@
       vault: [['Caveau. Cassette di sicurezza forzate a metà coprono le pareti.', 'Vault. Half-forced safe-deposit boxes line the walls.']],
       empty: [['Stanza vuota. Polvere, calcinacci e silenzio.', 'Empty room. Dust, fallen plaster and silence.'], ['Stanza spoglia. Sul muro qualcuno ha scritto un avvertimento con la bomboletta.', 'Bare room. Someone has spray-painted a warning on the wall.']],
       exit: [['Vano scala. I gradini scendono verso livelli ancora più profondi.', 'Stairwell. Steps lead down to even deeper levels.']],
+      lift: [['Ascensore. La cabina è ferma con le porte aperte; il pannello dei piani è stato divelto.', 'Lift. The car stands with its doors open; the floor panel has been ripped out.'], ['Montacarichi. Una gabbia d’acciaio e un cartello: portata massima 1500 kg.', 'Goods lift. A steel cage and a sign: maximum load 1500 kg.']],
     },
     kinds: {
       tomb: { ward: 4, morgue: 2, surgery: 1.5, office: 1, storage: 1, hall: 1, kitchen: 0.7, lab: 0.7, collapsed: 1, flooded: 0.7, fungus: 0.7, empty: 1.5 },
@@ -477,6 +484,8 @@
       vault: [['Caveau. Casseforti sigillate dietro uno scanner retinico.', 'Vault. Sealed strongboxes behind a retina scanner.']],
       empty: [['Stanza vuota. Graffiti al neon e un cartello: «zona morta».', 'Empty room. Neon graffiti and a sign: “dead zone”.'], ['Stanza spoglia. Le telecamere sono state accecate con la vernice.', 'Bare room. The cameras have been blinded with spray paint.']],
       exit: [['Pozzo dell’ascensore. Una scala d’emergenza scende ai sottolivelli.', 'Lift shaft. An emergency ladder leads down to the sublevels.']],
+      lift: [['Ascensore. Una voce sintetica annuncia piani che non esistono più.', 'Lift. A synthetic voice announces floors that no longer exist.'], ['Montacarichi. La piattaforma magnetica fluttua a mezz’aria, in attesa di un codice.', 'Freight lift. The maglev platform hovers in mid-air, waiting for a code.']],
+      platform: [['Banchina. La monorotaia è ferma da anni; gli schermi pubblicitari parlano al vuoto.', 'Platform. The monorail has not run for years; the ad screens talk to no one.'], ['Banchina. Tende di plastica e bancarelle abusive occupano il marciapiede.', 'Platform. Plastic awnings and illegal stalls cover the walkway.']],
     },
     kinds: {
       tomb: { surgery: 3, vats: 3, ward: 2, morgue: 1.5, storage: 1, office: 0.7, guard: 1, lab: 1, empty: 1 },
@@ -915,13 +924,519 @@
           for (let d = 0.5; d <= len - 0.4; d += 1) f.push({ t: 'server', x: s.x0 + ((s.x1 - s.x0) * d) / Math.max(len, 0.01), y: s.y0 + ((s.y1 - s.y0) * d) / Math.max(len, 0.01), ang: s.ang });
         }
         break;
+      // Built plans only: a water channel, the cabin of a lift, the pillars
+      // of a platform.
+      case 'channel': {
+        const horiz = w >= h;
+        f.push({ t: 'channel', x: cx, y: cy, w: horiz ? w : 1.4, h: horiz ? 1.4 : h });
+        break;
+      }
+      case 'lift':
+        f.push({ t: 'lift', x: cx, y: cy });
+        break;
+      case 'platform': {
+        const horiz = w >= h;
+        const n = Math.floor(((horiz ? w : h) - 1) / 3);
+        for (let i = 0; i < n; i++) {
+          const d = ((horiz ? w : h) - 3 * (n - 1)) / 2 + 3 * i;
+          f.push({ t: 'column', x: horiz ? x + d : cx, y: horiz ? cy : y + d });
+        }
+        break;
+      }
     }
-    return f.filter((q) => !(q.x !== undefined && q.t !== 'cells' && q.t !== 'rails' && q.t !== 'water' && q.t !== 'circle' && blocked(Math.floor(q.x), Math.floor(q.y)) && q.t !== 'stairs'));
+    return f.filter((q) => !(q.x !== undefined && q.t !== 'cells' && q.t !== 'rails' && q.t !== 'water' && q.t !== 'circle' && blocked(Math.floor(q.x), Math.floor(q.y)) && q.t !== 'stairs' && q.t !== 'channel' && q.t !== 'lift'));
+  }
+
+  // ------------------------------------------------------------- built plans
+  // Present day and cyberpunk: built places rather than carved ones. Rooms
+  // share thin walls and open onto hallways two squares wide, in rows on
+  // both sides; wings branch at right angles, big halls sit at the ends,
+  // stairwells and lift shafts are small square rooms, checkpoints split the
+  // main hallway and (cyberpunk) ventilation ducts are the secret ways.
+
+  // Room depth and width along the hallways, big halls and wings of each
+  // theme, plus its special layouts.
+  const PLANS = {
+    tomb: { depth: [4, 5], width: [3, 5], big: [0, 1], wings: 3, bigKind: 'ward' },
+    temple: { depth: [3, 5], width: [3, 5], big: [1, 1], wings: 2, bigEnd: true },
+    lair: { depth: [4, 6], width: [3, 5], big: [1, 2], wings: 1, bigKind: 'garage' },
+    prison: { depth: [3, 4], width: [3, 4], big: [0, 1], wings: 2, tunnel: true },
+    mine: { depth: [3, 5], width: [3, 5], big: [0, 1], wings: 1, metro: true },
+    sanctum: { depth: [4, 6], width: [3, 5], big: [1, 2], wings: 2, bigKind: 'lab' },
+  };
+  // Cyberpunk: the server farm is mostly big halls full of racks, the
+  // undercity has pipes along its tunnels.
+  const PLANS_CYBER = {
+    tomb: { bigKind: 'vats' },
+    sanctum: { depth: [4, 5], width: [3, 4], big: [2, 3], wings: 1, bigSide: true, bigKind: 'servers' },
+    mine: { pipes: true },
+  };
+  // How well a purpose suits a big hall, and (below 1) a regular room.
+  const BIGK = {
+    garage: 3, servers: 3, core: 3, hall: 2.5, plant: 2, ward: 2, ritual: 2, hydro: 2, prison: 2, throne: 2, barracks: 1.5, lab: 1.5,
+    kitchen: 1.5, vats: 1.5, office: 1.5, control: 1, storage: 1, statues: 1, archive: 1, mine: 1, morgue: 1, sewer: 1, flooded: 1,
+  };
+  const REGK = { garage: 0.25, hall: 0.3, platform: 0 };
+  const BIG_BOSS = { ritual: 1, throne: 1, core: 1, lab: 1, control: 1 };
+
+  const rectCells = (x, y, w, h) => {
+    const out = [];
+    for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) out.push([i, j]);
+    return out;
+  };
+  const rectOf = (a) => a.rect || a;
+
+  // Wall shared by two rectangles: its line, direction and span.
+  function sharedEdge(a, b) {
+    if (a.x + a.w === b.x || b.x + b.w === a.x) {
+      const s0 = Math.max(a.y, b.y), s1 = Math.min(a.y + a.h, b.y + b.h);
+      if (s1 > s0) return { vertical: true, at: a.x + a.w === b.x ? b.x : a.x, s0, s1 };
+    }
+    if (a.y + a.h === b.y || b.y + b.h === a.y) {
+      const s0 = Math.max(a.x, b.x), s1 = Math.min(a.x + a.w, b.x + b.w);
+      if (s1 > s0) return { vertical: false, at: a.y + a.h === b.y ? b.y : a.y, s0, s1 };
+    }
+    return null;
+  }
+
+  // Door `w` squares wide on an edge, from square `s`; its leaf swings into
+  // the rectangle `into`.
+  function doorAt(e, s, w, into) {
+    const c = s + w / 2;
+    const d = e.vertical ? { x: e.at, y: c, vertical: true, w } : { x: c, y: e.at, vertical: false, w };
+    if (into) d.into = (e.vertical ? into.x + into.w / 2 : into.y + into.h / 2) > e.at ? 1 : -1;
+    d.hinge = 0;
+    return d;
+  }
+
+  function builtPlan(rng, theme, target, cyber, loopsWanted) {
+    const P = Object.assign({}, PLANS[theme], cyber ? PLANS_CYBER[theme] : null);
+    let areas = [], links = [];
+    let occ = new Map();
+    const mark = (a) => { for (const [x, y] of a.cells || rectCells(a.x, a.y, a.w, a.h)) occ.set(ck(x, y), a.id); };
+    const add = (a) => { a.id = areas.length; areas.push(a); mark(a); return a; };
+    const free = (r) => {
+      for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) if (occ.has(ck(x, y))) return false;
+      return true;
+    };
+    // Nothing within `m` squares of a new hallway, except the areas given.
+    const clear = (r, m, except) => {
+      for (let y = r.y - m; y < r.y + r.h + m; y++) {
+        for (let x = r.x - m; x < r.x + r.w + m; x++) {
+          const o = occ.get(ck(x, y));
+          if (o !== undefined && !except.includes(areas[o])) return false;
+        }
+      }
+      return true;
+    };
+    const halls = [];
+    const hall = (x, y, w, h, axis, extra) => {
+      const H = add(Object.assign({ kind: 'corridor', hall: true, axis, rect: { x, y, w, h }, cells: rectCells(x, y, w, h) }, extra));
+      halls.push(H);
+      return H;
+    };
+    const room = (r, extra) => add(Object.assign({ kind: 'room', shape: 'rect', x: r.x, y: r.y, w: r.w, h: r.h }, extra));
+    // A doorway between two areas; o.w its width, o.at its first square.
+    const join = (A, B, o = {}) => {
+      const e = sharedEdge(rectOf(A), rectOf(B));
+      const w = Math.min(o.w || e.s1 - e.s0, e.s1 - e.s0);
+      const s = o.at !== undefined ? o.at : e.s0 + Math.floor((e.s1 - e.s0 - w) / 2);
+      const into = o.into || (B.kind === 'room' ? B : A.kind === 'room' ? A : null);
+      const door = doorAt(e, s, w, into && rectOf(into));
+      if (o.hinge) door.hinge = 1;
+      const l = { a: A.id, b: B.id, door };
+      for (const k of ['type', 'loop', 'checkpoint', 'blast', 'edge', 'duct']) if (o[k]) l[k] = o[k];
+      links.push(l);
+      return l;
+    };
+    // Rectangle of a room along one side of a hallway (side -1: above or
+    // left, +1: below or right), from square `a` along it.
+    const sideRect = (H, side, a, len, d) => {
+      const r = H.rect;
+      if (H.axis === 'x') return side < 0 ? { x: a, y: r.y - d, w: len, h: d } : { x: a, y: r.y + r.h, w: len, h: d };
+      return side < 0 ? { x: r.x - d, y: a, w: d, h: len } : { x: r.x + r.w, y: a, w: d, h: len };
+    };
+    // Rectangle closing the end of a hallway (end -1: start, +1: far end),
+    // `d` deep and `ext` squares wider than the hallway on each side.
+    const endRect = (H, end, d, e0, e1) => {
+      const r = H.rect;
+      if (H.axis === 'x') return { x: end < 0 ? r.x - d : r.x + r.w, y: r.y - e0, w: d, h: r.h + e0 + e1 };
+      return { x: r.x - e0, y: end < 0 ? r.y - d : r.y + r.h, w: r.w + e0 + e1, h: d };
+    };
+    const endFree = (H, end) => free(endRect(H, end, 1, 0, 0));
+    const dmax = P.depth[1];
+    const nBig = Math.min(target < 9 ? 1 : 3, rng.int(P.big[0], P.big[1]));
+    const avgW = (P.width[0] + P.width[1]) / 2;
+    const budget = Math.max(3, target - nBig - 2) * avgW * 0.6 + nBig * 5;
+    let entrance = null, spine = [];
+
+    if (P.metro) {
+      // A station: a double track between two long platforms, stairs up to
+      // the concourses, and a service tunnel with a single track.
+      const lp = Math.max(10, Math.min(22, Math.round(target * 1.1) + rng.int(-1, 2)));
+      const lt = lp + rng.int(8, 13);
+      const px = rng.int(3, lt - lp - 3);
+      const track = hall(0, 0, lt, 4, 'x', { track: 2, noRooms: true, openEnd: true });
+      const both = target >= 9 || rng.bool(0.5);
+      for (const side of both ? [-1, 1] : [-1]) {
+        const pl = room({ x: px, y: side < 0 ? -3 : 4, w: lp, h: 3 }, { role: 'platform' });
+        join(track, pl, { type: 'open', edge: true });
+        const cy = side < 0 ? -7 : 9;
+        const conc = hall(px + 1, cy, lp - 2, 2, 'x');
+        const stairs = lp >= 16 ? [px + 2, px + lp - 4] : [px + 2 + rng.int(0, lp - 8)];
+        for (const sx of stairs) {
+          const st = add({ kind: 'corridor', stairs: side < 0 ? 'n' : 's', rect: { x: sx, y: side < 0 ? -5 : 7, w: 2, h: 2 }, cells: rectCells(sx, side < 0 ? -5 : 7, 2, 2) });
+          join(pl, st, { type: 'open' });
+          join(st, conc, { type: 'open' });
+        }
+        if (!entrance) {
+          entrance = room(endRect(conc, -1, 3, side < 0 ? 1 : 0, side < 0 ? 0 : 1), { role: 'stair' });
+          join(conc, entrance, { w: 1, type: 'door', at: conc.rect.y + (side < 0 ? 1 : 0) });
+          spine.push(conc);
+        }
+      }
+      // The service tunnel carries one of the tracks further.
+      const sl = Math.max(6, Math.min(24, Math.round(budget * 0.6)));
+      const serv = hall(lt, 0, sl, 2, 'x', { rails: 1 });
+      join(track, serv, { type: 'open' });
+      spine.push(serv);
+    } else {
+      const len = Math.round(Math.max(8, Math.min(34, budget * rng.float(0.55, 0.8))));
+      // Bunker: a long access tunnel ends at a blast door.
+      const tl = P.tunnel ? rng.int(8, 14) : 0;
+      const tunnel = tl ? hall(-tl, 0, tl, 2, 'x', { noRooms: true }) : null;
+      // A security checkpoint splits the main hallway in two.
+      const cut = target >= 8 && len >= 12 && rng.bool(0.8) ? rng.int(Math.round(len * 0.3), Math.round(len * 0.55)) : 0;
+      spine.push(hall(0, 0, cut || len, 2, 'x'));
+      if (cut) { spine.push(hall(cut, 0, len - cut, 2, 'x')); join(spine[0], spine[1], { type: 'bars', checkpoint: true }); }
+      if (tunnel) join(tunnel, spine[0], { type: 'locked', blast: true });
+      const first = tunnel || spine[0];
+      const o = rng.int(0, 1);
+      entrance = room(endRect(first, -1, 3, o, 1 - o), { role: 'stair' });
+      join(first, entrance, { w: 1, type: 'door', at: rng.int(0, 1) });
+    }
+
+    // Wings at right angles to the main hallway; some turn at their end.
+    let wingBudget = budget - spine.reduce((s, H) => s + H.rect.w, 0) * (P.metro ? 0.5 : 1);
+    const main = spine[spine.length - 1];
+    for (let tries = 0, wings = 0; tries < 40 && wingBudget >= 5 && wings < P.wings; tries++) {
+      const len = Math.max(5, Math.min(14, Math.round(wingBudget * rng.float(0.45, 0.9))));
+      const parent = rng.pick(spine);
+      const pr = parent.rect;
+      if (pr.w < 8) continue;
+      if (P.metro && parent !== main) continue;
+      const x = rng.int(pr.x + 3, pr.x + pr.w - 5);
+      const up = rng.bool();
+      const r = up ? { x, y: pr.y - len, w: 2, h: len } : { x, y: pr.y + 2, w: 2, h: len };
+      if (!clear(r, dmax + 1, spine)) continue;
+      const W = hall(r.x, r.y, 2, len, 'y');
+      join(parent, W, { type: 'open' });
+      wingBudget -= len;
+      wings++;
+      if (wingBudget >= 5 && rng.bool(0.45)) {
+        const bl = Math.max(5, Math.min(10, Math.round(wingBudget * rng.float(0.5, 1))));
+        const right = rng.bool();
+        const by = up ? r.y : r.y + len - 2;
+        const br = { x: right ? x + 2 : x - bl, y: by, w: bl, h: 2 };
+        if (clear(br, dmax + 1, [W])) {
+          const B = hall(br.x, br.y, bl, 2, 'x');
+          join(W, B, { type: 'open' });
+          wingBudget -= bl;
+        }
+      }
+    }
+
+    // Big halls: at the end of the main hallway, or along its sides.
+    const bigs = [];
+    const bigRect = () => ({ len: rng.int(7, 11), d: rng.int(6, 8) });
+    for (let i = 0, tries = 0; i < nBig && tries < 30; tries++) {
+      const { len, d } = bigRect();
+      let r = null, H = null;
+      if (i === 0 && !P.bigSide && (P.bigEnd || rng.bool(0.6)) && endFree(main, 1)) {
+        H = main;
+        const e0 = Math.floor((len - 2) / 2);
+        r = endRect(main, 1, d, e0, len - 2 - e0);
+      } else {
+        H = rng.pick(halls.filter((q) => !q.noRooms && !q.track));
+        const span = H.axis === 'x' ? [H.rect.x, H.rect.x + H.rect.w] : [H.rect.y, H.rect.y + H.rect.h];
+        if (span[1] - span[0] < len) continue;
+        r = sideRect(H, rng.pick([-1, 1]), rng.int(span[0], span[1] - len), len, d);
+      }
+      if (!free(r)) continue;
+      const B = room(r, { role: 'big' });
+      join(H, B, { w: 2 });
+      bigs.push(B);
+      i++;
+    }
+
+    // Stairwells and lift shafts close free hallway ends, the farthest first.
+    const ex = entrance.x + entrance.w / 2, ey = entrance.y + entrance.h / 2;
+    const ends = [];
+    for (const H of halls) {
+      if (H.noRooms || H.track) continue;
+      for (const end of [-1, 1]) {
+        if (!endFree(H, end)) continue;
+        const r = endRect(H, end, 1, 0, 0);
+        ends.push({ H, end, d: Math.hypot(r.x - ex, r.y - ey) });
+      }
+    }
+    ends.sort((a, b) => b.d - a.d);
+    const stairsWanted = [rng.bool(0.75) ? 'exit' : null, rng.bool(0.4) ? 'lift' : null].filter(Boolean);
+    for (const role of stairsWanted) {
+      const o = rng.int(0, 1);
+      const e = ends.find((q) => endFree(q.H, q.end) && (free(endRect(q.H, q.end, 3, o, 1 - o)) || free(endRect(q.H, q.end, 3, 1 - o, o))));
+      if (!e) break;
+      const r = free(endRect(e.H, e.end, 3, o, 1 - o)) ? endRect(e.H, e.end, 3, o, 1 - o) : endRect(e.H, e.end, 3, 1 - o, o);
+      const R = room(r, { role });
+      join(e.H, R, { w: 1, at: (e.H.axis === 'x' ? e.H.rect.y : e.H.rect.x) + rng.int(0, 1) });
+    }
+
+    // Rooms in rows along both sides of every hallway.
+    for (const H of halls) {
+      if (H.noRooms || H.track) continue;
+      const along0 = H.axis === 'x' ? H.rect.x : H.rect.y, along1 = along0 + (H.axis === 'x' ? H.rect.w : H.rect.h);
+      for (const side of [-1, 1]) {
+        const depth = rng.int(P.depth[0], P.depth[1]);
+        let a = along0;
+        while (a <= along1 - 3) {
+          // The deepest room that fits here, then the free run along the
+          // hallway at that depth; short leftovers join the room.
+          let d = depth;
+          while (d >= 3 && !free(sideRect(H, side, a, 3, d))) d--;
+          if (d < 3) { a++; continue; }
+          let run = 3;
+          while (a + run < along1 && free(sideRect(H, side, a + run, 1, d))) run++;
+          const want = rng.int(P.width[0], P.width[1]);
+          const r = sideRect(H, side, a, run - Math.min(want, run) < 3 ? run : want, d);
+          const len = H.axis === 'x' ? r.w : r.h;
+          const R = room(r);
+          // Doors near a corner, as in offices and wards.
+          const k = len >= 4 ? (rng.bool(0.7) ? 1 : len - 2) : Math.floor(len / 2);
+          join(H, R, { w: 1, at: a + k, hinge: k >= len / 2 });
+          a += len;
+        }
+      }
+      // A room at a free end of the hallway.
+      for (const end of [-1, 1]) {
+        if (!endFree(H, end)) continue;
+        const d = rng.int(P.depth[0], P.depth[1]);
+        for (const [e0, e1] of [[1, 1], [0, 1], [1, 0], [0, 0]]) {
+          const r = endRect(H, end, d, e0, e1);
+          if (!free(r)) continue;
+          const R = room(r);
+          join(H, R, { w: 1, at: (H.axis === 'x' ? H.rect.y : H.rect.x) + rng.int(0, 1) });
+          break;
+        }
+      }
+    }
+
+    // Too many rooms: drop the regular ones farthest from the entrance.
+    const alive = () => areas.filter((a) => !a.dead);
+    const kill = (a) => { a.dead = true; links = links.filter((l) => l.a !== a.id && l.b !== a.id); };
+    let regular = areas.filter((a) => a.kind === 'room' && !a.role);
+    regular.sort((a, b) => Math.hypot(b.x - ex, b.y - ey) - Math.hypot(a.x - ex, a.y - ey));
+    let count = areas.filter((a) => a.kind === 'room').length;
+    for (const r of regular) { if (count <= target) break; kill(r); count--; }
+
+    // Hallways shrink to the rooms they serve; unused ones go.
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const H of areas) {
+        if (H.dead || !H.hall || H.track) continue;
+        let lo = Infinity, hi = -Infinity;
+        for (const l of links) {
+          const o = l.a === H.id ? l.b : l.b === H.id ? l.a : -1;
+          if (o < 0) continue;
+          const e = sharedEdge(H.rect, rectOf(areas[o]));
+          if (!e) continue;
+          const along = (H.axis === 'x') === !e.vertical;
+          lo = Math.min(lo, along ? e.s0 : e.at);
+          hi = Math.max(hi, along ? e.s1 : e.at);
+        }
+        const r = H.rect;
+        const a0 = H.axis === 'x' ? r.x : r.y, a1 = a0 + (H.axis === 'x' ? r.w : r.h);
+        if (hi - lo < 2) {
+          if (links.filter((l) => l.a === H.id || l.b === H.id).length <= 1 && H !== spine[0]) { kill(H); changed = true; }
+          continue;
+        }
+        const n0 = Math.max(a0, lo), n1 = Math.min(a1, hi);
+        if (n0 === a0 && n1 === a1) continue;
+        if (H.axis === 'x') { r.x = n0; r.w = n1 - n0; } else { r.y = n0; r.h = n1 - n0; }
+        H.cells = rectCells(r.x, r.y, r.w, r.h);
+        changed = true;
+      }
+    }
+
+    // Compact: the entrance first, then every living area in order.
+    const old = [entrance].concat(alive().filter((a) => a !== entrance));
+    const map = new Map(old.map((a, i) => [a.id, i]));
+    old.forEach((a, i) => { a.id = i; });
+    links = links.filter((l) => map.has(l.a) && map.has(l.b));
+    for (const l of links) { l.a = map.get(l.a); l.b = map.get(l.b); }
+    areas = old;
+    occ = new Map();
+    for (const a of areas) mark(a);
+
+    // Loops: doors between neighbouring rooms, secret panels and, in
+    // cyberpunk, ventilation ducts crawling round the back of the rooms.
+    const rooms = areas.filter((a) => a.kind === 'room');
+    const linked = (A, B) => links.some((l) => (l.a === A.id && l.b === B.id) || (l.a === B.id && l.b === A.id));
+    const pairs = [];
+    for (let i = 0; i < rooms.length; i++) {
+      for (let j = i + 1; j < rooms.length; j++) {
+        const A = rooms[i], B = rooms[j];
+        if (A === entrance || B === entrance || A.role === 'platform' || B.role === 'platform') continue;
+        const e = sharedEdge(A, B);
+        if (e && e.s1 - e.s0 >= 2 && !linked(A, B)) pairs.push([A, B, e]);
+      }
+    }
+    let secrets = cyber ? rng.int(0, 1) : rng.int(1, 2);
+    for (const [A, B, e] of rng.shuffle(pairs).slice(0, loopsWanted + secrets)) {
+      const span = e.s1 - e.s0;
+      const at = e.s0 + (span >= 3 ? rng.int(1, span - 2) : rng.int(0, span - 1));
+      join(A, B, { w: 1, at, loop: true, into: B, hinge: rng.bool(), type: secrets-- > 0 ? 'secret' : rng.pick(['door', 'door', 'open']) });
+    }
+    if (cyber) {
+      const want = Math.max(1, loopsWanted);
+      const tried = new Set();
+      for (let k = 0, tries = 0; k < want && tries < 12; tries++) {
+        const A = rng.pick(rooms.filter((r) => r !== entrance && r.role !== 'platform'));
+        if (!A || tried.has(A.id)) continue;
+        tried.add(A.id);
+        const duct = ductFrom(A);
+        if (!duct) continue;
+        const D = add({ kind: 'corridor', duct: true, cells: duct.path });
+        const [c0, c1] = [duct.path[0], duct.path[duct.path.length - 1]];
+        links.push({ a: A.id, b: D.id, door: Object.assign(doorBetween(duct.from, c0), { w: 1 }), type: 'secret', duct: true, loop: true });
+        links.push({ a: D.id, b: duct.to.id, door: Object.assign(doorBetween(c1, duct.toCell), { w: 1 }), type: 'secret', duct: true, loop: true });
+        k++;
+      }
+    }
+    function doorBetween(c1, c2) {
+      return { x: (c1[0] + c2[0]) / 2 + 0.5, y: (c1[1] + c2[1]) / 2 + 0.5, vertical: c1[0] !== c2[0] };
+    }
+    // Shortest crawl through solid ground from the back of room A to another
+    // room it does not open onto.
+    function ductFrom(A) {
+      const start = [];
+      for (const [x, y] of rectCells(A.x, A.y, A.w, A.h)) {
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const q = [x + dx, y + dy];
+          if (!occ.has(ck(q[0], q[1]))) start.push({ c: q, from: [x, y] });
+        }
+      }
+      const seen = new Set();
+      let frontier = rng.shuffle(start).filter((s) => {
+        const kq = ck(s.c[0], s.c[1]);
+        if (seen.has(kq)) return false;
+        seen.add(kq);
+        return true;
+      });
+      for (let step = 0; step < 14 && frontier.length; step++) {
+        const next = [];
+        for (const f of frontier) {
+          const [x, y] = f.c;
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const q = [x + dx, y + dy], kq = ck(q[0], q[1]);
+            const o = occ.get(kq);
+            if (o !== undefined) {
+              const B = areas[o];
+              if (step >= 2 && B.kind === 'room' && B !== A && B !== entrance && B.role !== 'platform' && !linked(A, B) && !sharedEdge(A, B)) {
+                const path = [];
+                let p = f;
+                for (; p.prev; p = p.prev) path.unshift(p.c);
+                path.unshift(p.c);
+                return { path, from: p.from, to: B, toCell: q };
+              }
+              continue;
+            }
+            if (seen.has(kq)) continue;
+            seen.add(kq);
+            next.push({ c: q, prev: f });
+          }
+        }
+        frontier = next;
+      }
+      return null;
+    }
+
+    return { areas, links, entrance, rooms: areas.filter((a) => a.kind === 'room'), target };
   }
 
   // ------------------------------------------------------------- generation
 
+  // Breadth-first walk from the entrance: depth of every area and the order
+  // in which rooms are numbered.
+  function numberRooms(areas, links, start) {
+    const neighbours = new Map(areas.map((a) => [a.id, []]));
+    for (const l of links) { neighbours.get(l.a).push(l.b); neighbours.get(l.b).push(l.a); }
+    const depth = new Map([[start, 0]]);
+    const queue = [start];
+    const order = [];
+    while (queue.length) {
+      const id = queue.shift();
+      if (areas[id].kind === 'room') order.push(id);
+      for (const n of neighbours.get(id)) if (!depth.has(n)) { depth.set(n, depth.get(id) + 1); queue.push(n); }
+    }
+    order.forEach((id, i) => { areas[id].num = i + 1; });
+    return { neighbours, depth, order };
+  }
+
+  // Squares on both sides of a door (one door wide).
+  function fantasyDoorCells(l) {
+    return l.door.vertical ? [[Math.floor(l.door.x - 1), Math.floor(l.door.y)], [Math.floor(l.door.x), Math.floor(l.door.y)]]
+      : [[Math.floor(l.door.x), Math.floor(l.door.y - 1)], [Math.floor(l.door.x), Math.floor(l.door.y)]];
+  }
+
+  // Furniture, creatures, treasures and traps of every room.
+  function fillContents(cr, D, theme, rooms, links, doorCells) {
+    const monsters = D.monsters[theme];
+    for (const r of rooms) {
+      const doorsIn = [];
+      for (const l of links) {
+        if (l.a !== r.id && l.b !== r.id) continue;
+        // cell inside the room next to the door
+        const cand = doorCells(l);
+        for (const c of cand) if (c[0] >= r.x && c[0] < r.x + r.w && c[1] >= r.y && c[1] < r.y + r.h) doorsIn.push(c);
+        if (l.type === 'secret') r.secret = true;
+        if (l.type === 'locked') r.locked = true;
+        if (l.duct) r.vent = true;
+      }
+      // Built plans: sewers run in a straight channel.
+      const kind = r.role === 'platform' ? 'platform' : doorCells === builtDoorCells && r.purpose === 'sewer' ? 'channel' : FURN[r.purpose] || r.purpose;
+      r.features = furnish(cr, r, kind, doorsIn);
+      r.text = { v: cr.int(0, D.rooms[r.purpose].length - 1) };
+      if (r.purpose !== 'entrance' && r.purpose !== 'exit' && (r.boss || cr.bool(0.42))) {
+        let mi = r.boss ? monsters.findIndex((m) => m[4]) : cr.int(0, monsters.length - (D === T ? 1 : 2));
+        // Present day and cyberpunk bosses are someone, met only in their room.
+        if (D !== T && !r.boss && mi >= monsters.findIndex((m) => m[4])) mi++;
+        const m = monsters[Math.max(0, mi)];
+        const n = m[4] ? 1 : cr.int(1, 5);
+        r.text.monster = { i: Math.max(0, mi), n, s: cr.int(0, 2) };
+      }
+      if (r.purpose === 'vault' || cr.bool(r.boss ? 0.8 : 0.22)) {
+        r.text.treasure = { i: cr.int(0, D.treasures.length - 1), s: cr.int(0, D.treasureSentences.length - 1), coins: cr.int(5, 50) * 10 };
+      }
+      if (r.purpose !== 'entrance' && cr.bool(0.14)) r.text.trap = cr.int(0, D.traps.length - 1);
+    }
+  }
+
+  // Indices of the title words and of the story sentences.
+  function makeStory(tr, D, theme) {
+    const title = { place: tr.int(0, D.places[theme].length - 1), noun: tr.int(0, (D.nouns[theme] || D.nouns).length - 1), adj: tr.int(0, D.adjs.length - 1) };
+    const story = {
+      opening: tr.int(0, D.openings.length - 1),
+      rumor: tr.int(0, D.rumors[theme].length - 1),
+      goal: tr.int(0, D.goals.length - 1),
+      name: D.storyNames ? Carto.Names[D.storyNames[theme]](tr) : theme === 'mine' ? Carto.Names.place(tr) : Carto.Names.person(tr),
+      treasure: tr.int(1, D.treasures.length - 1),
+    };
+    return { title, story };
+  }
+
   function generate(seed, opts) {
+    // Present day and cyberpunk: built places, planned in their own way.
+    if (Carto.Setting.current !== 'fantasy') return generateBuilt(seed, opts);
     const rng = new Carto.Random(seed);
     const D = tables(Carto.Setting.current);
     const theme = opts.theme && opts.theme !== 'auto' ? opts.theme : rng.fork('theme').pick(THEMES);
@@ -945,17 +1460,7 @@
     }
 
     // Room graph and numbering (breadth first from the entrance).
-    const neighbours = new Map(areas.map((a) => [a.id, []]));
-    for (const l of links) { neighbours.get(l.a).push(l.b); neighbours.get(l.b).push(l.a); }
-    const depth = new Map([[0, 0]]);
-    const queue = [0];
-    const order = [];
-    while (queue.length) {
-      const id = queue.shift();
-      if (areas[id].kind === 'room') order.push(id);
-      for (const n of neighbours.get(id)) if (!depth.has(n)) { depth.set(n, depth.get(id) + 1); queue.push(n); }
-    }
-    order.forEach((id, i) => { areas[id].num = i + 1; });
+    const { neighbours, depth, order } = numberRooms(areas, links, 0);
 
     // Room purposes.
     const pr = rng.fork('purpose');
@@ -975,45 +1480,10 @@
     }
 
     // Contents.
-    const cr = rng.fork('contents');
-    const monsters = D.monsters[theme];
-    for (const r of rooms) {
-      const doorsIn = [];
-      for (const l of links) {
-        if (l.a !== r.id && l.b !== r.id) continue;
-        // cell inside the room next to the door
-        const cand = l.door.vertical ? [[Math.floor(l.door.x - 1), Math.floor(l.door.y)], [Math.floor(l.door.x), Math.floor(l.door.y)]]
-          : [[Math.floor(l.door.x), Math.floor(l.door.y - 1)], [Math.floor(l.door.x), Math.floor(l.door.y)]];
-        for (const c of cand) if (c[0] >= r.x && c[0] < r.x + r.w && c[1] >= r.y && c[1] < r.y + r.h) doorsIn.push(c);
-        if (l.type === 'secret') r.secret = true;
-        if (l.type === 'locked') r.locked = true;
-      }
-      r.features = furnish(cr, r, FURN[r.purpose] || r.purpose, doorsIn);
-      r.text = { v: cr.int(0, D.rooms[r.purpose].length - 1) };
-      if (r.purpose !== 'entrance' && r.purpose !== 'exit' && (r.boss || cr.bool(0.42))) {
-        let mi = r.boss ? monsters.findIndex((m) => m[4]) : cr.int(0, monsters.length - (D === T ? 1 : 2));
-        // Present day and cyberpunk bosses are someone, met only in their room.
-        if (D !== T && !r.boss && mi >= monsters.findIndex((m) => m[4])) mi++;
-        const m = monsters[Math.max(0, mi)];
-        const n = m[4] ? 1 : cr.int(1, 5);
-        r.text.monster = { i: Math.max(0, mi), n, s: cr.int(0, 2) };
-      }
-      if (r.purpose === 'vault' || cr.bool(r.boss ? 0.8 : 0.22)) {
-        r.text.treasure = { i: cr.int(0, D.treasures.length - 1), s: cr.int(0, D.treasureSentences.length - 1), coins: cr.int(5, 50) * 10 };
-      }
-      if (r.purpose !== 'entrance' && cr.bool(0.14)) r.text.trap = cr.int(0, D.traps.length - 1);
-    }
+    fillContents(rng.fork('contents'), D, theme, rooms, links, fantasyDoorCells);
 
     // Title and story.
-    const tr = rng.fork('title');
-    const title = { place: tr.int(0, D.places[theme].length - 1), noun: tr.int(0, (D.nouns[theme] || D.nouns).length - 1), adj: tr.int(0, D.adjs.length - 1) };
-    const story = {
-      opening: tr.int(0, D.openings.length - 1),
-      rumor: tr.int(0, D.rumors[theme].length - 1),
-      goal: tr.int(0, D.goals.length - 1),
-      name: D.storyNames ? Carto.Names[D.storyNames[theme]](tr) : theme === 'mine' ? Carto.Names.place(tr) : Carto.Names.person(tr),
-      treasure: tr.int(1, D.treasures.length - 1),
-    };
+    const { title, story } = makeStory(rng.fork('title'), D, theme);
 
     // Bounds in cells.
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -1022,6 +1492,111 @@
       for (const [x, y] of cells) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
     }
     return { seed, theme, areas, links, rooms: order.map((id) => areas[id]), title, story, bounds: { x0, y0, x1: x1 + 1, y1: y1 + 1 } };
+  }
+
+  // Squares on both sides of a door as wide as it is.
+  function builtDoorCells(l) {
+    const d = l.door, w = d.w || 1, out = [];
+    // Platforms keep their pillars along the edge.
+    if (l.edge) return out;
+    for (let i = 0; i < w; i++) {
+      const s = Math.floor((d.vertical ? d.y : d.x) - w / 2 + i);
+      if (d.vertical) out.push([d.x - 1, s], [d.x, s]);
+      else out.push([s, d.y - 1], [s, d.y]);
+    }
+    return out;
+  }
+
+  // Present day and cyberpunk: a built plan, its rooms given purposes by
+  // their shape (big halls, stairwells, the guard post by a checkpoint).
+  function generateBuilt(seed, opts) {
+    const setting = Carto.Setting.current, cyber = setting === 'cyber';
+    const rng = new Carto.Random(seed);
+    const D = tables(setting);
+    const theme = opts.theme && opts.theme !== 'auto' ? opts.theme : rng.fork('theme').pick(THEMES);
+    const sizes = { small: [6, 8, 1], medium: [10, 14, 2], large: [16, 22, 4] };
+    const [lo, hi, loopMax] = sizes[opts.size] || sizes.medium;
+    const lr = rng.fork('plan');
+    let best = null;
+    for (let i = 0; i < 8; i++) {
+      const target = lr.int(lo, hi);
+      const res = builtPlan(lr, theme, target, cyber, lr.int(Math.max(0, loopMax - 1), loopMax));
+      const n = res.rooms.length;
+      res.score = n < lo ? lo - n : n > hi ? n - hi : 0;
+      if (!best || res.score < best.score) best = res;
+      if (!res.score) break;
+    }
+    const { areas, links, entrance } = best;
+    const P = Object.assign({}, PLANS[theme], cyber ? PLANS_CYBER[theme] : null);
+
+    // Door types; checkpoints, blast doors and platform edges come with the plan.
+    const dr = rng.fork('doors');
+    for (const l of links) {
+      if (l.type) continue;
+      l.type = l.door.w > 1 ? dr.weighted([['door', 3], ['open', 2]])
+        : theme === 'prison' ? dr.weighted([['door', 4], ['locked', 1.2], ['bars', 1.2], ['open', 1]])
+          : dr.weighted([['door', 6], ['open', 1.5], ['locked', 0.8], ['bars', 0.3]]);
+    }
+
+    const { depth, order } = numberRooms(areas, links, entrance.id);
+    const rooms = order.map((id) => areas[id]);
+
+    // Purposes, by the shape and place of each room.
+    const pr = rng.fork('purpose');
+    const kinds = Object.entries(D.kinds[theme]);
+    const ent = rooms[0];
+    ent.purpose = 'entrance';
+    for (const r of rooms) if (r.role === 'exit' || r.role === 'lift' || r.role === 'platform') r.purpose = r.role;
+    const far = (r) => depth.get(r.id) * 100 + Math.hypot(r.x + r.w / 2 - ent.x, r.y + r.h / 2 - ent.y);
+    const dist = (r, p) => Math.hypot(r.x + r.w / 2 - p.x, r.y + r.h / 2 - p.y);
+    const open = rooms.filter((r) => !r.purpose);
+    const bossKind = D.boss[theme];
+    const pool = open.filter((r) => (r.role === 'big') === !!BIG_BOSS[bossKind]);
+    const boss = (pool.length ? pool : open).slice().sort((a, b) => far(b) - far(a))[0];
+    if (boss) { boss.purpose = bossKind; boss.boss = true; }
+    // The vault: a small room far from the entrance, behind a locked door.
+    const smalls = rooms.filter((r) => !r.purpose && !r.role).sort((a, b) => far(b) - far(a));
+    if (smalls.length) {
+      const v = smalls[pr.int(0, Math.min(2, smalls.length - 1))];
+      v.purpose = 'vault';
+      for (const l of links) if ((l.a === v.id || l.b === v.id) && l.type !== 'secret') l.type = 'locked';
+    }
+    // A guard post next to every checkpoint and blast door.
+    for (const l of links) {
+      if (!l.checkpoint && !l.blast) continue;
+      const near = rooms.filter((r) => !r.purpose && !r.role).sort((a, b) => dist(a, l.door) - dist(b, l.door))[0];
+      if (near && dist(near, l.door) < 7) near.purpose = 'guard';
+    }
+    // The rest by the theme's weights, less likely each time a purpose repeats.
+    const used = {};
+    for (const r of rooms) used[r.purpose] = (used[r.purpose] || 0) + 1;
+    const rarer = (k, v) => v * Math.pow(0.4, used[k] || 0);
+    let firstBig = true;
+    for (const r of rooms) {
+      if (r.purpose) continue;
+      if (r.role === 'big') {
+        if (firstBig && P.bigKind && D.rooms[P.bigKind]) r.purpose = P.bigKind;
+        else {
+          const w = kinds.filter(([k]) => BIGK[k]).map(([k, v]) => [k, v * BIGK[k] * (P.bigKind === k ? 1 : Math.pow(0.6, used[k] || 0))]);
+          r.purpose = pr.weighted(w.length ? w : kinds);
+        }
+        firstBig = false;
+      } else {
+        r.purpose = pr.weighted(kinds.map(([k, v]) => [k, rarer(k, v) * (k in REGK ? REGK[k] : 1)]).filter((q) => q[1] > 0));
+      }
+      used[r.purpose] = (used[r.purpose] || 0) + 1;
+    }
+
+    fillContents(rng.fork('contents'), D, theme, rooms, links, builtDoorCells);
+    const { title, story } = makeStory(rng.fork('title'), D, theme);
+
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const a of areas) {
+      for (const [x, y] of a.cells || [[a.x, a.y], [a.x + a.w - 1, a.y + a.h - 1]]) {
+        x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+      }
+    }
+    return { seed, theme, built: true, areas, links, rooms, title, story, bounds: { x0, y0, x1: x1 + 1, y1: y1 + 1 } };
   }
 
   // ------------------------------------------------------------- text
@@ -1070,7 +1645,8 @@
       parts.push(D.treasureSentences[tx.treasure.s][l].replace('{T}', tt));
     }
     if (tx.trap !== undefined) parts.push(D.trapSentence[l].replace('{R}', D.traps[tx.trap][l]));
-    if (r.secret) parts.push(t('dungeon.secret'));
+    if (r.vent) parts.push(t('dungeon.duct'));
+    else if (r.secret) parts.push(t('dungeon.secret'));
     else if (r.locked && r.purpose === 'vault') parts.push(t('dungeon.locked'));
     return { head, body: parts.filter(Boolean).join(' ') };
   }
@@ -1284,7 +1860,48 @@
         out.water.circle(P(f.x), P(f.y), P(f.r));
         out.thin.circle(P(f.x), P(f.y), P(f.r) * 1.15);
         break;
+      // Built plans: a water channel with its kerbs, and a lift cabin,
+      // crossed as on architects' drawings.
+      case 'channel': {
+        const r = G.rect(P(f.x), P(f.y), P(f.w), P(f.h));
+        out.water.poly(r);
+        const horiz = f.w >= f.h;
+        for (const k of [-0.2, 0.2]) {
+          if (horiz) out.ripple.line({ x: P(f.x - f.w / 2), y: P(f.y + k) }, { x: P(f.x + f.w / 2), y: P(f.y + k) });
+          else out.ripple.line({ x: P(f.x + k), y: P(f.y - f.h / 2) }, { x: P(f.x + k), y: P(f.y + f.h / 2) });
+        }
+        break;
+      }
+      case 'lift': {
+        const r = G.rect(P(f.x), P(f.y), CS * 1.7, CS * 1.7);
+        out.light.poly(r);
+        out.thin.line(r[0], r[2]);
+        out.thin.line(r[1], r[3]);
+        break;
+      }
     }
+  }
+
+  function drawFurniture(svg, m, pal) {
+    const out = {
+      solid: new Svg.Batch(), light: new Svg.Batch(), dark: new Svg.Batch(), thin: new Svg.Batch(),
+      water: new Svg.Batch(), ripple: new Svg.Batch(), waterDot: new Svg.Batch(), shade: new Svg.Batch(),
+      fungus: new Svg.Batch(), wall: new Svg.Batch(), bars: new Svg.Batch(), accent: new Svg.Batch(),
+    };
+    const fr = new Carto.Random(m.seed + 5);
+    for (const r of m.rooms) for (const f of r.features || []) drawFeature(f, out, pal, fr);
+    svg.path(out.water.toString(), { fill: pal.water, stroke: pal.waterInk, strokeWidth: CS * 0.07 });
+    svg.path(out.ripple.toString(), { fill: 'none', stroke: pal.waterInk, strokeWidth: CS * 0.05, opacity: 0.6 });
+    svg.path(out.shade.toString(), { fill: pal.paperShade, stroke: pal.inkSoft, strokeWidth: CS * 0.05 });
+    svg.path(out.fungus.toString(), { fill: pal.green, stroke: pal.greenInk, strokeWidth: CS * 0.05 });
+    svg.path(out.accent.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: CS * 0.08 });
+    svg.path(out.light.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.075, strokeLinejoin: 'round' });
+    svg.path(out.dark.toString(), { fill: pal.inkSoft, stroke: pal.ink, strokeWidth: CS * 0.075 });
+    svg.path(out.waterDot.toString(), { fill: pal.water, stroke: pal.ink, strokeWidth: CS * 0.05 });
+    svg.path(out.thin.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.05, strokeLinecap: 'round' });
+    svg.path(out.solid.toString(), { fill: pal.ink });
+    svg.path(out.wall.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.25 });
+    svg.path(out.bars.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.12, strokeDasharray: (CS * 0.05) + ' ' + (CS * 0.16), strokeLinecap: 'round' });
   }
 
   function render(m, o) {
@@ -1297,7 +1914,9 @@
 
     // Text block under the map, in balanced columns.
     const fs = 13, lh = fs * 1.32;
-    const pageW = Math.max(mapW, showPage ? 640 : 0);
+    let pageW = Math.max(mapW, showPage ? 640 : 0);
+    // Built plans: a page wide enough for a long title.
+    if (m.built && !o.preview) pageW = Math.max(pageW, titleText(m).length * 34 * 0.62 + 48);
     let notesH = 0;
     const columns = [];
     const story = storyText(m);
@@ -1330,101 +1949,86 @@
     const ox = (W - mapW) / 2 + (pad - b.x0) * CS, oy = titleH + (pad - b.y0) * CS;
     svg.open({ transform: 'translate(' + Svg.num(ox) + ' ' + Svg.num(oy) + ')' });
 
-    // Hatching around the walls.
-    const rng = new Carto.Random(m.seed + 99);
-    const hatch = new Svg.Batch();
-    const rooms = m.areas;
-    for (let y = b.y0 - pad; y < b.y1 + pad; y++) {
-      for (let x = b.x0 - pad; x < b.x1 + pad; x++) {
-        let d = Infinity;
-        for (const a of rooms) {
-          d = Math.min(d, distToArea(a, x + 0.5, y + 0.5));
-          if (d === 0) break;
+    if (m.built) drawBuilt(svg, m, o, pal);
+    else {
+      // Hatching around the walls.
+      const rng = new Carto.Random(m.seed + 99);
+      const hatch = new Svg.Batch();
+      const rooms = m.areas;
+      for (let y = b.y0 - pad; y < b.y1 + pad; y++) {
+        for (let x = b.x0 - pad; x < b.x1 + pad; x++) {
+          let d = Infinity;
+          for (const a of rooms) {
+            d = Math.min(d, distToArea(a, x + 0.5, y + 0.5));
+            if (d === 0) break;
+          }
+          if (d === 0 || d > 2.1) continue;
+          const n = d < 1.2 ? 2 : rng.bool(0.6) ? 1 : 0;
+          for (let i = 0; i < n; i++) {
+            Draw.hatchCluster(hatch, rng, (x + rng.next()) * CS, (y + rng.next()) * CS, CS * 0.78, rng.float(0, Math.PI), 3);
+          }
         }
-        if (d === 0 || d > 2.1) continue;
-        const n = d < 1.2 ? 2 : rng.bool(0.6) ? 1 : 0;
-        for (let i = 0; i < n; i++) {
-          Draw.hatchCluster(hatch, rng, (x + rng.next()) * CS, (y + rng.next()) * CS, CS * 0.78, rng.float(0, Math.PI), 3);
+      }
+      svg.path(hatch.toString(), { stroke: pal.hatch, strokeWidth: CS * 0.07, strokeLinecap: 'round', fill: 'none', opacity: 0.9 });
+
+      // Walls: a thick outline of every floor shape, then the floors on top.
+      const floors = new Svg.Batch();
+      for (const a of rooms) floors.add(floorPath(a));
+      const fd = floors.toString();
+      svg.path(fd, { fill: pal.ink, stroke: pal.ink, strokeWidth: CS * 0.5, strokeLinejoin: 'round' });
+      svg.path(fd, { fill: pal.floor });
+
+      // Grid lines, clipped to the floors.
+      if (o.grid !== false) {
+        const gclip = Carto.uid('dgrid');
+        svg.defs('<clipPath id="' + gclip + '"><path d="' + fd + '"/></clipPath>');
+        const grid = new Svg.Batch();
+        for (let x = b.x0; x <= b.x1; x++) grid.line({ x: x * CS, y: b.y0 * CS }, { x: x * CS, y: b.y1 * CS });
+        for (let y = b.y0; y <= b.y1; y++) grid.line({ x: b.x0 * CS, y: y * CS }, { x: b.x1 * CS, y: y * CS });
+        svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: CS * 0.05, fill: 'none', clipPath: 'url(#' + gclip + ')' });
+      }
+
+      // Furniture.
+      drawFurniture(svg, m, pal);
+
+      // Doors.
+      const doors = new Svg.Batch(), doorsDark = new Svg.Batch(), secretWalls = new Svg.Batch(), barred = new Svg.Batch();
+      for (const l of m.links) {
+        const d = l.door;
+        const x = d.x * CS, y = d.y * CS;
+        const along = d.vertical ? { x: 0, y: 1 } : { x: 1, y: 0 };
+        if (l.type === 'door' || l.type === 'locked') {
+          const r = G.rect(x, y, CS * (d.vertical ? 0.36 : 0.8), CS * (d.vertical ? 0.8 : 0.36));
+          doors.poly(r);
+          if (l.type === 'locked') doorsDark.poly(G.rect(x, y, CS * 0.22, CS * 0.22));
+        } else if (l.type === 'secret') {
+          secretWalls.line(G.add({ x, y }, G.scale(along, -CS / 2)), G.add({ x, y }, G.scale(along, CS / 2)));
+        } else if (l.type === 'bars') {
+          for (const s of [-0.3, 0, 0.3]) barred.circle(x + along.x * s * CS, y + along.y * s * CS, CS * 0.08);
         }
       }
-    }
-    svg.path(hatch.toString(), { stroke: pal.hatch, strokeWidth: CS * 0.07, strokeLinecap: 'round', fill: 'none', opacity: 0.9 });
-
-    // Walls: a thick outline of every floor shape, then the floors on top.
-    const floors = new Svg.Batch();
-    for (const a of rooms) floors.add(floorPath(a));
-    const fd = floors.toString();
-    svg.path(fd, { fill: pal.ink, stroke: pal.ink, strokeWidth: CS * 0.5, strokeLinejoin: 'round' });
-    svg.path(fd, { fill: pal.floor });
-
-    // Grid lines, clipped to the floors.
-    if (o.grid !== false) {
-      const gclip = Carto.uid('dgrid');
-      svg.defs('<clipPath id="' + gclip + '"><path d="' + fd + '"/></clipPath>');
-      const grid = new Svg.Batch();
-      for (let x = b.x0; x <= b.x1; x++) grid.line({ x: x * CS, y: b.y0 * CS }, { x: x * CS, y: b.y1 * CS });
-      for (let y = b.y0; y <= b.y1; y++) grid.line({ x: b.x0 * CS, y: y * CS }, { x: b.x1 * CS, y: y * CS });
-      svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: CS * 0.05, fill: 'none', clipPath: 'url(#' + gclip + ')' });
-    }
-
-    // Furniture.
-    const out = {
-      solid: new Svg.Batch(), light: new Svg.Batch(), dark: new Svg.Batch(), thin: new Svg.Batch(),
-      water: new Svg.Batch(), ripple: new Svg.Batch(), waterDot: new Svg.Batch(), shade: new Svg.Batch(),
-      fungus: new Svg.Batch(), wall: new Svg.Batch(), bars: new Svg.Batch(), accent: new Svg.Batch(),
-    };
-    const fr = new Carto.Random(m.seed + 5);
-    for (const r of m.rooms) for (const f of r.features || []) drawFeature(f, out, pal, fr);
-    svg.path(out.water.toString(), { fill: pal.water, stroke: pal.waterInk, strokeWidth: CS * 0.07 });
-    svg.path(out.ripple.toString(), { fill: 'none', stroke: pal.waterInk, strokeWidth: CS * 0.05, opacity: 0.6 });
-    svg.path(out.shade.toString(), { fill: pal.paperShade, stroke: pal.inkSoft, strokeWidth: CS * 0.05 });
-    svg.path(out.fungus.toString(), { fill: pal.green, stroke: pal.greenInk, strokeWidth: CS * 0.05 });
-    svg.path(out.accent.toString(), { fill: 'none', stroke: pal.accent, strokeWidth: CS * 0.08 });
-    svg.path(out.light.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.075, strokeLinejoin: 'round' });
-    svg.path(out.dark.toString(), { fill: pal.inkSoft, stroke: pal.ink, strokeWidth: CS * 0.075 });
-    svg.path(out.waterDot.toString(), { fill: pal.water, stroke: pal.ink, strokeWidth: CS * 0.05 });
-    svg.path(out.thin.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.05, strokeLinecap: 'round' });
-    svg.path(out.solid.toString(), { fill: pal.ink });
-    svg.path(out.wall.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.25 });
-    svg.path(out.bars.toString(), { fill: 'none', stroke: pal.ink, strokeWidth: CS * 0.12, strokeDasharray: (CS * 0.05) + ' ' + (CS * 0.16), strokeLinecap: 'round' });
-
-    // Doors.
-    const doors = new Svg.Batch(), doorsDark = new Svg.Batch(), secretWalls = new Svg.Batch(), barred = new Svg.Batch();
-    for (const l of m.links) {
-      const d = l.door;
-      const x = d.x * CS, y = d.y * CS;
-      const along = d.vertical ? { x: 0, y: 1 } : { x: 1, y: 0 };
-      if (l.type === 'door' || l.type === 'locked') {
-        const r = G.rect(x, y, CS * (d.vertical ? 0.36 : 0.8), CS * (d.vertical ? 0.8 : 0.36));
-        doors.poly(r);
-        if (l.type === 'locked') doorsDark.poly(G.rect(x, y, CS * 0.22, CS * 0.22));
-      } else if (l.type === 'secret') {
-        secretWalls.line(G.add({ x, y }, G.scale(along, -CS / 2)), G.add({ x, y }, G.scale(along, CS / 2)));
-      } else if (l.type === 'bars') {
-        for (const s of [-0.3, 0, 0.3]) barred.circle(x + along.x * s * CS, y + along.y * s * CS, CS * 0.08);
+      svg.path(secretWalls.toString(), { stroke: pal.ink, strokeWidth: CS * 0.5, fill: 'none' });
+      svg.path(doors.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.09 });
+      svg.path(doorsDark.toString(), { fill: pal.ink });
+      svg.path(barred.toString(), { fill: pal.ink });
+      for (const l of m.links) {
+        if (l.type !== 'secret') continue;
+        const d = l.door;
+        const off = d.vertical ? { x: 0, y: -CS * 0.95 } : { x: -CS * 0.95, y: 0 };
+        Draw.label(svg, d.x * CS + off.x, d.y * CS + off.y, 'S', CS * 0.75, pal, { title: true, halo: true, haloColor: pal.floor });
       }
-    }
-    svg.path(secretWalls.toString(), { stroke: pal.ink, strokeWidth: CS * 0.5, fill: 'none' });
-    svg.path(doors.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.09 });
-    svg.path(doorsDark.toString(), { fill: pal.ink });
-    svg.path(barred.toString(), { fill: pal.ink });
-    for (const l of m.links) {
-      if (l.type !== 'secret') continue;
-      const d = l.door;
-      const off = d.vertical ? { x: 0, y: -CS * 0.95 } : { x: -CS * 0.95, y: 0 };
-      Draw.label(svg, d.x * CS + off.x, d.y * CS + off.y, 'S', CS * 0.75, pal, { title: true, halo: true, haloColor: pal.floor });
-    }
 
-    // Room numbers.
-    for (const r of m.rooms) {
-      const cx = (r.x + r.w / 2) * CS, cy = (r.y + r.h / 2) * CS;
-      let px = cx, py = cy;
-      // Keep numbers off central furniture.
-      if ((r.features || []).some((f) => f.x !== undefined && Math.hypot(f.x * CS - cx, f.y * CS - cy) < CS * 0.9)) {
-        px = (r.x + 0.75) * CS + (r.w > 2 ? CS * 0.1 : 0);
-        py = (r.y + 0.8) * CS;
+      // Room numbers.
+      for (const r of m.rooms) {
+        const cx = (r.x + r.w / 2) * CS, cy = (r.y + r.h / 2) * CS;
+        let px = cx, py = cy;
+        // Keep numbers off central furniture.
+        if ((r.features || []).some((f) => f.x !== undefined && Math.hypot(f.x * CS - cx, f.y * CS - cy) < CS * 0.9)) {
+          px = (r.x + 0.75) * CS + (r.w > 2 ? CS * 0.1 : 0);
+          py = (r.y + 0.8) * CS;
+        }
+        Draw.label(svg, px, py, String(r.num), CS * 0.95, pal, { haloColor: pal.floor, haloWidth: 0.4 });
       }
-      Draw.label(svg, px, py, String(r.num), CS * 0.95, pal, { haloColor: pal.floor, haloWidth: 0.4 });
     }
     svg.close();
 
@@ -1462,6 +2066,357 @@
       }
     }
     return svg.toString();
+  }
+
+  // ------------------------------------------------------------- built plans: drawing
+
+  // Square → area owning it (ducts apart).
+  function ownerMap(m) {
+    const own = new Map();
+    for (const a of m.areas) {
+      if (a.duct) continue;
+      for (const [x, y] of a.cells || rectCells(a.x, a.y, a.w, a.h)) own.set(ck(x, y), a);
+    }
+    return own;
+  }
+
+  // Walls of a built plan as straight runs between grid corners: outer walls,
+  // partitions, secret panels and the open ends of tunnels; doorways are gaps.
+  function wallRuns(m, own) {
+    const gaps = new Map();
+    for (const l of m.links) {
+      if (l.duct) continue;
+      const d = l.door, w = d.w || 1;
+      for (let i = 0; i < w; i++) {
+        const s = Math.floor((d.vertical ? d.y : d.x) - w / 2 + i);
+        gaps.set(d.vertical ? 'v' + d.x + ',' + s : 'h' + s + ',' + d.y, l.type === 'secret' ? 'secret' : 'gap');
+      }
+    }
+    const segs = { h: new Map(), v: new Map() };
+    const put = (o, line, at, type) => {
+      const key = type + '|' + line;
+      const list = segs[o].get(key) || [];
+      list.push(at);
+      segs[o].set(key, list);
+    };
+    for (const [key, a] of own) {
+      const [x, y] = key.split(',').map(Number);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const b = own.get(ck(x + dx, y + dy));
+        if (b === a || (b && b.id < a.id)) continue;
+        const vert = dx !== 0;
+        const line = vert ? x + (dx > 0 ? 1 : 0) : y + (dy > 0 ? 1 : 0);
+        const at = vert ? y : x;
+        const g = gaps.get(vert ? 'v' + line + ',' + at : 'h' + at + ',' + line);
+        if (g === 'gap') continue;
+        let type = b ? 'int' : 'ext';
+        if (g === 'secret') type = 'secret';
+        // Tunnels run on beyond the edge of the map.
+        else if (!b && a.openEnd && vert && line === a.rect.x) type = 'open';
+        put(vert ? 'v' : 'h', line, at, type);
+      }
+    }
+    const runs = [];
+    for (const o of ['h', 'v']) {
+      for (const [key, list] of segs[o]) {
+        const [type, line] = key.split('|');
+        const L = +line;
+        list.sort((p, q) => p - q);
+        let s0 = list[0], prev = list[0];
+        const flush = (end) => runs.push(o === 'h' ? { type, x0: s0, y0: L, x1: end, y1: L } : { type, x0: L, y0: s0, x1: L, y1: end });
+        for (let i = 1; i < list.length; i++) {
+          if (list[i] === prev + 1) { prev = list[i]; continue; }
+          flush(prev + 1);
+          s0 = prev = list[i];
+        }
+        flush(prev + 1);
+      }
+    }
+    return runs;
+  }
+
+  // Architectural plan: solid walls without hatching, a light poché around
+  // the building, a fine grid, doors with their swing and numbers in circles.
+  function drawBuilt(svg, m, o, pal) {
+    const cyber = m.setting === 'cyber';
+    const P = (v) => v * CS;
+    const own = ownerMap(m);
+    const runs = wallRuns(m, own);
+    const n = Svg.num;
+
+    // Poché: the solid ground around the building, ducts included.
+    const poche = new Svg.Batch();
+    const rowRuns = (cells, mg) => {
+      const rows = new Map();
+      for (const [x, y] of cells) { const r = rows.get(y) || []; r.push(x); rows.set(y, r); }
+      for (const [y, xs] of rows) {
+        xs.sort((p, q) => p - q);
+        let s0 = xs[0], prev = xs[0];
+        for (let i = 1; i <= xs.length; i++) {
+          if (i < xs.length && xs[i] === prev + 1) { prev = xs[i]; continue; }
+          poche.poly([{ x: P(s0 - mg), y: P(y - mg) }, { x: P(prev + 1 + mg), y: P(y - mg) }, { x: P(prev + 1 + mg), y: P(y + 1 + mg) }, { x: P(s0 - mg), y: P(y + 1 + mg) }]);
+          if (i < xs.length) s0 = prev = xs[i];
+        }
+      }
+    };
+    rowRuns([...own.keys()].map((k) => k.split(',').map(Number)), 0.9);
+    for (const a of m.areas) if (a.duct) rowRuns(a.cells, 0.5);
+    svg.path(poche.toString(), { fill: cyber ? pal.paperShade : pal.paperShade, stroke: 'none' });
+
+    // Floors; hallways a shade darker.
+    const floors = new Svg.Batch(), hallFloor = new Svg.Batch(), trackFloor = new Svg.Batch();
+    for (const a of m.areas) {
+      if (a.duct) continue;
+      const r = rectOf(a);
+      const pts = [{ x: P(r.x), y: P(r.y) }, { x: P(r.x + r.w), y: P(r.y) }, { x: P(r.x + r.w), y: P(r.y + r.h) }, { x: P(r.x), y: P(r.y + r.h) }];
+      floors.poly(pts);
+      if (a.track) trackFloor.poly(pts);
+      else if (a.kind === 'corridor') hallFloor.poly(pts);
+    }
+    const fd = floors.toString();
+    svg.path(fd, { fill: pal.floor });
+    svg.path(hallFloor.toString(), { fill: pal.grid, opacity: cyber ? 0.35 : 0.3 });
+    svg.path(trackFloor.toString(), { fill: pal.inkSoft, opacity: 0.18 });
+
+    // A fine grid, clipped to the floors.
+    if (o.grid !== false) {
+      const gclip = Carto.uid('dgrid');
+      svg.defs('<clipPath id="' + gclip + '"><path d="' + fd + '"/></clipPath>');
+      const b = m.bounds, grid = new Svg.Batch();
+      for (let x = b.x0; x <= b.x1; x++) grid.line({ x: P(x), y: P(b.y0) }, { x: P(x), y: P(b.y1) });
+      for (let y = b.y0; y <= b.y1; y++) grid.line({ x: P(b.x0), y: P(y) }, { x: P(b.x1), y: P(y) });
+      svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: CS * 0.03, fill: 'none', clipPath: 'url(#' + gclip + ')' });
+    }
+
+    // Tracks, platform edges, stairs and pipes.
+    const thin = new Svg.Batch(), soft = new Svg.Batch(), beam = new Svg.Batch(), safety = new Svg.Batch(), pipes = new Svg.Batch();
+    const trackLine = (x0, x1, y) => {
+      if (cyber) {
+        // Monorail: one beam on pylons.
+        beam.poly([{ x: P(x0), y: P(y - 0.18) }, { x: P(x1), y: P(y - 0.18) }, { x: P(x1), y: P(y + 0.18) }, { x: P(x0), y: P(y + 0.18) }]);
+        for (let s = x0 + 1.5; s < x1 - 0.5; s += 3) beam.poly(G.rect(P(s), P(y), CS * 0.6, CS * 0.6));
+        return;
+      }
+      for (let s = x0 + 0.25; s < x1; s += 0.5) soft.line({ x: P(s), y: P(y - 0.42) }, { x: P(s), y: P(y + 0.42) });
+      for (const off of [-0.26, 0.26]) thin.line({ x: P(x0), y: P(y + off) }, { x: P(x1), y: P(y + off) });
+    };
+    for (const a of m.areas) {
+      const r = a.rect;
+      if (a.track) for (let k = 0; k < a.track; k++) trackLine(r.x, r.x + r.w, r.y + 1 + 2 * k);
+      if (a.rails) trackLine(r.x, r.x + r.w, r.y + 1);
+      if (a.stairs) {
+        for (let i = 1; i < 6; i++) thin.line({ x: P(r.x), y: P(r.y + (i * r.h) / 6) }, { x: P(r.x + r.w), y: P(r.y + (i * r.h) / 6) });
+        // Arrow up the flight.
+        const up = a.stairs === 'n' ? -1 : 1, cx = P(r.x + r.w / 2);
+        const y0 = P(r.y + r.h / 2 - up * r.h * 0.35), y1 = P(r.y + r.h / 2 + up * r.h * 0.35);
+        soft.line({ x: cx, y: y0 }, { x: cx, y: y1 });
+        soft.line({ x: cx - CS * 0.25, y: y1 - up * CS * 0.3 }, { x: cx, y: y1 });
+        soft.line({ x: cx + CS * 0.25, y: y1 - up * CS * 0.3 }, { x: cx, y: y1 });
+      }
+      if (a.hall && m.setting === 'cyber' && m.theme === 'mine' && !a.track) {
+        // Pipes along one wall of the tunnels.
+        const horiz = a.axis === 'x';
+        for (const off of [0.16, 0.34]) {
+          if (horiz) pipes.line({ x: P(r.x), y: P(r.y + off) }, { x: P(r.x + r.w), y: P(r.y + off) });
+          else pipes.line({ x: P(r.x + off), y: P(r.y) }, { x: P(r.x + off), y: P(r.y + r.h) });
+        }
+        for (let s = 1; s < (horiz ? r.w : r.h); s += 2) {
+          if (horiz) soft.line({ x: P(r.x + s), y: P(r.y + 0.08) }, { x: P(r.x + s), y: P(r.y + 0.42) });
+          else soft.line({ x: P(r.x + 0.08), y: P(r.y + s) }, { x: P(r.x + 0.42), y: P(r.y + s) });
+        }
+      }
+    }
+    for (const l of m.links) {
+      if (!l.edge) continue;
+      const d = l.door, s = d.into || 1, half = (d.w || 1) / 2;
+      // The platform edge and its safety line.
+      const a0 = { x: P(d.x - half), y: P(d.y + s * 0.35) }, a1 = { x: P(d.x + half), y: P(d.y + s * 0.35) };
+      safety.line(a0, a1);
+      thin.line({ x: P(d.x - half), y: P(d.y) }, { x: P(d.x + half), y: P(d.y) });
+    }
+    svg.path(soft.toString(), { stroke: pal.inkSoft, strokeWidth: CS * 0.06, fill: 'none', strokeLinecap: 'round' });
+    svg.path(thin.toString(), { stroke: pal.ink, strokeWidth: CS * 0.06, fill: 'none' });
+    svg.path(beam.toString(), { fill: pal.inkSoft, stroke: pal.ink, strokeWidth: CS * 0.05 });
+    svg.path(pipes.toString(), { stroke: pal.inkSoft, strokeWidth: CS * 0.1, fill: 'none' });
+    svg.path(safety.toString(), { stroke: pal.accent, strokeWidth: CS * 0.12, strokeDasharray: n(CS * 0.4) + ' ' + n(CS * 0.2), fill: 'none' });
+
+    // Empty pockets closed in by the building: service shafts.
+    const b = m.bounds, outside = new Set(), stack = [[b.x0 - 1, b.y0 - 1]];
+    const ductCell = new Set();
+    for (const a of m.areas) if (a.duct) for (const [x, y] of a.cells) ductCell.add(ck(x, y));
+    outside.add(ck(b.x0 - 1, b.y0 - 1));
+    while (stack.length) {
+      const [x, y] = stack.pop();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy, k = ck(nx, ny);
+        if (nx < b.x0 - 1 || ny < b.y0 - 1 || nx > b.x1 || ny > b.y1 || outside.has(k) || own.has(k) || ductCell.has(k)) continue;
+        outside.add(k);
+        stack.push([nx, ny]);
+      }
+    }
+    const shafts = new Svg.Batch(), seenShaft = new Set();
+    for (let y = b.y0; y < b.y1; y++) {
+      for (let x = b.x0; x < b.x1; x++) {
+        const k = ck(x, y);
+        if (own.has(k) || outside.has(k) || ductCell.has(k) || seenShaft.has(k)) continue;
+        // The pocket and its bounding box; only rectangles get the cross.
+        const cells = [[x, y]], st = [[x, y]];
+        seenShaft.add(k);
+        while (st.length) {
+          const [cx, cy] = st.pop();
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const q = ck(cx + dx, cy + dy);
+            if (own.has(q) || outside.has(q) || ductCell.has(q) || seenShaft.has(q)) continue;
+            seenShaft.add(q);
+            cells.push([cx + dx, cy + dy]);
+            st.push([cx + dx, cy + dy]);
+          }
+        }
+        const xs = cells.map((c) => c[0]), ys = cells.map((c) => c[1]);
+        const q = { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs) + 1, y1: Math.max(...ys) + 1 };
+        if ((q.x1 - q.x0) * (q.y1 - q.y0) !== cells.length || q.x1 - q.x0 < 2 || q.y1 - q.y0 < 2 || cells.length > 16) continue;
+        const i = 0.3;
+        shafts.line({ x: P(q.x0 + i), y: P(q.y0 + i) }, { x: P(q.x1 - i), y: P(q.y1 - i) });
+        shafts.line({ x: P(q.x1 - i), y: P(q.y0 + i) }, { x: P(q.x0 + i), y: P(q.y1 - i) });
+      }
+    }
+    svg.path(shafts.toString(), { stroke: pal.inkSoft, strokeWidth: CS * 0.05, fill: 'none' });
+
+    // Furniture, kept inside the walls.
+    const fclip = Carto.uid('dfloor');
+    svg.defs('<clipPath id="' + fclip + '"><path d="' + fd + '"/></clipPath>');
+    svg.open({ clipPath: 'url(#' + fclip + ')' });
+    drawFurniture(svg, m, pal);
+    svg.close();
+
+    // Ventilation ducts: a narrow dashed crawlway behind grilles.
+    const ducts = new Svg.Batch(), grilles = new Svg.Batch();
+    for (const a of m.areas) {
+      if (!a.duct) continue;
+      const ends = m.links.filter((l) => l.duct && (l.a === a.id || l.b === a.id)).map((l) => l.door);
+      const pts = a.cells.map(([x, y]) => ({ x: P(x + 0.5), y: P(y + 0.5) }));
+      const near = (d, c) => Math.hypot(P(d.x) - c.x, P(d.y) - c.y);
+      if (ends.length === 2) {
+        const [d0, d1] = near(ends[0], pts[0]) < near(ends[1], pts[0]) ? ends : [ends[1], ends[0]];
+        pts.unshift({ x: P(d0.x), y: P(d0.y) });
+        pts.push({ x: P(d1.x), y: P(d1.y) });
+      }
+      ducts.poly(pts, false);
+      for (const d of ends) {
+        const r = G.rect(P(d.x), P(d.y), CS * (d.vertical ? 0.3 : 0.7), CS * (d.vertical ? 0.7 : 0.3));
+        grilles.poly(r);
+      }
+    }
+    const dd = ducts.toString();
+    svg.path(dd, { stroke: pal.inkSoft, strokeWidth: CS * 0.5, fill: 'none', opacity: 0.35, strokeLinejoin: 'round' });
+    svg.path(dd, { stroke: pal.ink, strokeWidth: CS * 0.06, fill: 'none', strokeDasharray: n(CS * 0.25) + ' ' + n(CS * 0.15), strokeLinejoin: 'round' });
+
+    // Walls: solid bands centred on the grid lines; outer walls are thicker.
+    const walls = new Svg.Batch(), open = new Svg.Batch();
+    for (const r of runs) {
+      if (r.type === 'open') { open.line({ x: P(r.x0), y: P(r.y0) }, { x: P(r.x1), y: P(r.y1) }); continue; }
+      const t2 = (r.type === 'ext' ? 0.3 : 0.17) / 2;
+      walls.poly([{ x: P(r.x0 - t2), y: P(r.y0 - t2) }, { x: P(r.x1 + t2), y: P(r.y0 - t2) }, { x: P(r.x1 + t2), y: P(r.y1 + t2) }, { x: P(r.x0 - t2), y: P(r.y1 + t2) }]);
+    }
+    const wd = walls.toString();
+    if (cyber) {
+      // Neon: the walls glow.
+      const glow = Carto.uid('dglow');
+      svg.defs('<filter id="' + glow + '" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="' + n(CS * 0.22) + '"/></filter>');
+      svg.path(wd, { fill: pal.ink, stroke: pal.ink, strokeWidth: CS * 0.25, opacity: 0.55, filter: 'url(#' + glow + ')' });
+    }
+    svg.path(wd, { fill: pal.ink });
+    svg.path(open.toString(), { stroke: pal.ink, strokeWidth: CS * 0.08, strokeDasharray: n(CS * 0.3) + ' ' + n(CS * 0.2), fill: 'none' });
+    svg.path(grilles.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.06 });
+
+    // Doors.
+    const leaves = new Svg.Batch(), arcs = new Svg.Batch(), solid = new Svg.Batch(), dots = new Svg.Batch(), shutters = new Svg.Batch(), beams = new Svg.Batch();
+    for (const l of m.links) {
+      if (l.duct || l.edge || l.type === 'secret') continue;
+      const d = l.door, w = d.w || 1;
+      const p0 = d.vertical ? { x: d.x, y: d.y - w / 2 } : { x: d.x - w / 2, y: d.y };
+      const p1 = d.vertical ? { x: d.x, y: d.y + w / 2 } : { x: d.x + w / 2, y: d.y };
+      const along = d.vertical ? { x: 0, y: 1 } : { x: 1, y: 0 };
+      const nrm = d.vertical ? { x: d.into || 1, y: 0 } : { x: 0, y: d.into || 1 };
+      const S = (p) => ({ x: P(p.x), y: P(p.y) });
+      const across = (t, off) => {
+        const c = G.add(p0, G.scale(along, t * w));
+        const q = G.add(c, G.scale(nrm, off));
+        return q;
+      };
+      const slab = (t0, t1, off, th, batch) => {
+        const a = across(t0, off - th / 2), b = across(t1, off - th / 2), c = across(t1, off + th / 2), e = across(t0, off + th / 2);
+        batch.poly([S(a), S(b), S(c), S(e)]);
+      };
+      if (l.type === 'door') {
+        // Leaves open at a right angle, with their swing.
+        const halves = w >= 2 ? [[p0, p1, w / 2], [p1, p0, w / 2]] : d.hinge ? [[p1, p0, w]] : [[p0, p1, w]];
+        for (const [h, q, len] of halves) {
+          const dir = G.norm(G.sub(q, h));
+          const tip = G.add(h, G.scale(nrm, len * 0.95));
+          leaves.poly([S(h), S(G.add(h, G.scale(dir, 0.07))), S(G.add(tip, G.scale(dir, 0.07))), S(tip)]);
+          const end = G.add(h, G.scale(dir, len));
+          const cr = (tip.x - h.x) * (end.y - h.y) - (tip.y - h.y) * (end.x - h.x);
+          arcs.add('M' + n(P(tip.x)) + ' ' + n(P(tip.y)) + 'A' + n(P(len * 0.95)) + ' ' + n(P(len * 0.95)) + ' 0 0 ' + (cr > 0 ? 1 : 0) + ' ' + n(P(end.x - dir.x * len * 0.05)) + ' ' + n(P(end.y - dir.y * len * 0.05)));
+        }
+      } else if (l.type === 'locked') {
+        if (l.blast) {
+          // Blast door: two heavy leaves, shut.
+          slab(0, 0.48, 0, 0.42, solid);
+          slab(0.52, 1, 0, 0.42, solid);
+        } else {
+          slab(0, 1, 0, 0.14, leaves);
+          dots.poly(G.rect(P(d.x - nrm.x * 0.3), P(d.y - nrm.y * 0.3), CS * 0.26, CS * 0.26));
+        }
+      } else if (l.type === 'bars') {
+        for (let i = 0; i < w * 4; i++) dots.circle(P(p0.x + along.x * (i + 0.5) / 4), P(p0.y + along.y * (i + 0.5) / 4), CS * 0.07);
+        if (l.checkpoint) {
+          // Scanner posts on both sides and the beam between them.
+          for (const t0 of [0, 1]) {
+            const c = across(t0, 0.5);
+            dots.poly(G.rect(P(c.x - along.x * (t0 ? 0.2 : -0.2)), P(c.y - along.y * (t0 ? 0.2 : -0.2)), CS * 0.3, CS * 0.3));
+          }
+          beams.line(S(across(0.08, 0.5)), S(across(0.92, 0.5)));
+        }
+      } else if (l.type === 'open' && w >= 2 && (m.areas[l.a].kind === 'room' || m.areas[l.b].kind === 'room')) {
+        // Roller shutter, rolled up.
+        shutters.line(S(p0), S(p1));
+      }
+    }
+    svg.path(arcs.toString(), { stroke: pal.inkSoft, strokeWidth: CS * 0.045, fill: 'none' });
+    svg.path(leaves.toString(), { fill: pal.floor, stroke: pal.ink, strokeWidth: CS * 0.05 });
+    svg.path(solid.toString(), { fill: pal.inkSoft, stroke: pal.ink, strokeWidth: CS * 0.07 });
+    svg.path(dots.toString(), { fill: pal.ink });
+    svg.path(beams.toString(), { stroke: pal.accent, strokeWidth: CS * 0.07, fill: 'none', strokeDasharray: n(CS * 0.12) + ' ' + n(CS * 0.08) });
+    svg.path(shutters.toString(), { stroke: pal.ink, strokeWidth: CS * 0.06, fill: 'none', strokeDasharray: n(CS * 0.15) + ' ' + n(CS * 0.1) });
+    // Room numbers go in the middle, or in a corner when furniture is there.
+    const spots = m.rooms.map((r) => {
+      const cx = (r.x + r.w / 2) * CS, cy = (r.y + r.h / 2) * CS;
+      if ((r.features || []).some((f) => f.x !== undefined && Math.hypot(f.x * CS - cx, f.y * CS - cy) < CS * 1.4)) return { r, x: (r.x + 0.75) * CS, y: (r.y + 0.75) * CS };
+      return { r, x: cx, y: cy };
+    });
+    // Secret doors: an S beside the wall, clear of the numbers.
+    for (const l of m.links) {
+      if (l.type !== 'secret' || l.duct) continue;
+      const d = l.door;
+      const cands = (d.vertical ? [[0, -0.9], [0, 0.9], [-0.55, -0.6], [0.55, -0.6], [-0.55, 0.6], [0.55, 0.6]] : [[-0.9, 0], [0.9, 0], [-0.6, -0.55], [-0.6, 0.55], [0.6, -0.55], [0.6, 0.55]])
+        .map(([dx, dy]) => ({ x: (d.x + dx) * CS, y: (d.y + dy) * CS }));
+      const room = (p) => Math.min(...spots.map((q) => Math.hypot(q.x - p.x, q.y - p.y)));
+      const best = cands.reduce((a, b) => (room(b) > room(a) + 0.01 ? b : a));
+      Draw.label(svg, best.x, best.y, 'S', CS * 0.7, pal, { title: true, halo: true, haloColor: pal.floor });
+    }
+
+    // Room numbers in circles.
+    const rings = new Svg.Batch();
+    for (const s of spots) rings.circle(s.x, s.y, CS * (s.r.num >= 10 ? 0.6 : 0.52));
+    svg.path(rings.toString(), { fill: pal.floor, stroke: cyber ? pal.accent : pal.ink, strokeWidth: CS * 0.07 });
+    for (const s of spots) Draw.label(svg, s.x, s.y + CS * 0.03, String(s.r.num), CS * (s.r.num >= 10 ? 0.62 : 0.7), pal, { halo: false });
+
+    // Scale: one square is a metre and a half.
+    if (!o.preview) {
+      const b = m.bounds;
+      Draw.scaleBar(svg, P(b.x0 - 2), P(b.y1 + 0.9), P(10), 15, 'm', pal, 5);
+    }
   }
 
   // ------------------------------------------------------------- 3D model
@@ -1511,84 +2466,9 @@
     gold: { name: 'Neon ciano', color: '#3ff0ff', roughness: 0.2 },
   };
 
-  function model3d(m) {
-    const C = 1.5, HW = 3, M = Carto.Mesh3D.Mesh;
-    const MAT = { modern: MAT3D_MODERN, cyber: MAT3D_CYBER }[m.setting] || MAT3D;
-    const b = m.bounds;
-    const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
-    const X = (v) => v * C + ox, S = (v) => v * C + os;
-    const floor = new Set();
-    const k = (x, y) => x + ',' + y;
-    for (const a of m.areas) {
-      const cells = a.cells || [];
-      if (!a.cells) for (let y = a.y; y < a.y + a.h; y++) for (let x = a.x; x < a.x + a.w; x++) cells.push([x, y]);
-      for (const [x, y] of cells) floor.add(k(x, y));
-    }
-    const parts = [];
-    const mesh = (name, material) => { const me = new M(); parts.push({ name, mesh: me, material }); return me; };
-
-    // Floors: one object per room, named after the key, so rooms can be picked out.
-    const corridors = mesh(t('dungeon.3d.corridors'), 'floor');
-    for (const a of m.areas) {
-      if (a.kind === 'corridor') { for (const [x, y] of a.cells) corridors.box(X(x), S(y), X(x + 1), S(y + 1), -0.2, 0); continue; }
-      const me = mesh(a.num + '. ' + roomText(m, a).head, 'floor');
-      me.box(X(a.x), S(a.y), X(a.x + a.w), S(a.y + a.h), -0.2, 0);
-    }
-
-    // Rock: every empty square touching a floor, as one block with only the
-    // faces that can be seen.
-    const rock = new Set(), rockCells = [];
-    for (const key of floor) {
-      const [x, y] = key.split(',').map(Number);
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-        const q = k(x + dx, y + dy);
-        if (!floor.has(q) && !rock.has(q)) { rock.add(q); rockCells.push([x + dx, y + dy]); }
-      }
-    }
-    const walls = mesh(t('dungeon.3d.rock'), 'rock');
-    for (const [x, y] of rockCells) walls.face([[X(x), HW, S(y)], [X(x + 1), HW, S(y)], [X(x + 1), HW, S(y + 1)], [X(x), HW, S(y + 1)]], [0, 1, 0]);
-    for (const r of Carto.Mesh3D.boundaryRuns((x, y) => rock.has(k(x, y)), rockCells)) {
-      walls.face([[X(r.x0), 0, S(r.s0)], [X(r.x1), 0, S(r.s1)], [X(r.x1), HW, S(r.s1)], [X(r.x0), HW, S(r.s0)]], [r.nx, 0, r.ns]);
-    }
-    // Round rooms: rock fills the corners of their square.
-    for (const a of m.areas) {
-      if (a.shape !== 'round') continue;
-      const cx = a.x + a.w / 2, cy = a.y + a.h / 2, r = a.w / 2;
-      for (let q = 0; q < 4; q++) {
-        const sx = q === 0 || q === 3 ? 1 : -1, sy = q < 2 ? 1 : -1;
-        const corner = [X(cx + sx * r), S(cy + sy * r)];
-        const arc = [];
-        const a0 = Math.atan2(sy, 0), a1 = Math.atan2(0, sx);
-        let da = a1 - a0;
-        if (da > Math.PI) da -= 2 * Math.PI;
-        if (da < -Math.PI) da += 2 * Math.PI;
-        for (let i = 0; i <= 10; i++) { const ang = a0 + (da * i) / 10; arc.push([X(cx + Math.cos(ang) * r), S(cy + Math.sin(ang) * r)]); }
-        walls.prism([corner, ...arc], 0, HW, { center: corner });
-      }
-    }
-
-    // Doors.
-    const doors = mesh(t('dungeon.3d.doors'), MAT.steel ? 'steel' : 'wood'), iron = mesh(t('dungeon.3d.iron'), 'iron');
-    const secret = mesh(t('dungeon.3d.secret'), 'rock'), lintels = mesh(t('dungeon.3d.lintels'), 'rock');
-    for (const l of m.links) {
-      const d = l.door, x = X(d.x), s = S(d.y), ang = d.vertical ? 90 : 0;
-      if (l.type === 'door' || l.type === 'locked') {
-        doors.boxAt(x, s, C * 0.82, 0.12, 0, 2.3, ang);
-        lintels.boxAt(x, s, C, 0.5, 2.3, HW, ang);
-        if (l.type === 'locked') iron.boxAt(x, s, 0.22, 0.2, 1.0, 1.25, ang);
-      } else if (l.type === 'secret') {
-        secret.boxAt(x, s, C, 0.6, 0, HW, ang);
-      } else if (l.type === 'bars') {
-        for (let i = -2; i <= 2; i++) {
-          const off = (i * C) / 5.5;
-          iron.cylinder(x + (d.vertical ? 0 : off), s + (d.vertical ? off : 0), 0.035, 0, 2.6, 8);
-        }
-        iron.boxAt(x, s, C, 0.08, 2.5, 2.6, ang);
-        lintels.boxAt(x, s, C, 0.5, 2.6, HW, ang);
-      }
-    }
-
-    // Furniture.
+  // Furniture of every room, one object per material.
+  function furniture3d(m, mesh, MAT, X, S) {
+    const C = 1.5, HW = 3;
     const by = {};
     const of = (mat) => by[mat] || (by[mat] = mesh(t('dungeon.3d.furniture') + ' · ' + MAT[mat].name, mat));
     const rng = new Carto.Random(m.seed + 7);
@@ -1689,9 +2569,195 @@
             break;
           case 'machine': of('iron').boxAt(fx, fs, f.w * C, f.h * C, 0, 1.6); of('dark').cylinder(fx, fs, Math.min(f.w, f.h) * 0.3 * C, 1.6, 2.4, 14); break;
           case 'vat': of('iron').cylinder(fx, fs, f.r * C * 1.1, 0, 0.25, 16); of('water').cylinder(fx, fs, f.r * C, 0.25, 2.1, 16); of('iron').cylinder(fx, fs, f.r * C * 1.1, 2.1, 2.3, 16); break;
+          // Built plans.
+          case 'channel': of('water').boxAt(fx, fs, f.w * C, f.h * C, 0, 0.03); break;
+          case 'lift':
+            of('steel').boxAt(fx, fs, 1.7 * C, 1.7 * C, 0, 0.1);
+            for (const [u, v] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) of('steel').boxAt(fx + u * 0.8 * C, fs + v * 0.8 * C, 0.1, 0.1, 0.1, 2.4);
+            of('steel').boxAt(fx, fs, 1.7 * C, 1.7 * C, 2.4, 2.5);
+            break;
         }
       }
     }
+  }
+
+  function model3d(m) {
+    // Present day and cyberpunk: thin walls along the plan.
+    if (m.built) return model3dBuilt(m);
+    const C = 1.5, HW = 3, M = Carto.Mesh3D.Mesh;
+    const MAT = { modern: MAT3D_MODERN, cyber: MAT3D_CYBER }[m.setting] || MAT3D;
+    const b = m.bounds;
+    const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
+    const X = (v) => v * C + ox, S = (v) => v * C + os;
+    const floor = new Set();
+    const k = (x, y) => x + ',' + y;
+    for (const a of m.areas) {
+      const cells = a.cells || [];
+      if (!a.cells) for (let y = a.y; y < a.y + a.h; y++) for (let x = a.x; x < a.x + a.w; x++) cells.push([x, y]);
+      for (const [x, y] of cells) floor.add(k(x, y));
+    }
+    const parts = [];
+    const mesh = (name, material) => { const me = new M(); parts.push({ name, mesh: me, material }); return me; };
+
+    // Floors: one object per room, named after the key, so rooms can be picked out.
+    const corridors = mesh(t('dungeon.3d.corridors'), 'floor');
+    for (const a of m.areas) {
+      if (a.kind === 'corridor') { for (const [x, y] of a.cells) corridors.box(X(x), S(y), X(x + 1), S(y + 1), -0.2, 0); continue; }
+      const me = mesh(a.num + '. ' + roomText(m, a).head, 'floor');
+      me.box(X(a.x), S(a.y), X(a.x + a.w), S(a.y + a.h), -0.2, 0);
+    }
+
+    // Rock: every empty square touching a floor, as one block with only the
+    // faces that can be seen.
+    const rock = new Set(), rockCells = [];
+    for (const key of floor) {
+      const [x, y] = key.split(',').map(Number);
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const q = k(x + dx, y + dy);
+        if (!floor.has(q) && !rock.has(q)) { rock.add(q); rockCells.push([x + dx, y + dy]); }
+      }
+    }
+    const walls = mesh(t('dungeon.3d.rock'), 'rock');
+    for (const [x, y] of rockCells) walls.face([[X(x), HW, S(y)], [X(x + 1), HW, S(y)], [X(x + 1), HW, S(y + 1)], [X(x), HW, S(y + 1)]], [0, 1, 0]);
+    for (const r of Carto.Mesh3D.boundaryRuns((x, y) => rock.has(k(x, y)), rockCells)) {
+      walls.face([[X(r.x0), 0, S(r.s0)], [X(r.x1), 0, S(r.s1)], [X(r.x1), HW, S(r.s1)], [X(r.x0), HW, S(r.s0)]], [r.nx, 0, r.ns]);
+    }
+    // Round rooms: rock fills the corners of their square.
+    for (const a of m.areas) {
+      if (a.shape !== 'round') continue;
+      const cx = a.x + a.w / 2, cy = a.y + a.h / 2, r = a.w / 2;
+      for (let q = 0; q < 4; q++) {
+        const sx = q === 0 || q === 3 ? 1 : -1, sy = q < 2 ? 1 : -1;
+        const corner = [X(cx + sx * r), S(cy + sy * r)];
+        const arc = [];
+        const a0 = Math.atan2(sy, 0), a1 = Math.atan2(0, sx);
+        let da = a1 - a0;
+        if (da > Math.PI) da -= 2 * Math.PI;
+        if (da < -Math.PI) da += 2 * Math.PI;
+        for (let i = 0; i <= 10; i++) { const ang = a0 + (da * i) / 10; arc.push([X(cx + Math.cos(ang) * r), S(cy + Math.sin(ang) * r)]); }
+        walls.prism([corner, ...arc], 0, HW, { center: corner });
+      }
+    }
+
+    // Doors.
+    const doors = mesh(t('dungeon.3d.doors'), MAT.steel ? 'steel' : 'wood'), iron = mesh(t('dungeon.3d.iron'), 'iron');
+    const secret = mesh(t('dungeon.3d.secret'), 'rock'), lintels = mesh(t('dungeon.3d.lintels'), 'rock');
+    for (const l of m.links) {
+      const d = l.door, x = X(d.x), s = S(d.y), ang = d.vertical ? 90 : 0;
+      if (l.type === 'door' || l.type === 'locked') {
+        doors.boxAt(x, s, C * 0.82, 0.12, 0, 2.3, ang);
+        lintels.boxAt(x, s, C, 0.5, 2.3, HW, ang);
+        if (l.type === 'locked') iron.boxAt(x, s, 0.22, 0.2, 1.0, 1.25, ang);
+      } else if (l.type === 'secret') {
+        secret.boxAt(x, s, C, 0.6, 0, HW, ang);
+      } else if (l.type === 'bars') {
+        for (let i = -2; i <= 2; i++) {
+          const off = (i * C) / 5.5;
+          iron.cylinder(x + (d.vertical ? 0 : off), s + (d.vertical ? off : 0), 0.035, 0, 2.6, 8);
+        }
+        iron.boxAt(x, s, C, 0.08, 2.5, 2.6, ang);
+        lintels.boxAt(x, s, C, 0.5, 2.6, HW, ang);
+      }
+    }
+
+    // Furniture.
+    furniture3d(m, mesh, MAT, X, S);
+    return { name: titleText(m), groups: [{ name: titleText(m), parts }], materials: MAT };
+  }
+
+  // Built plans: floors, walls along the grid lines with gaps for the doors,
+  // doors and lintels, blast doors and checkpoints, tracks below the
+  // platforms and ventilation ducts.
+  function model3dBuilt(m) {
+    const C = 1.5, HW = 3, M = Carto.Mesh3D.Mesh, LOW = -1.1;
+    const MAT = { modern: MAT3D_MODERN, cyber: MAT3D_CYBER }[m.setting] || MAT3D_MODERN;
+    const b = m.bounds;
+    const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
+    const X = (v) => v * C + ox, S = (v) => v * C + os;
+    const parts = [];
+    const mesh = (name, material) => { const me = new M(); parts.push({ name, mesh: me, material }); return me; };
+
+    // Floors: one object per room; track beds lie a platform's height lower.
+    const corridors = mesh(t('dungeon.3d.corridors'), 'floor');
+    for (const a of m.areas) {
+      if (a.duct) continue;
+      if (a.kind === 'corridor') {
+        const r = a.rect;
+        corridors.box(X(r.x), S(r.y), X(r.x + r.w), S(r.y + r.h), a.track ? LOW - 0.2 : -0.2, a.track ? LOW : 0);
+        continue;
+      }
+      const me = mesh(a.num + '. ' + roomText(m, a).head, 'floor');
+      me.box(X(a.x), S(a.y), X(a.x + a.w), S(a.y + a.h), a.role === 'platform' ? LOW : -0.2, 0);
+    }
+
+    // Walls: outer walls 30 cm thick, partitions 15 cm.
+    const walls = mesh(t('dungeon.3d.rock'), 'rock'), secret = mesh(t('dungeon.3d.secret'), 'rock');
+    for (const r of wallRuns(m, ownerMap(m))) {
+      if (r.type === 'open') continue;
+      const h = (r.type === 'ext' ? 0.3 : 0.15) / 2;
+      (r.type === 'secret' ? secret : walls).box(X(r.x0) - h, S(r.y0) - h, X(r.x1) + h, S(r.y1) + h, LOW, HW);
+    }
+
+    // Doors, gates and lintels.
+    const doors = mesh(t('dungeon.3d.doors'), 'steel'), iron = mesh(t('dungeon.3d.iron'), 'iron'), lintels = mesh(t('dungeon.3d.lintels'), 'rock');
+    for (const l of m.links) {
+      if (l.duct || l.edge || l.type === 'secret') continue;
+      const d = l.door, w = (d.w || 1) * C, x = X(d.x), s = S(d.y), ang = d.vertical ? 90 : 0;
+      const halls = m.areas[l.a].kind === 'corridor' && m.areas[l.b].kind === 'corridor';
+      if (!halls || l.checkpoint || l.blast) lintels.boxAt(x, s, w, 0.3, 2.3, HW, ang);
+      if (l.blast) doors.boxAt(x, s, w, 0.45, 0, 2.3, ang);
+      else if (l.type === 'door' || l.type === 'locked') {
+        doors.boxAt(x, s, w * 0.92, 0.06, 0, 2.2, ang);
+        if (l.type === 'locked') iron.boxAt(x, s, 0.2, 0.16, 1.0, 1.2, ang);
+      } else if (l.type === 'bars') {
+        const n = Math.round(w / 0.25);
+        for (let i = 0; i < n; i++) {
+          const off = (i + 0.5) * (w / n) - w / 2;
+          iron.cylinder(x + (d.vertical ? 0 : off), s + (d.vertical ? off : 0), 0.025, 0, 2.3, 8);
+        }
+        if (l.checkpoint) {
+          // Scanner posts on both sides.
+          for (const k of [-1, 1]) iron.boxAt(x + (d.vertical ? 0 : k * (w / 2 - 0.15)), s + (d.vertical ? k * (w / 2 - 0.15) : 0), 0.25, 0.25, 0, 1.6, ang);
+        }
+      }
+    }
+
+    // Ducts: a sheet-metal casing along the crawlway.
+    const ducts = mesh(t('dungeon.3d.ducts'), 'steel');
+    for (const a of m.areas) {
+      if (!a.duct) continue;
+      const ends = m.links.filter((l) => l.duct && (l.a === a.id || l.b === a.id)).map((l) => [l.door.x, l.door.y]);
+      const pts = a.cells.map(([x, y]) => [x + 0.5, y + 0.5]);
+      const near = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+      if (ends.length === 2) {
+        const [e0, e1] = near(ends[0], pts[0]) < near(ends[1], pts[0]) ? ends : [ends[1], ends[0]];
+        pts.unshift(e0);
+        pts.push(e1);
+      }
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const [p, q] = [pts[i], pts[i + 1]];
+        ducts.box(X(Math.min(p[0], q[0])) - 0.35, S(Math.min(p[1], q[1])) - 0.35, X(Math.max(p[0], q[0])) + 0.35, S(Math.max(p[1], q[1])) + 0.35, 0, 0.8);
+      }
+    }
+
+    // Tracks: two rails, or a monorail beam on pylons.
+    const tracks = mesh(t('dungeon.3d.tracks'), 'iron');
+    for (const a of m.areas) {
+      const n = a.track || a.rails || 0;
+      if (!n) continue;
+      const r = a.rect, base = a.track ? LOW : 0;
+      for (let k = 0; k < n; k++) {
+        const c = r.y + 1 + 2 * k;
+        if (m.setting === 'cyber') {
+          tracks.box(X(r.x), S(c) - 0.2, X(r.x + r.w), S(c) + 0.2, base + 0.6, base + 0.9);
+          for (let p = r.x + 1.5; p < r.x + r.w - 0.5; p += 3) tracks.boxAt(X(p), S(c), 0.5, 0.5, base, base + 0.6);
+        } else {
+          for (const o of [-0.26, 0.26]) tracks.box(X(r.x), S(c + o) - 0.04, X(r.x + r.w), S(c + o) + 0.04, base, base + 0.15);
+        }
+      }
+    }
+
+    furniture3d(m, mesh, MAT, X, S);
     return { name: titleText(m), groups: [{ name: titleText(m), parts }], materials: MAT };
   }
 
@@ -1722,5 +2788,5 @@
     fileName: (m) => titleText(m),
   });
 
-  Carto.Dungeon = { generate, render, titleText };
+  Carto.Dungeon = { generate, render, titleText, wallRuns, ownerMap };
 })(window.Carto = window.Carto || {});
