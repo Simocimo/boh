@@ -48,21 +48,26 @@
   const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
   // ------------------------------------------------------------ option codec
-  function defaults(gen) {
+  // An option may have its own default per setting (opt.defs.modern…).
+  const defOf = (opt, setting) => (opt.defs && setting in opt.defs ? opt.defs[setting] : opt.def);
+
+  function defaults(gen, setting = 'fantasy') {
     const o = {};
-    for (const opt of gen.options) o[opt.id] = opt.def;
+    for (const opt of gen.options) o[opt.id] = defOf(opt, setting);
+    o.setting = setting;
     return o;
   }
 
-  function decodeOpt(opt, raw) {
-    if (raw === undefined) return opt.def;
+  function decodeOpt(opt, raw, setting) {
+    const def = defOf(opt, setting);
+    if (raw === undefined) return def;
     switch (opt.type) {
       case 'bool': return raw === '1';
       case 'range': {
         const v = parseFloat(raw);
-        return isNaN(v) ? opt.def : Math.max(opt.min, Math.min(opt.max, v));
+        return isNaN(v) ? def : Math.max(opt.min, Math.min(opt.max, v));
       }
-      case 'select': return opt.values.includes(raw) ? raw : opt.def;
+      case 'select': return opt.values.includes(raw) ? raw : def;
       default: return String(raw).replace(/_/g, ' ');
     }
   }
@@ -87,8 +92,9 @@
       const i = p.indexOf('-');
       if (i > 0) raw[p.slice(0, i)] = p.slice(i + 1);
     }
+    const setting = S.IDS.includes(raw.setting) ? raw.setting : 'fantasy';
     const opts = {};
-    for (const opt of gen.options) opts[opt.id] = decodeOpt(opt, raw[opt.id]);
+    for (const opt of gen.options) opts[opt.id] = decodeOpt(opt, raw[opt.id], setting);
     return { gen, seed, opts };
   }
 
@@ -96,7 +102,7 @@
     let s = gen.id + '.' + seed;
     for (const opt of gen.options) {
       const v = opts[opt.id];
-      if (v === undefined || v === opt.def || v === '') continue;
+      if (v === undefined || v === defOf(opt, opts.setting) || v === '') continue;
       s += '.' + opt.id + '-' + encodeOpt(opt, v);
     }
     return '#' + s;
@@ -104,7 +110,7 @@
   // Links between maps keep the setting of the map they come from.
   Carto.linkTo = (id, seed, opts = {}) => {
     const gen = byId[id];
-    return gen ? buildHash(gen, seed, Object.assign(defaults(gen), { setting: S.current }, opts)) : '#';
+    return gen ? buildHash(gen, seed, Object.assign(defaults(gen, opts.setting || S.current), opts)) : '#';
   };
 
   // ------------------------------------------------------------------- DOM
@@ -331,7 +337,12 @@
 
   function setOption(id, value) {
     state.opts[id] = value;
-    if (id === 'setting') { state.palette = paletteFor(value); buildPanel(); }
+    if (id === 'setting') {
+      // Options with per-setting defaults start over from the new setting's.
+      for (const o of state.gen.options) if (o.defs) state.opts[o.id] = defOf(o, value);
+      state.palette = paletteFor(value);
+      buildPanel();
+    }
     // Options that only change the drawing do not need a new model.
     const opt = state.gen.options.find((o) => o.id === id);
     if (opt && opt.renderOnly) {
@@ -396,7 +407,7 @@
   function openSave(save) {
     const g = byId[save.gen];
     if (!g) return;
-    const opts = Object.assign(defaults(g), save.opts || {});
+    const opts = Object.assign(defaults(g, (save.opts && save.opts.setting) || 'fantasy'), save.opts || {});
     if (g.loadData) g.loadData(save.seed, opts, save.data);
     state.pendingSave = { id: save.id, gen: save.gen, seed: save.seed };
     const h = buildHash(g, save.seed, opts);
