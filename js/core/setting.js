@@ -64,8 +64,8 @@
       'Moreau Ishikawa Park Ruiz Arkwright Hale Voss Krieger Tanaka Wei Zhou Silva Ferro Nakamura'
     ).split(' '),
     corp: (
-      'Arasaka Militech Kirin Omnitek Helix Zaibatsu Tessier Hanzo Daedal Kronos Vantage Sentinel ' +
-      'Biotechnica Petrochem Nakatomi Yutani Cyberdyne Genetek Novatek Orbital Quantis Synthex Tyrell'
+      'Hoshiko Veltrane Omnivex Kessler Daikon Sarissa Novacorp Halvorsen Takamura Brightline Ostrava ' +
+      'Meridian Quorvex Ironbridge Solenne Kuraishi Vantor Helion Graymark Tessaract Zhenlong Auralis'
     ).split(' '),
   };
 

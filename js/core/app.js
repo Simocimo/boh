@@ -235,7 +235,14 @@
   }
 
   // -------------------------------------------------------------- workbench
+  // Option labels follow the setting of the map in hand.
   function buildPanel() {
+    const prev = S.current;
+    S.use(curSetting());
+    try { buildPanelFor(); } finally { S.use(prev); }
+  }
+
+  function buildPanelFor() {
     const g = state.gen;
     els.title.textContent = t('gen.' + g.id + '.name');
     els.desc.textContent = t('gen.' + g.id + '.desc');
@@ -324,7 +331,7 @@
 
   function setOption(id, value) {
     state.opts[id] = value;
-    if (id === 'setting') { state.palette = paletteFor(value); buildSwatches(); }
+    if (id === 'setting') { state.palette = paletteFor(value); buildPanel(); }
     // Options that only change the drawing do not need a new model.
     const opt = state.gen.options.find((o) => o.id === id);
     if (opt && opt.renderOnly) {
