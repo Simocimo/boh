@@ -34,6 +34,33 @@
       'dungeon.secret': 'Una porta segreta è nascosta in una parete.',
       'dungeon.locked': 'Una porta è chiusa a chiave.',
       'dungeon.legend': 'S: porta segreta · ■: porta chiusa a chiave · ⋮: grata',
+      // Present day (2026).
+      'dungeon.opt.theme.tomb@modern': 'Ospedale',
+      'dungeon.opt.theme.temple@modern': 'Setta',
+      'dungeon.opt.theme.lair@modern': 'Gang',
+      'dungeon.opt.theme.prison@modern': 'Bunker',
+      'dungeon.opt.theme.mine@modern': 'Metro',
+      'dungeon.opt.theme.sanctum@modern': 'Laboratorio',
+      'dungeon.secret@modern': 'Un pannello nasconde una porta segreta in una parete.',
+      'dungeon.locked@modern': 'Una porta blindata è chiusa a chiave.',
+      'dungeon.legend@modern': 'S: porta segreta · ■: porta chiusa a chiave · ⋮: cancello a sbarre',
+      'dungeon.3d.rock@modern': 'Muri',
+      'dungeon.3d.iron@modern': 'Sbarre e serrature',
+      'dungeon.3d.secret@modern': 'Pannelli nascosti',
+      // Cyberpunk.
+      'dungeon.opt.theme.tomb@cyber': 'Clinica',
+      'dungeon.opt.theme.temple@cyber': 'Culto IA',
+      'dungeon.opt.theme.lair@cyber': 'Gang',
+      'dungeon.opt.theme.prison@cyber': 'Sito nero',
+      'dungeon.opt.theme.mine@cyber': 'Sottocittà',
+      'dungeon.opt.theme.sanctum@cyber': 'Centro dati',
+      'dungeon.secret@cyber': 'Un pannello olografico nasconde un passaggio in una parete.',
+      'dungeon.locked@cyber': 'Una porta è sigillata da una serratura elettronica.',
+      'dungeon.legend@cyber': 'S: passaggio nascosto · ■: serratura elettronica · ⋮: barriera di sicurezza',
+      'dungeon.3d.rock@cyber': 'Pareti',
+      'dungeon.3d.iron@cyber': 'Barriere e serrature',
+      'dungeon.3d.secret@cyber': 'Passaggi nascosti',
+      'dungeon.3d.lintels@cyber': 'Telai',
     },
     en: {
       'gen.dungeon.name': 'Dungeon',
@@ -62,6 +89,32 @@
       'dungeon.secret': 'A secret door is hidden in one wall.',
       'dungeon.locked': 'One door is locked.',
       'dungeon.legend': 'S: secret door · ■: locked door · ⋮: bars',
+      // Present day (2026).
+      'dungeon.opt.theme.tomb@modern': 'Hospital',
+      'dungeon.opt.theme.temple@modern': 'Cult',
+      'dungeon.opt.theme.lair@modern': 'Gang',
+      'dungeon.opt.theme.prison@modern': 'Bunker',
+      'dungeon.opt.theme.mine@modern': 'Subway',
+      'dungeon.opt.theme.sanctum@modern': 'Laboratory',
+      'dungeon.secret@modern': 'A panel hides a secret door in one wall.',
+      'dungeon.locked@modern': 'A steel door is locked.',
+      'dungeon.legend@modern': 'S: secret door · ■: locked door · ⋮: barred gate',
+      'dungeon.3d.rock@modern': 'Walls',
+      'dungeon.3d.secret@modern': 'Hidden panels',
+      // Cyberpunk.
+      'dungeon.opt.theme.tomb@cyber': 'Clinic',
+      'dungeon.opt.theme.temple@cyber': 'AI cult',
+      'dungeon.opt.theme.lair@cyber': 'Gang',
+      'dungeon.opt.theme.prison@cyber': 'Black site',
+      'dungeon.opt.theme.mine@cyber': 'Undercity',
+      'dungeon.opt.theme.sanctum@cyber': 'Server farm',
+      'dungeon.secret@cyber': 'A holographic panel hides a passage in one wall.',
+      'dungeon.locked@cyber': 'One door is sealed by a maglock.',
+      'dungeon.legend@cyber': 'S: hidden passage · ■: maglock · ⋮: security bars',
+      'dungeon.3d.rock@cyber': 'Walls',
+      'dungeon.3d.iron@cyber': 'Barriers and locks',
+      'dungeon.3d.secret@cyber': 'Hidden passages',
+      'dungeon.3d.lintels@cyber': 'Frames',
     },
   });
 
@@ -207,6 +260,276 @@
     ],
     trapSentence: ['Trappola: {R}.', 'Trap: {R}.'],
   };
+
+  // Present day (2026): the same theme ids become an abandoned hospital, a
+  // cult compound, a gang hideout, a Cold War bunker, disused metro tunnels and
+  // a research lab. Titles are "place + name" (nouns per theme, the English
+  // may put the place inside with {p}); story names can be companies.
+  const TM = Object.assign({}, T, {
+    places: {
+      tomb: [['Ospedale', 'Hospital'], ['Sanatorio', 'Sanatorium'], ['Clinica', 'Clinic'], ['Ospedale psichiatrico', 'Asylum']],
+      temple: [['Comunità', 'Community'], ['Tempio', 'Temple'], ['Rifugio', 'Retreat']],
+      lair: [['Covo', 'Hideout'], ['Officina', 'Garage'], ['Magazzino', 'Warehouse']],
+      prison: [['Bunker', 'Bunker'], ['Base', 'Base'], ['Rifugio antiatomico', 'Fallout Shelter']],
+      mine: [['Stazione', 'Station'], ['Gallerie', 'Tunnels'], ['Fogne', 'Sewers'], ['Deposito', 'Depot']],
+      sanctum: [['Laboratori', 'Laboratories'], ['Istituto', 'Institute'], ['Centro ricerche', 'Research Centre']],
+    },
+    nouns: {
+      tomb: [['San Gerardo', 'St. Gerard'], ['Santa Lucia', 'St. Lucy'], ['Sant’Agata', 'St. Agatha'], ['Villa Serena', 'Villa Serena'],
+        ['Villa Azzurra', 'Bluewater'], ['Le Querce', 'Oakwood'], ['Pineta', 'Pinewood'], ['Monteverde', 'Greenhill']],
+      temple: [['della Nuova Alba', 'New Dawn'], ['della Luce Interiore', 'Inner Light'], ['dell’Ultimo Giorno', 'Last Day'], ['del Risveglio', 'Awakening'],
+        ['della Seconda Nascita', 'Second Birth'], ['dei Figli del Sole', 'Children of the Sun'], ['della Grande Quiete', 'Great Stillness'], ['del Cerchio Bianco', 'White Circle']],
+      lair: [['dei Lupi Neri', 'Black Wolves'], ['dei Corvi', 'Crows'], ['delle Vipere', 'Vipers'], ['dei Re della Strada', 'Street Kings'],
+        ['dei Diavoli Rossi', 'Red Devils'], ['dei Cani Sciolti', 'Stray Dogs'], ['degli Scorpioni', 'Scorpions'], ['della Banda del Porto', 'Harbour Crew']],
+      prison: [['Delta-7', 'Delta-7'], ['Sigma', 'Sigma'], ['Orione', 'Orion'], ['Cassiopea', 'Cassiopeia'], ['K-12', 'K-12'], ['Zulu', 'Zulu'], ['Aurora', 'Aurora']],
+      mine: [['di Porta Nord', 'North Gate'], ['del Vecchio Mercato', 'Old Market'], ['di San Teodoro', 'St. Theodore'], ['dell’Arsenale', 'Arsenal'],
+        ['della Cittadella', 'Citadel'], ['delle Fornaci', 'Furnace Street'], ['di Ponte Vecchio', 'Old Bridge']],
+      sanctum: [['Prometeo', 'Prometheus'], ['Minerva', 'Minerva'], ['Galeno', 'Galen'], ['Atlante', 'Atlas'], ['Genesi', 'Genesis'],
+        ['Iperione', 'Hyperion'], ['Chimera', 'Chimera'], ['Fenice', 'Phoenix']],
+    },
+    storyNames: { tomb: 'person', temple: 'person', lair: 'person', prison: 'corp', mine: 'place', sanctum: 'corp' },
+    coinMul: 10,
+    openings: [
+      ['Da anni nessuno mette piede qui sotto.', 'No one has set foot down here in years.'],
+      ['Un video girato da due ragazzi è diventato virale; poi i ragazzi sono spariti.', 'A video shot by two teenagers went viral; then the teenagers vanished.'],
+      ['Uno scavo per i lavori stradali ha aperto un accesso dimenticato.', 'Roadworks have broken into a forgotten access shaft.'],
+      ['Una fonte anonima ha mandato le coordinate e una sola parola: «sbrigatevi».', 'An anonymous source sent the coordinates and a single word: “hurry”.'],
+      ['La polizia ha chiuso le indagini troppo in fretta.', 'The police closed the investigation far too quickly.'],
+      ['Un giornalista ha lasciato un messaggio in segreteria, poi più nulla.', 'A journalist left a voicemail, then nothing more.'],
+    ],
+    rumors: {
+      tomb: [['Si dice che {name}, ex medico del reparto, continui a operare qui sotto.', 'They say {name}, once a doctor here, still operates down below.'], ['Le cartelle dei pazienti di {name} sono sparite il giorno della chiusura.', 'The files of {name}’s patients vanished the day the hospital closed.']],
+      temple: [['La comunità di {name} promette la salvezza a chi rinuncia a tutto.', 'The community of {name} promises salvation to those who give up everything.'], ['I seguaci di {name} si riuniscono qui sotto a ogni luna nuova.', 'The followers of {name} gather down here every new moon.']],
+      lair: [['La gang di {name} usa questo posto come base.', '{name}’s gang uses this place as its base.'], ['Le rapine degli ultimi mesi portano tutte alla banda di {name}.', 'Every robbery of the last few months leads back to {name}’s crew.']],
+      prison: [['Dismesso nel 1991, il bunker è stato comprato in segreto dalla {name}.', 'Decommissioned in 1991, the bunker was secretly bought by {name}.'], ['Chi lavora per la {name} non parla mai di cosa succede qui sotto.', 'No one who works for {name} ever talks about what happens down here.']],
+      mine: [['La stazione di {name} fu chiusa nel 1987, dopo un incidente mai chiarito.', '{name} station was closed in 1987 after an accident that was never explained.'], ['Sotto {name} corre una linea della metropolitana che non compare su nessuna mappa.', 'Beneath {name} runs a metro line that appears on no map.']],
+      sanctum: [['Qui la {name} conduceva ricerche che nessun comitato etico avrebbe approvato.', 'Here {name} ran research no ethics board would ever have approved.'], ['La {name} giura che questo laboratorio è chiuso da anni.', '{name} swears this laboratory has been closed for years.']],
+    },
+    goals: [
+      ['Un cliente anonimo paga bene chi gli riporterà {treasure}.', 'An anonymous client pays well for whoever brings back {treasure}.'],
+      ['Bisogna scoprire che cosa succede qui sotto prima che ci scappi il morto.', 'Someone has to find out what is going on down here before somebody gets killed.'],
+      ['Una famiglia cerca notizie di una persona scomparsa, vista l’ultima volta qui.', 'A family is looking for a missing person, last seen here.'],
+    ],
+    rooms: {
+      entrance: [['Ingresso. Una scala di servizio scende dal livello della strada.', 'Entrance. A service stair leads down from street level.'], ['Ingresso. Un portellone forzato si apre su gradini di cemento.', 'Entrance. A forced hatch opens onto concrete steps.']],
+      guard: [['Guardiola. Monitor spenti e un posacenere traboccante.', 'Security booth. Dead monitors and an overflowing ashtray.'], ['Posto di controllo. Una sbarra e un tornello bloccano il passaggio.', 'Checkpoint. A barrier and a turnstile block the way.']],
+      storage: [['Magazzino. Scatoloni sfondati e scaffali di metallo piegati.', 'Storeroom. Burst cardboard boxes and buckled metal shelving.'], ['Deposito. Fusti di plastica e bancali accatastati.', 'Depot. Plastic drums and stacked pallets.']],
+      barracks: [['Dormitorio. Brandine da campo e sacchi a pelo ammuffiti.', 'Dormitory. Camp beds and mouldy sleeping bags.']],
+      armory: [['Armeria. Rastrelliere vuote; resta solo una cassetta di munizioni.', 'Armoury. Empty racks; only an ammunition box remains.']],
+      prison: [['Celle. Sbarre verniciate di grigio e brande fissate al muro.', 'Cells. Grey-painted bars and bunks bolted to the wall.'], ['Blocco di detenzione. Sulle porte, spioncini e numeri dipinti a stampo.', 'Detention block. Peepholes and stencilled numbers on the doors.']],
+      hall: [['Atrio. Pilastri di cemento reggono un soffitto macchiato d’umidità.', 'Lobby. Concrete pillars hold up a damp-stained ceiling.']],
+      kitchen: [['Mensa. Una cucina industriale e tavoli d’acciaio incrostati.', 'Canteen. An industrial kitchen and crusted steel tables.']],
+      flooded: [['Locale allagato. L’acqua torbida arriva alle caviglie.', 'Flooded room. Murky water reaches the ankles.'], ['Vasca di raccolta. Una pozza d’acqua scura occupa gran parte della stanza.', 'Sump. A pool of dark water fills most of the room.']],
+      collapsed: [['Crollo. Una soletta è venuta giù; si passa a fatica tra i calcinacci.', 'Collapse. A floor slab has come down; one squeezes through the rubble.']],
+      well: [['Pozzo d’ispezione. Una grata copre un pozzo da cui sale aria fredda.', 'Inspection shaft. A grate covers a shaft breathing cold air.']],
+      lab: [['Laboratorio. Banconi, provette rotte e un forte odore di solventi.', 'Laboratory. Benches, broken test tubes and a sharp smell of solvents.'], ['Laboratorio di analisi. Una centrifuga gira ancora.', 'Analysis lab. A centrifuge is still spinning.']],
+      archive: [['Archivio. Schedari rovesciati e faldoni sparsi sul pavimento.', 'Archive. Overturned filing cabinets and binders strewn across the floor.']],
+      shrine: [['Cappella. Un altare improvvisato coperto di candele e fotografie.', 'Chapel. A makeshift altar covered in candles and photographs.'], ['Sala di preghiera. Il simbolo della setta è dipinto sul muro.', 'Prayer room. The cult’s symbol is painted on the wall.']],
+      ritual: [['Sala delle cerimonie. Un cerchio dipinto sul pavimento, circondato da sedie.', 'Ceremony hall. A circle painted on the floor, ringed by chairs.']],
+      lair: [['Bivacco. Materassi lerci, lattine vuote e cartoni di pizza.', 'Squat. Filthy mattresses, empty cans and pizza boxes.']],
+      throne: [['Ufficio del capo. Una poltrona di pelle sotto la bandiera della gang.', 'Boss’s office. A leather armchair under the gang’s flag.']],
+      mine: [['Galleria. Binari arrugginiti si perdono nel buio.', 'Tunnel. Rusty tracks disappear into the dark.'], ['Galleria di servizio. Un carrello di manutenzione è abbandonato sui binari.', 'Service tunnel. A maintenance trolley stands abandoned on the tracks.']],
+      platform: [['Banchina. Piastrelle sbeccate e un cartellone pubblicitario del 1985.', 'Platform. Chipped tiles and an advertising poster from 1985.']],
+      sewer: [['Collettore. Un canale d’acqua scura scorre lentamente.', 'Sewer main. A channel of dark water flows sluggishly.']],
+      fungus: [['Stanza della muffa. Chiazze nere coprono muri e soffitto; l’aria è irrespirabile.', 'Mould room. Black patches cover walls and ceiling; the air is barely breathable.']],
+      morgue: [['Obitorio. Celle frigorifere aperte e tavoli d’acciaio.', 'Morgue. Open cold-storage drawers and steel tables.'], ['Camera mortuaria. Barelle abbandonate e un odore pungente di formalina.', 'Mortuary. Abandoned stretchers and a sharp smell of formalin.']],
+      ward: [['Corsia. Letti arrugginiti in fila, con le flebo ancora appese.', 'Ward. Rows of rusty beds, IV drips still hanging.'], ['Reparto. Lenzuola ingiallite e cartelle cliniche sparse.', 'Ward. Yellowed sheets and scattered medical charts.']],
+      surgery: [['Sala operatoria. Un lettino sotto la lampada scialitica; gli strumenti sono puliti.', 'Operating theatre. A table under the surgical lamp; the instruments are clean.'], ['Sala operatoria. Teli verdi strappati e un carrello di ferri arrugginiti.', 'Operating theatre. Torn green drapes and a trolley of rusty instruments.']],
+      office: [['Uffici. Scrivanie, sedie girevoli e computer di vent’anni fa.', 'Offices. Desks, swivel chairs and twenty-year-old computers.']],
+      garage: [['Garage. Auto senza targa e attrezzi sparsi sul pavimento.', 'Garage. Cars without plates and tools strewn across the floor.']],
+      plant: [['Sala macchine. Un generatore diesel e tubi che gocciolano.', 'Plant room. A diesel generator and dripping pipes.']],
+      control: [['Sala comando. Console spente e una mappa murale piena di puntine.', 'Control room. Dead consoles and a wall map full of pins.']],
+      servers: [['Sala server. Gli armadi rack ronzano ancora, alimentati chissà da dove.', 'Server room. The racks are still humming, powered from who knows where.']],
+      vats: [['Sala colture. Vasche di vetro piene di un liquido torbido.', 'Culture room. Glass tanks full of a cloudy liquid.']],
+      vault: [['Caveau. Cassette di sicurezza forzate a metà coprono le pareti.', 'Vault. Half-forced safe-deposit boxes line the walls.']],
+      empty: [['Stanza vuota. Polvere, calcinacci e silenzio.', 'Empty room. Dust, fallen plaster and silence.'], ['Stanza spoglia. Sul muro qualcuno ha scritto un avvertimento con la bomboletta.', 'Bare room. Someone has spray-painted a warning on the wall.']],
+      exit: [['Vano scala. I gradini scendono verso livelli ancora più profondi.', 'Stairwell. Steps lead down to even deeper levels.']],
+    },
+    kinds: {
+      tomb: { ward: 4, morgue: 2, surgery: 1.5, office: 1, storage: 1, hall: 1, kitchen: 0.7, lab: 0.7, collapsed: 1, flooded: 0.7, fungus: 0.7, empty: 1.5 },
+      temple: { shrine: 3, ritual: 2, barracks: 1.5, kitchen: 1, archive: 1, office: 1, storage: 1, prison: 0.7, hall: 1, empty: 1 },
+      lair: { lair: 2, storage: 2, garage: 2, guard: 2, barracks: 1, kitchen: 1, armory: 1, prison: 0.7, collapsed: 0.5, empty: 1 },
+      prison: { prison: 3, guard: 2, barracks: 2, armory: 1.5, storage: 1.5, control: 1, plant: 1, kitchen: 1, flooded: 0.7, empty: 1 },
+      mine: { mine: 4, platform: 2, sewer: 2, collapsed: 1.5, storage: 1, plant: 1, lair: 1, well: 1, fungus: 1, empty: 1 },
+      sanctum: { lab: 3, office: 2, archive: 1.5, servers: 1, vats: 1, storage: 1, surgery: 0.5, hall: 1, flooded: 0.5, empty: 1 },
+    },
+    boss: { tomb: 'surgery', temple: 'ritual', lair: 'throne', prison: 'control', mine: 'lair', sanctum: 'lab' },
+    monsters: {
+      tomb: [['un saccheggiatore', 'saccheggiatori', 'a looter', 'looters'], ['un cane randagio', 'cani randagi', 'a stray dog', 'stray dogs'], ['un ladro di rame', 'ladri di rame', 'a copper thief', 'copper thieves'], ['un ratto', 'ratti', 'a rat', 'rats'], ['un chirurgo radiato', 'chirurghi radiati', 'a struck-off surgeon', 'struck-off surgeons', 1]],
+      temple: [['un adepto', 'adepti', 'a cultist', 'cultists'], ['una guardia della setta', 'guardie della setta', 'a cult guard', 'cult guards'], ['un reclutatore', 'reclutatori', 'a recruiter', 'recruiters'], ['un dobermann', 'dobermann', 'a Dobermann', 'Dobermanns'], ['il guru', 'guru', 'the guru', 'gurus', 1]],
+      lair: [['un membro della gang', 'membri della gang', 'a gang member', 'gang members'], ['una vedetta', 'vedette', 'a lookout', 'lookouts'], ['un pitbull', 'pitbull', 'a pit bull', 'pit bulls'], ['un picchiatore', 'picchiatori', 'an enforcer', 'enforcers'], ['il capobanda', 'capibanda', 'the gang leader', 'gang leaders', 1]],
+      prison: [['un mercenario', 'mercenari', 'a mercenary', 'mercenaries'], ['una guardia armata', 'guardie armate', 'an armed guard', 'armed guards'], ['un drone di sorveglianza', 'droni di sorveglianza', 'a surveillance drone', 'surveillance drones'], ['un prigioniero in fuga', 'prigionieri in fuga', 'an escaped prisoner', 'escaped prisoners'], ['il comandante', 'comandanti', 'the commander', 'commanders', 1]],
+      mine: [['un contrabbandiere', 'contrabbandieri', 'a smuggler', 'smugglers'], ['un ratto', 'ratti', 'a rat', 'rats'], ['un cane randagio', 'cani randagi', 'a stray dog', 'stray dogs'], ['un ricettatore', 'ricettatori', 'a fence', 'fences'], ['un alligatore', 'alligatori', 'an alligator', 'alligators', 1]],
+      sanctum: [['una guardia giurata', 'guardie giurate', 'a security guard', 'security guards'], ['un drone di sicurezza', 'droni di sicurezza', 'a security drone', 'security drones'], ['una cavia fuggita', 'cavie fuggite', 'an escaped test subject', 'escaped test subjects'], ['un ricercatore', 'ricercatori', 'a researcher', 'researchers'], ['il Soggetto Zero', 'Soggetti Zero', 'Subject Zero', 'Subject Zeros', 1]],
+    },
+    monsterSentences: {
+      one: [['{M} si aggira nella stanza.', '{M} prowls the room.'], ['{M} fa la guardia.', '{M} stands guard.'], ['{M} attende immobile nella penombra.', '{M} waits motionless in the gloom.']],
+      many: [['{M} si aggirano nella stanza.', '{M} prowl the room.'], ['{M} fanno la guardia.', '{M} stand guard.'], ['{M} attendono immobili nella penombra.', '{M} wait motionless in the gloom.']],
+    },
+    treasures: [
+      ['una busta con {coins} euro in contanti', 'an envelope holding {coins} euros in cash'],
+      ['un portatile pieno di dati compromettenti', 'a laptop full of compromising data'],
+      ['una chiavetta USB cifrata', 'an encrypted USB stick'],
+      ['un mazzo di tessere magnetiche', 'a bundle of keycards'],
+      ['un orologio d’oro', 'a gold wristwatch'],
+      ['una pistola con due caricatori', 'a pistol with two magazines'],
+      ['una valigetta di documenti riservati', 'a briefcase of classified documents'],
+      ['la piantina dei livelli inferiori', 'a floor plan of the lower levels'],
+      ['un taccuino pieno di codici e nomi', 'a notebook full of codes and names'],
+      ['lingotti d’oro avvolti in un asciugamano', 'gold bars wrapped in a towel'],
+      ['un telefono satellitare', 'a satellite phone'],
+      ['un disco rigido con l’etichetta «NON APRIRE»', 'a hard drive labelled “DO NOT OPEN”'],
+    ],
+    treasureSentences: [['In una cassaforte a muro: {T}.', 'In a wall safe: {T}.'], ['In un armadietto: {T}.', 'In a locker: {T}.'], ['Sotto una piastrella smossa: {T}.', 'Under a loose tile: {T}.']],
+    traps: [
+      ['un filo teso fa esplodere una granata', 'a tripwire sets off a grenade'],
+      ['un sensore di movimento fa scattare l’allarme', 'a motion sensor trips the alarm'],
+      ['il pavimento marcio cede sul piano di sotto', 'the rotten floor gives way to the level below'],
+      ['un cavo scoperto mette in tensione l’acqua a terra', 'a bare cable electrifies the water on the floor'],
+      ['una porta tagliafuoco si chiude alle spalle degli intrusi', 'a fire door slams shut behind intruders'],
+      ['una tagliola è nascosta tra i detriti', 'a bear trap is hidden in the debris'],
+      ['una fuga di gas aspetta solo una scintilla', 'a gas leak is just waiting for a spark'],
+    ],
+  });
+
+  // Cyberpunk: a back-alley clinic and body bank, the data temple of an AI
+  // cult, a gang den, a corporate black site, the undercity's maintenance
+  // tunnels and a corporate server farm.
+  const TC = Object.assign({}, T, {
+    places: {
+      tomb: [['Clinica', 'Clinic'], ['Banca dei corpi', 'Body Bank'], ['Ambulatorio', 'Med Center']],
+      temple: [['Tempio', 'Temple'], ['Santuario', 'Shrine'], ['Chiesa', 'Church']],
+      lair: [['Covo', 'Den'], ['Tana', 'Lair'], ['Garage', 'Garage']],
+      prison: [['Sito nero', 'Black Site'], ['Struttura', 'Facility'], ['Centro di detenzione', 'Detention Center']],
+      mine: [['Sottocittà', 'Undercity'], ['Tunnel di servizio', 'Service Tunnels'], ['Condotti', 'Conduits']],
+      sanctum: [['Centro dati', 'Data Center'], ['Server farm', 'Server Farm'], ['Laboratorio', 'Lab']],
+    },
+    nouns: {
+      tomb: [['Loto Nero', 'Black Lotus'], ['Seconda Pelle', 'Second Skin'], ['Mano Ferma', 'Steady Hand'], ['Kitsune', 'Kitsune'],
+        ['Rinascita', 'Rebirth'], ['Pezzi di Ricambio', 'Spare Parts'], ['Cuore d’Acciaio', 'Steel Heart']],
+      temple: [['del Codice Vivente', '{p} of the Living Code'], ['della Mente Unica', '{p} of the One Mind'], ['del Segnale', '{p} of the Signal'],
+        ['dell’Ascensione Digitale', '{p} of Digital Ascension'], ['della Rete Eterna', '{p} of the Eternal Net'], ['dell’Ultimo Algoritmo', '{p} of the Last Algorithm'],
+        ['del Dio nella Macchina', '{p} of the God in the Machine'], ['del Silicio Sacro', '{p} of Holy Silicon']],
+      lair: [['dei Serpenti Cromati', 'Chrome Serpents'], ['dei Neon Rossi', 'Red Neons'], ['dei Cani di Ferro', 'Iron Dogs'], ['dei Fantasmi', 'Ghosts'],
+        ['delle Lame', 'Blades'], ['dei Mangiacromo', 'Chrome Eaters'], ['delle Tigri Elettriche', 'Electric Tigers'], ['dei Sei Teschi', 'Six Skulls']],
+      prison: [['Omega', 'Omega'], ['Ade', 'Hades'], ['Tartaro', 'Tartarus'], ['Zero', 'Zero'], ['Cerbero', 'Cerberus'], ['Kappa-9', 'Kappa-9'], ['Abisso', 'Abyss']],
+      mine: [['del Settore 9', 'Sector 9'], ['del Livello Zero', 'Level Zero'], ['di Ruggine', 'Rust'], ['del Vecchio Porto', 'Old Harbor'],
+        ['della Linea Morta', 'Dead Line'], ['del Blocco 33', 'Block 33'], ['dello Snodo Est', 'East Junction'], ['del Sottolivello 7', 'Sublevel 7']],
+      sanctum: [['Nodo Sigma', 'Node Sigma'], ['Iperione', 'Hyperion'], ['Kronos', 'Kronos'], ['Mnemosine', 'Mnemosyne'], ['Babele', 'Babel'],
+        ['Labirinto', 'Labyrinth'], ['Oracolo', 'Oracle'], ['Zenith', 'Zenith']],
+    },
+    storyNames: { tomb: 'person', temple: 'person', lair: 'person', prison: 'corp', mine: 'place', sanctum: 'corp' },
+    coinMul: 10,
+    openings: [
+      ['Le telecamere del quartiere non inquadrano mai questo ingresso.', 'The district cameras never point at this entrance.'],
+      ['Un fixer ha un lavoro: pagamento alla consegna, nessuna domanda.', 'A fixer has a job: payment on delivery, no questions asked.'],
+      ['Un blackout di tre minuti ha aperto porte che restavano chiuse da anni.', 'A three-minute blackout opened doors that had stayed shut for years.'],
+      ['Un netrunner ha trovato questo posto su un server che non doveva esistere.', 'A netrunner found this place on a server that should not exist.'],
+      ['Sulla rete circola un file corrotto con una mappa parziale.', 'A corrupted file with a partial map is circulating on the net.'],
+      ['Un contatto è sparito qui sotto; il suo biomonitor trasmette ancora.', 'A contact disappeared down here; their biomonitor is still pinging.'],
+    ],
+    rumors: {
+      tomb: [['Qui {name} installa impianti senza licenza e non fa domande.', 'Here {name} installs unlicensed chrome and asks no questions.'], ['Chi non paga i debiti con {name} finisce smontato pezzo per pezzo nella banca dei corpi.', 'Those who don’t pay their debts to {name} end up stripped for parts in the body bank.']],
+      temple: [['{name} predica che l’IA salverà chi le cederà la propria mente.', '{name} preaches that the AI will save those who surrender their minds to it.'], ['Il culto di {name} ha trasformato un vecchio nodo di rete in un santuario.', '{name}’s cult has turned an old network node into a shrine.']],
+      lair: [['La gang di {name} controlla il quartiere da qui.', '{name}’s gang runs the block from here.'], ['Le razzie di cromo partono da qui, agli ordini di {name}.', 'The chrome raids start here, on the orders of {name}.']],
+      prison: [['Ufficialmente questo sito non esiste; i registri della {name} dicono altro.', 'Officially this site does not exist; the ledgers of {name} say otherwise.'], ['La {name} fa sparire qui i suoi nemici, e a volte i suoi dipendenti.', '{name} makes its enemies disappear here, and sometimes its own employees.']],
+      mine: [['Sotto {name} si apre un dedalo di tunnel che nessuna corp si prende più la briga di mappare.', 'Beneath {name} lies a maze of tunnels no corp bothers to map any more.'], ['I tunnel di servizio di {name} sono la via preferita dei contrabbandieri.', 'The service tunnels of {name} are the smugglers’ favourite route.']],
+      sanctum: [['I server della {name} custodiscono segreti che valgono una guerra.', 'The servers of {name} hold secrets worth a war.'], ['Qui la {name} tiene sotto chiave un’IA che ha imparato troppo.', 'Here {name} keeps an AI that learned too much under lock and key.']],
+    },
+    goals: [
+      ['Il fixer paga in contanti puliti chi recupera {treasure}.', 'The fixer pays clean cash to whoever recovers {treasure}.'],
+      ['Bisogna entrare, prendere i dati e uscire prima che arrivi la sicurezza.', 'The job: get in, grab the data and get out before security arrives.'],
+      ['Qualcuno deve portare fuori un ostaggio prima che lo cancellino.', 'Someone has to extract a hostage before they get erased.'],
+    ],
+    rooms: {
+      entrance: [['Ingresso. Un montacarichi scende dalla strada tra luci al neon tremolanti.', 'Entrance. A freight lift descends from the street under flickering neon.'], ['Ingresso. Una botola di manutenzione, con il lettore di badge forzato.', 'Entrance. A maintenance hatch, its badge reader hacked open.']],
+      guard: [['Posto di sicurezza. Le immagini delle telecamere tremolano in ologramma sopra il bancone.', 'Security post. Camera holo-feeds flicker above the desk.'], ['Checkpoint. Uno scanner corporeo e una porta a tenuta stagna.', 'Checkpoint. A body scanner and an airtight door.']],
+      storage: [['Magazzino. Container impilati con il logo di una corp cancellato.', 'Storeroom. Stacked containers with a corp logo scrubbed off.'], ['Deposito. Casse di componenti elettronici e fusti di refrigerante.', 'Depot. Crates of electronics and drums of coolant.']],
+      barracks: [['Alloggi. Capsule letto impilate, ognuna con il suo schermo.', 'Quarters. Stacked sleep pods, each with its own screen.']],
+      armory: [['Armeria. Rastrelliere a riconoscimento biometrico, quasi tutte vuote.', 'Armoury. Biometric weapon racks, almost all of them empty.']],
+      prison: [['Celle. Porte di plexiglas e collari inibitori appesi al muro.', 'Cells. Plexiglass doors and inhibitor collars hanging on the wall.'], ['Blocco di contenimento. I prigionieri dormono collegati a una rete sedativa.', 'Containment block. Prisoners sleep wired into a sedation net.']],
+      torture: [['Sala interrogatori. Una sedia di contenzione con un casco neurale.', 'Interrogation room. A restraint chair fitted with a neural helmet.']],
+      hall: [['Atrio. Colonne d’acciaio e pubblicità olografiche che parlano al vuoto.', 'Atrium. Steel columns and holo-ads talking to no one.']],
+      statues: [['Deposito androidi. File di androidi spenti fissano la porta.', 'Android storage. Rows of deactivated androids stare at the door.']],
+      kitchen: [['Mensa. Distributori di cibo sintetico e tavoli di plastica.', 'Canteen. Synth-food dispensers and plastic tables.']],
+      flooded: [['Locale allagato. Refrigerante e acqua piovana coprono il pavimento.', 'Flooded room. Coolant and rainwater cover the floor.']],
+      collapsed: [['Crollo. Una trave di cemento armato ha sfondato il soffitto.', 'Collapse. A reinforced concrete beam has broken through the ceiling.']],
+      well: [['Pozzo di ventilazione. Un vento caldo sale dai livelli inferiori.', 'Ventilation shaft. A warm draught rises from the lower levels.']],
+      lab: [['Laboratorio. Bracci robotici immobili sopra banconi sterili.', 'Laboratory. Motionless robot arms above sterile benches.'], ['Laboratorio di bioingegneria. Una stampante di tessuti è ancora accesa.', 'Bioengineering lab. A tissue printer is still running.']],
+      archive: [['Archivio dati. Scaffali di nastri olografici e terminali spenti.', 'Data archive. Shelves of holo-tapes and dead terminals.']],
+      shrine: [['Cappella. Un altare di schermi rotti mostra lo stesso volto generato.', 'Chapel. An altar of broken screens shows the same generated face.'], ['Santuario. Candele a LED circondano un vecchio processore chiuso in una teca.', 'Shrine. LED candles surround an old processor enshrined in a glass case.']],
+      ritual: [['Sala della connessione. Un anello olografico pulsa al centro; i fedeli si collegano qui.', 'Uplink hall. A holographic ring pulses at the centre; the faithful jack in here.']],
+      lair: [['Tana. Materassi, cavi strappati e pezzi di cromo rubato.', 'Den. Mattresses, ripped cables and stolen chrome.']],
+      throne: [['Sala del boss. Un trono di sedili d’auto saldati, sotto un’insegna al neon.', 'Boss’s hall. A throne of welded car seats under a neon sign.']],
+      mine: [['Tunnel di servizio. I binari della vecchia monorotaia e fasci di cavi.', 'Service tunnel. Old monorail tracks and bundled cables.'], ['Condotto. Un carrello di manutenzione automatico è fermo sui binari.', 'Conduit. An automated maintenance cart sits idle on the tracks.']],
+      sewer: [['Canale di scolo. Acqua iridescente scorre verso il basso.', 'Drainage channel. Iridescent water flows downwards.']],
+      hydro: [['Serra idroponica. Alghe e funghi modificati crescono sotto lampade UV.', 'Hydroponic farm. Engineered algae and fungi grow under UV lamps.']],
+      morgue: [['Banca dei corpi. Cassetti criogenici in fila, ognuno con il suo codice a barre.', 'Body bank. Rows of cryo-drawers, each with its own barcode.']],
+      ward: [['Sala di degenza. Lettini con monitor che suonano a vuoto.', 'Recovery ward. Cots with monitors beeping at no one.']],
+      surgery: [['Sala operatoria. Un lettino sotto un ragno di bracci chirurgici.', 'Operating room. A table under a spider of surgical arms.'], ['Ambulatorio. Un impianto oculare attende su un vassoio sterile, accanto al lettino.', 'Chrome bay. An ocular implant waits on a sterile tray beside the table.']],
+      office: [['Uffici. Postazioni open space con gli schermi ancora accesi.', 'Offices. Open-plan workstations, screens still on.']],
+      garage: [['Garage. Moto truccate e un’auto blindata a metà.', 'Garage. Souped-up bikes and a half-armoured car.']],
+      plant: [['Sala macchine. Una turbina e tubi di refrigerante che fischiano.', 'Plant room. A turbine and hissing coolant pipes.']],
+      control: [['Sala di controllo. Pareti di schermi mostrano ogni corridoio.', 'Control room. Walls of screens show every corridor.']],
+      servers: [['Sala server. File di rack ronzano nel freddo, con i LED che ammiccano nel buio.', 'Server hall. Rows of racks hum in the cold, their LEDs winking in the dark.'], ['Nodo di rete. Fasci di fibra ottica pendono dal soffitto.', 'Network node. Bundles of optic fibre hang from the ceiling.']],
+      vats: [['Sala delle vasche. Organi coltivati galleggiano in cilindri di vetro.', 'Tank room. Vat-grown organs float in glass cylinders.'], ['Vasche di clonazione. Corpi senza nome galleggiano nel liquido amniotico.', 'Cloning vats. Nameless bodies float in amniotic fluid.']],
+      core: [['Nucleo. Un’IA ribelle parla da ogni altoparlante; i suoi server formano un anello.', 'Core. A rogue AI speaks through every speaker; its servers form a ring.']],
+      vault: [['Caveau. Casseforti sigillate dietro uno scanner retinico.', 'Vault. Sealed strongboxes behind a retina scanner.']],
+      empty: [['Stanza vuota. Graffiti al neon e un cartello: «zona morta».', 'Empty room. Neon graffiti and a sign: “dead zone”.'], ['Stanza spoglia. Le telecamere sono state accecate con la vernice.', 'Bare room. The cameras have been blinded with spray paint.']],
+      exit: [['Pozzo dell’ascensore. Una scala d’emergenza scende ai sottolivelli.', 'Lift shaft. An emergency ladder leads down to the sublevels.']],
+    },
+    kinds: {
+      tomb: { surgery: 3, vats: 3, ward: 2, morgue: 1.5, storage: 1, office: 0.7, guard: 1, lab: 1, empty: 1 },
+      temple: { shrine: 3, ritual: 2, servers: 2, hall: 1, barracks: 1, archive: 1, prison: 0.7, hydro: 0.7, empty: 1 },
+      lair: { lair: 2, garage: 2, storage: 2, guard: 2, armory: 1, barracks: 1, kitchen: 1, surgery: 0.5, empty: 1 },
+      prison: { prison: 3, torture: 1.5, guard: 2, barracks: 1, armory: 1, control: 1.5, servers: 1, vats: 0.7, empty: 1 },
+      mine: { mine: 3, plant: 2, sewer: 1.5, collapsed: 1.5, storage: 1, hydro: 1, lair: 1, well: 1, flooded: 0.7, empty: 1 },
+      sanctum: { servers: 4, lab: 2, office: 1.5, vats: 1, control: 1, statues: 0.7, storage: 1, hall: 0.7, empty: 1 },
+    },
+    boss: { tomb: 'surgery', temple: 'ritual', lair: 'throne', prison: 'torture', mine: 'lair', sanctum: 'core' },
+    monsters: {
+      tomb: [['un buttafuori cromato', 'buttafuori cromati', 'a chromed bouncer', 'chromed bouncers'], ['un drone medico', 'droni medici', 'a med drone', 'med drones'], ['un trafficante di organi', 'trafficanti di organi', 'an organ trafficker', 'organ traffickers'], ['un chirurgo clandestino', 'chirurghi clandestini', 'a back-alley ripperdoc', 'back-alley ripperdocs', 1], ['un cyberpsicotico', 'cyberpsicotici', 'a cyberpsycho', 'cyberpsychos', 1]],
+      temple: [['un adepto connesso', 'adepti connessi', 'a wired acolyte', 'wired acolytes'], ['un sacerdote del codice', 'sacerdoti del codice', 'a code priest', 'code priests'], ['un drone sentinella', 'droni sentinella', 'a sentinel drone', 'sentinel drones'], ['un avatar dell’IA', 'avatar dell’IA', 'an avatar of the AI', 'avatars of the AI', 1]],
+      lair: [['un gangster cromato', 'gangster cromati', 'a chromed ganger', 'chromed gangers'], ['un netrunner', 'netrunner', 'a netrunner', 'netrunners'], ['un cane cibernetico', 'cani cibernetici', 'a cyber-dog', 'cyber-dogs'], ['il boss della gang', 'boss della gang', 'the gang boss', 'gang bosses', 1], ['un cyberpsicotico', 'cyberpsicotici', 'a cyberpsycho', 'cyberpsychos', 1]],
+      prison: [['un agente della sicurezza corp', 'agenti della sicurezza corp', 'a corp security agent', 'corp security agents'], ['un drone da combattimento', 'droni da combattimento', 'a combat drone', 'combat drones'], ['una torretta automatica', 'torrette automatiche', 'an automated turret', 'automated turrets'], ['un prigioniero potenziato', 'prigionieri potenziati', 'an augmented prisoner', 'augmented prisoners'], ['l’interrogatore capo', 'interrogatori capo', 'the chief interrogator', 'chief interrogators', 1]],
+      mine: [['uno scavenger', 'scavenger', 'a scavenger', 'scavengers'], ['un drone di manutenzione impazzito', 'droni di manutenzione impazziti', 'a rogue maintenance drone', 'rogue maintenance drones'], ['un ratto mutante', 'ratti mutanti', 'a mutant rat', 'mutant rats'], ['un contrabbandiere', 'contrabbandieri', 'a smuggler', 'smugglers'], ['un cyberpsicotico', 'cyberpsicotici', 'a cyberpsycho', 'cyberpsychos', 1]],
+      sanctum: [['una guardia corp', 'guardie corp', 'a corp guard', 'corp guards'], ['un drone di sicurezza', 'droni di sicurezza', 'a security drone', 'security drones'], ['una torretta IA', 'torrette IA', 'an AI turret', 'AI turrets'], ['un netrunner della corp', 'netrunner della corp', 'a corp netrunner', 'corp netrunners'], ['un androide guardiano', 'androidi guardiani', 'a guardian android', 'guardian androids', 1]],
+    },
+    monsterSentences: {
+      one: [['{M} sorveglia la stanza.', '{M} watches over the room.'], ['{M} fa la guardia.', '{M} stands guard.'], ['{M} attende immobile tra le luci al neon.', '{M} waits motionless in the neon glow.']],
+      many: [['{M} sorvegliano la stanza.', '{M} watch over the room.'], ['{M} fanno la guardia.', '{M} stand guard.'], ['{M} attendono immobili tra le luci al neon.', '{M} wait motionless in the neon glow.']],
+    },
+    treasures: [
+      ['un credstick con {coins} crediti', 'a credstick loaded with {coins} credits'],
+      ['uno shard di dati cifrato', 'an encrypted data shard'],
+      ['un impianto prototipo ancora sigillato', 'a sealed prototype implant'],
+      ['una keycard di livello dirigenziale', 'an executive-level keycard'],
+      ['un cyberdeck modificato', 'a modded cyberdeck'],
+      ['un occhio cibernetico di grado militare', 'a military-grade cybereye'],
+      ['una pistola smart con munizioni a ricerca', 'a smart pistol with homing rounds'],
+      ['tre fiale di stimolanti da combattimento', 'three vials of combat stims'],
+      ['un chip con ricordi rubati', 'a chip full of stolen memories'],
+      ['la mappa della rete di sorveglianza', 'a map of the surveillance network'],
+      ['una lama a monofilamento', 'a monofilament blade'],
+      ['il codice sorgente di un’IA', 'the source code of an AI'],
+    ],
+    treasureSentences: [['In un armadietto blindato: {T}.', 'In an armoured locker: {T}.'], ['Dietro un pannello: {T}.', 'Behind a wall panel: {T}.'], ['In un vano sotto il pavimento: {T}.', 'In a cavity under the floor: {T}.']],
+    traps: [
+      ['una griglia laser si accende all’improvviso', 'a laser grid flicks on without warning'],
+      ['una torretta con sensore di movimento cala dal soffitto', 'a motion-sensor turret drops from the ceiling'],
+      ['un filo teso fa esplodere una granata a frammentazione', 'a tripwire sets off a frag grenade'],
+      ['un ICE nero frigge gli impianti di chi si collega al terminale', 'black ICE fries the implants of anyone who jacks into the terminal'],
+      ['un impulso EMP spegne impianti e armi smart', 'an EMP pulse shuts down implants and smart weapons'],
+      ['le porte si sigillano e dalle bocchette esce gas soporifero', 'the doors seal and sleeping gas hisses from the vents'],
+      ['il pavimento elettrificato scarica migliaia di volt', 'the electrified floor discharges thousands of volts'],
+    ],
+  });
+
+  // Text tables of a setting; the model stores only indices into them.
+  const tables = (s) => (s === 'modern' ? TM : s === 'cyber' ? TC : T);
+  const tab = (m) => tables((m && m.setting) || Carto.Setting.current);
+  // New room purposes furnished like an existing kind.
+  const FURN = { morgue: 'crypt', ward: 'barracks', archive: 'library', platform: 'hall', sewer: 'flooded', hydro: 'fungus' };
 
   const THEMES = ['tomb', 'temple', 'lair', 'prison', 'mine', 'sanctum'];
   const L = () => (I18n.lang === 'it' ? 0 : 1);
@@ -441,6 +764,8 @@
       }
       case 'ritual':
         f.push({ t: 'circle', x: cx, y: cy, r: Math.max(1, Math.min(w, h) / 2 - 0.8) });
+        // Cyberpunk: a holographic ring, without the pentacle.
+        if (Carto.Setting.is('cyber')) f[0].ring = true;
         break;
       case 'library': {
         for (const side of walls.slice(0, 2)) f.push({ t: 'shelf', side, ...alongWall(side, 0.25) });
@@ -532,6 +857,64 @@
         f.push({ t: 'stairs', x: p.x, y: p.y, side: wall, down: kind === 'exit' });
         break;
       }
+      // Present day and cyberpunk only.
+      case 'surgery':
+        f.push({ t: 'table', x: cx, y: cy, ang: w >= h ? 0 : 90 }, { t: 'lamp', x: cx, y: cy });
+        if (walls.length) f.push({ t: 'shelf', ...alongWall(walls[0], 0.25) });
+        f.push({ t: 'console', x: x + 0.7, y: y + h - 0.7, ang: 0 });
+        break;
+      case 'office':
+        for (let j = y + 1; j <= y + h - 1; j += 2) {
+          for (let i = x + 1; i <= x + w - 1; i += 2) {
+            if (blocked(i, j) || blocked(i, j + 0.65)) continue;
+            f.push({ t: 'table', x: i, y: j, ang: 0 }, { t: 'stool', x: i, y: j + 0.65 });
+          }
+        }
+        break;
+      case 'garage': {
+        // Cars side by side, nose to the wall.
+        const along = h >= w;
+        const n = Math.max(1, Math.floor(((along ? h : w) - 0.4) / 1.6));
+        for (let i = 0; i < n; i++) {
+          const d = (i + 0.5) * ((along ? h : w) / n);
+          f.push({ t: 'car', x: along ? cx : x + d, y: along ? y + d : cy, ang: along ? 90 : 0 });
+        }
+        f.push({ t: 'barrel', x: x + 0.5, y: y + 0.5 });
+        break;
+      }
+      case 'plant':
+        f.push({ t: 'machine', x: cx, y: cy, w: Math.max(1, Math.min(2.4, w - 1.4)), h: Math.max(1, Math.min(1.6, h - 1.4)) });
+        f.push({ t: 'barrel', x: x + 0.5, y: y + 0.5 }, { t: 'barrel', x: x + w - 0.5, y: y + h - 0.5 });
+        break;
+      case 'control': {
+        const s = alongWall(wall, 0.4);
+        const len = Math.hypot(s.x1 - s.x0, s.y1 - s.y0);
+        for (let d = 0.5; d <= len - 0.4; d += 1) f.push({ t: 'console', x: s.x0 + ((s.x1 - s.x0) * d) / Math.max(len, 0.01), y: s.y0 + ((s.y1 - s.y0) * d) / Math.max(len, 0.01), ang: s.ang });
+        f.push({ t: 'table', x: cx, y: cy, ang: w >= h ? 0 : 90 });
+        break;
+      }
+      case 'servers': {
+        // Rows of racks along the longer side.
+        const horiz = w >= h;
+        const rows = horiz ? h : w, cols = horiz ? w : h;
+        const n = Math.floor(rows / 2);
+        for (let k = 0, r = (rows - 2 * (n - 1)) / 2; k < n; k++, r += 2) {
+          for (let c = 1; c < cols - 1; c++) f.push({ t: 'server', x: horiz ? x + c + 0.5 : x + r, y: horiz ? y + r : y + c + 0.5, ang: horiz ? 0 : 90 });
+        }
+        break;
+      }
+      case 'vats':
+        // The top left corner stays free for the room number.
+        for (let j = y + 1; j <= y + h - 0.9; j += 1.5) for (let i = x + 1; i <= x + w - 0.9; i += 1.5) if (!blocked(i, j) && (i > x + 1 || j > y + 1)) f.push({ t: 'vat', x: i, y: j, r: 0.45 });
+        break;
+      case 'core':
+        f.push({ t: 'circle', x: cx, y: cy, r: Math.max(1, Math.min(w, h) / 2 - 1.2), ring: true });
+        for (const side of walls) {
+          const s = alongWall(side, 0.4);
+          const len = Math.hypot(s.x1 - s.x0, s.y1 - s.y0);
+          for (let d = 0.5; d <= len - 0.4; d += 1) f.push({ t: 'server', x: s.x0 + ((s.x1 - s.x0) * d) / Math.max(len, 0.01), y: s.y0 + ((s.y1 - s.y0) * d) / Math.max(len, 0.01), ang: s.ang });
+        }
+        break;
     }
     return f.filter((q) => !(q.x !== undefined && q.t !== 'cells' && q.t !== 'rails' && q.t !== 'water' && q.t !== 'circle' && blocked(Math.floor(q.x), Math.floor(q.y)) && q.t !== 'stairs'));
   }
@@ -540,6 +923,7 @@
 
   function generate(seed, opts) {
     const rng = new Carto.Random(seed);
+    const D = tables(Carto.Setting.current);
     const theme = opts.theme && opts.theme !== 'auto' ? opts.theme : rng.fork('theme').pick(THEMES);
     const sizes = { small: [6, 8, 1], medium: [10, 14, 2], large: [16, 22, 4] };
     const [lo, hi, loopMax] = sizes[opts.size] || sizes.medium;
@@ -575,11 +959,11 @@
 
     // Room purposes.
     const pr = rng.fork('purpose');
-    const kinds = Object.entries(T.kinds[theme]);
+    const kinds = Object.entries(D.kinds[theme]);
     const leaves = rooms.filter((r) => r !== rooms[0] && neighbours.get(r.id).length === 1);
     const deepest = rooms.slice(1).sort((a, b) => depth.get(b.id) - depth.get(a.id))[0];
     rooms[0].purpose = 'entrance';
-    if (deepest) { deepest.purpose = T.boss[theme]; deepest.boss = true; }
+    if (deepest) { deepest.purpose = D.boss[theme]; deepest.boss = true; }
     const spare = leaves.filter((r) => !r.purpose);
     if (spare.length) pr.pick(spare).purpose = 'vault';
     const spare2 = leaves.filter((r) => !r.purpose);
@@ -592,7 +976,7 @@
 
     // Contents.
     const cr = rng.fork('contents');
-    const monsters = T.monsters[theme];
+    const monsters = D.monsters[theme];
     for (const r of rooms) {
       const doorsIn = [];
       for (const l of links) {
@@ -604,29 +988,31 @@
         if (l.type === 'secret') r.secret = true;
         if (l.type === 'locked') r.locked = true;
       }
-      r.features = furnish(cr, r, r.purpose, doorsIn);
-      r.text = { v: cr.int(0, T.rooms[r.purpose].length - 1) };
+      r.features = furnish(cr, r, FURN[r.purpose] || r.purpose, doorsIn);
+      r.text = { v: cr.int(0, D.rooms[r.purpose].length - 1) };
       if (r.purpose !== 'entrance' && r.purpose !== 'exit' && (r.boss || cr.bool(0.42))) {
-        const mi = r.boss ? monsters.findIndex((m) => m[4]) : cr.int(0, monsters.length - 1);
+        let mi = r.boss ? monsters.findIndex((m) => m[4]) : cr.int(0, monsters.length - (D === T ? 1 : 2));
+        // Present day and cyberpunk bosses are someone, met only in their room.
+        if (D !== T && !r.boss && mi >= monsters.findIndex((m) => m[4])) mi++;
         const m = monsters[Math.max(0, mi)];
         const n = m[4] ? 1 : cr.int(1, 5);
         r.text.monster = { i: Math.max(0, mi), n, s: cr.int(0, 2) };
       }
       if (r.purpose === 'vault' || cr.bool(r.boss ? 0.8 : 0.22)) {
-        r.text.treasure = { i: cr.int(0, T.treasures.length - 1), s: cr.int(0, T.treasureSentences.length - 1), coins: cr.int(5, 50) * 10 };
+        r.text.treasure = { i: cr.int(0, D.treasures.length - 1), s: cr.int(0, D.treasureSentences.length - 1), coins: cr.int(5, 50) * 10 };
       }
-      if (r.purpose !== 'entrance' && cr.bool(0.14)) r.text.trap = cr.int(0, T.traps.length - 1);
+      if (r.purpose !== 'entrance' && cr.bool(0.14)) r.text.trap = cr.int(0, D.traps.length - 1);
     }
 
     // Title and story.
     const tr = rng.fork('title');
-    const title = { place: tr.int(0, T.places[theme].length - 1), noun: tr.int(0, T.nouns.length - 1), adj: tr.int(0, T.adjs.length - 1) };
+    const title = { place: tr.int(0, D.places[theme].length - 1), noun: tr.int(0, (D.nouns[theme] || D.nouns).length - 1), adj: tr.int(0, D.adjs.length - 1) };
     const story = {
-      opening: tr.int(0, T.openings.length - 1),
-      rumor: tr.int(0, T.rumors[theme].length - 1),
-      goal: tr.int(0, T.goals.length - 1),
-      name: theme === 'mine' ? Carto.Names.place(tr) : Carto.Names.person(tr),
-      treasure: tr.int(1, T.treasures.length - 1),
+      opening: tr.int(0, D.openings.length - 1),
+      rumor: tr.int(0, D.rumors[theme].length - 1),
+      goal: tr.int(0, D.goals.length - 1),
+      name: D.storyNames ? Carto.Names[D.storyNames[theme]](tr) : theme === 'mine' ? Carto.Names.place(tr) : Carto.Names.person(tr),
+      treasure: tr.int(1, D.treasures.length - 1),
     };
 
     // Bounds in cells.
@@ -641,44 +1027,49 @@
   // ------------------------------------------------------------- text
 
   function titleText(m) {
-    const l = L();
-    const place = T.places[m.theme][m.title.place][l];
-    const noun = T.nouns[m.title.noun];
-    const adj = T.adjs[m.title.adj];
+    const l = L(), D = tab(m);
+    const place = D.places[m.theme][m.title.place][l];
+    // Present day and cyberpunk: "place + name", no adjective.
+    if (D !== T) {
+      const nm = D.nouns[m.theme][m.title.noun];
+      return l === 0 ? place + ' ' + nm[0] : nm[1].includes('{p}') ? nm[1].replace('{p}', place) : nm[1] + ' ' + place;
+    }
+    const noun = D.nouns[m.title.noun];
+    const adj = D.adjs[m.title.adj];
     if (l === 1) return place + ' of the ' + adj[4] + ' ' + noun[2];
     const g = { ms: 0, fs: 1, mp: 2, fp: 3 }[noun[1]];
     return place + ' ' + noun[0] + ' ' + adj[g];
   }
 
   function storyText(m) {
-    const l = L(), s = m.story;
-    const treasure = T.treasures[s.treasure][l].replace('{coins}', '300');
+    const l = L(), s = m.story, D = tab(m);
+    const treasure = D.treasures[s.treasure][l].replace('{coins}', String(300 * (D.coinMul || 1)));
     return [
-      T.openings[s.opening][l],
-      T.rumors[m.theme][s.rumor][l].replace('{name}', s.name),
-      T.goals[s.goal][l].replace('{treasure}', treasure),
+      D.openings[s.opening][l],
+      D.rumors[m.theme][s.rumor][l].replace('{name}', s.name),
+      D.goals[s.goal][l].replace('{treasure}', treasure),
     ].join(' ');
   }
 
   function roomText(m, r) {
-    const l = L();
-    const base = T.rooms[r.purpose][r.text.v % T.rooms[r.purpose].length][l];
+    const l = L(), D = tab(m);
+    const base = D.rooms[r.purpose][r.text.v % D.rooms[r.purpose].length][l];
     const dot = base.indexOf('. ');
     const head = dot > 0 ? base.slice(0, dot) : base;
     const parts = [dot > 0 ? base.slice(dot + 2) : ''];
     const tx = r.text;
     if (tx.monster) {
-      const mm = T.monsters[m.theme][tx.monster.i];
+      const mm = D.monsters[m.theme][tx.monster.i];
       const n = tx.monster.n;
-      const phrase = n === 1 ? mm[l === 0 ? 0 : 2] : T.numbers[n][l] + ' ' + mm[l === 0 ? 1 : 3];
-      const sent = T.monsterSentences[n === 1 ? 'one' : 'many'][tx.monster.s][l];
+      const phrase = n === 1 ? mm[l === 0 ? 0 : 2] : D.numbers[n][l] + ' ' + mm[l === 0 ? 1 : 3];
+      const sent = D.monsterSentences[n === 1 ? 'one' : 'many'][tx.monster.s][l];
       parts.push(sent.replace('{M}', cap(phrase)));
     }
     if (tx.treasure) {
-      const tt = T.treasures[tx.treasure.i][l].replace('{coins}', tx.treasure.coins);
-      parts.push(T.treasureSentences[tx.treasure.s][l].replace('{T}', tt));
+      const tt = D.treasures[tx.treasure.i][l].replace('{coins}', tx.treasure.coins * (D.coinMul || 1));
+      parts.push(D.treasureSentences[tx.treasure.s][l].replace('{T}', tt));
     }
-    if (tx.trap !== undefined) parts.push(T.trapSentence[l].replace('{R}', T.traps[tx.trap][l]));
+    if (tx.trap !== undefined) parts.push(D.trapSentence[l].replace('{R}', D.traps[tx.trap][l]));
     if (r.secret) parts.push(t('dungeon.secret'));
     else if (r.locked && r.purpose === 'vault') parts.push(t('dungeon.locked'));
     return { head, body: parts.filter(Boolean).join(' ') };
@@ -737,6 +1128,7 @@
       case 'circle': {
         out.accent.circle(P(f.x), P(f.y), P(f.r));
         out.accent.circle(P(f.x), P(f.y), P(f.r) * 0.86);
+        if (f.ring) { out.accent.circle(P(f.x), P(f.y), P(f.r) * 0.45); break; }
         const star = [];
         for (let i = 0; i < 5; i++) star.push(G.add({ x: P(f.x), y: P(f.y) }, G.fromAngle(-Math.PI / 2 + (i * 4 * Math.PI) / 5, P(f.r) * 0.86)));
         out.accent.poly(star);
@@ -858,6 +1250,40 @@
         }
         break;
       }
+      // Present day and cyberpunk.
+      case 'server':
+        out.dark.poly(G.rect(P(f.x), P(f.y), CS * (f.ang ? 0.7 : 1), CS * (f.ang ? 1 : 0.7)));
+        out.accent.circle(P(f.x), P(f.y), CS * 0.08);
+        break;
+      case 'console': {
+        const r = G.rect(P(f.x), P(f.y), CS * (f.ang ? 0.55 : 0.9), CS * (f.ang ? 0.9 : 0.55));
+        out.dark.poly(r);
+        out.accent.poly(G.scalePoly(r, 0.55));
+        break;
+      }
+      case 'lamp':
+        out.accent.circle(P(f.x), P(f.y), CS * 0.5);
+        out.accent.circle(P(f.x), P(f.y), CS * 0.18);
+        break;
+      case 'car': {
+        const body = G.rect(P(f.x), P(f.y), CS * (f.ang ? 2.6 : 1.1), CS * (f.ang ? 1.1 : 2.6));
+        out.light.poly(body);
+        // Windscreen and rear window.
+        const cab = G.rect(P(f.x), P(f.y), CS * (f.ang ? 1.2 : 0.85), CS * (f.ang ? 0.85 : 1.2));
+        out.thin.poly(cab);
+        break;
+      }
+      case 'machine': {
+        out.dark.poly(G.rect(P(f.x), P(f.y), P(f.w), P(f.h)));
+        const rr = Math.min(f.w, f.h) * 0.32;
+        out.thin.circle(P(f.x - f.w / 4), P(f.y), P(rr));
+        out.thin.circle(P(f.x + f.w / 4), P(f.y), P(rr));
+        break;
+      }
+      case 'vat':
+        out.water.circle(P(f.x), P(f.y), P(f.r));
+        out.thin.circle(P(f.x), P(f.y), P(f.r) * 1.15);
+        break;
     }
   }
 
@@ -875,11 +1301,13 @@
     let notesH = 0;
     const columns = [];
     const story = storyText(m);
-    const storyLines = showPage ? Draw.wrap(story, Math.floor(pageW / (fs * 0.5))) : [];
+    // Monospaced lettering (cyberpunk) has wider characters.
+    const mono = /mono/i.test(pal.fontLabel || '');
+    const storyLines = showPage ? Draw.wrap(story, Math.floor(pageW / (fs * (mono ? 0.66 : 0.5)))) : [];
     if (showPage) {
       const nCols = pageW > 900 ? 3 : pageW > 560 ? 2 : 1;
       const colW = (pageW - 40 - (nCols - 1) * 22) / nCols;
-      const maxChars = Math.floor(colW / (fs * 0.47));
+      const maxChars = Math.floor(colW / (fs * (mono ? 0.62 : 0.47)));
       const blocks = m.rooms.map((r) => {
         const tx = roomText(m, r);
         const lines = Draw.wrap(r.num + '. ' + tx.head + '. ' + tx.body, maxChars);
@@ -1052,9 +1480,40 @@
     fungus: { name: 'Funghi', color: '#7a9a52' },
     gold: { name: 'Oro', color: '#c99a2e', metallic: 0.9, roughness: 0.35 },
   };
+  // Present day: concrete floors, painted walls, steel doors.
+  const MAT3D_MODERN = {
+    floor: { name: 'Cemento', color: '#9a9893', roughness: 0.9 },
+    rock: { name: 'Muri intonacati', color: '#d6d1c4', roughness: 0.9 },
+    wood: { name: 'Mobili', color: '#8b7b63' },
+    iron: { name: 'Ferro', color: '#3c3f44', metallic: 0.7, roughness: 0.45 },
+    steel: { name: 'Acciaio verniciato', color: '#6d7980', metallic: 0.5, roughness: 0.5 },
+    stone: { name: 'Calcestruzzo', color: '#b3b0a7' },
+    dark: { name: 'Lamiera scura', color: '#4a4d52', metallic: 0.3, roughness: 0.6 },
+    water: { name: 'Acqua torbida', color: '#4f6a5c', alpha: 0.8, roughness: 0.1 },
+    accent: { name: 'Vernice rossa', color: '#c8362e' },
+    bone: { name: 'Rifiuti', color: '#c9c2ae' },
+    fungus: { name: 'Muffa', color: '#3e4a30' },
+    gold: { name: 'Ottone', color: '#b8923a', metallic: 0.9, roughness: 0.35 },
+  };
+  // Cyberpunk: dark metal and neon.
+  const MAT3D_CYBER = {
+    floor: { name: 'Grigliato metallico', color: '#2a2e36', metallic: 0.6, roughness: 0.55 },
+    rock: { name: 'Pareti in metallo', color: '#20242c', metallic: 0.5, roughness: 0.6 },
+    wood: { name: 'Polimero', color: '#3b4150' },
+    iron: { name: 'Acciaio', color: '#5a606b', metallic: 0.85, roughness: 0.35 },
+    steel: { name: 'Porte blindate', color: '#454b57', metallic: 0.8, roughness: 0.4 },
+    stone: { name: 'Cemento armato', color: '#4b505a' },
+    dark: { name: 'Carbonio', color: '#14161b', roughness: 0.4 },
+    water: { name: 'Refrigerante', color: '#1fb8c9', alpha: 0.7, roughness: 0.05 },
+    accent: { name: 'Neon magenta', color: '#ff3fa4', roughness: 0.2 },
+    bone: { name: 'Rottami', color: '#8c8f96', metallic: 0.6 },
+    fungus: { name: 'Colture idroponiche', color: '#46e08a' },
+    gold: { name: 'Neon ciano', color: '#3ff0ff', roughness: 0.2 },
+  };
 
   function model3d(m) {
     const C = 1.5, HW = 3, M = Carto.Mesh3D.Mesh;
+    const MAT = { modern: MAT3D_MODERN, cyber: MAT3D_CYBER }[m.setting] || MAT3D;
     const b = m.bounds;
     const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
     const X = (v) => v * C + ox, S = (v) => v * C + os;
@@ -1109,7 +1568,7 @@
     }
 
     // Doors.
-    const doors = mesh(t('dungeon.3d.doors'), 'wood'), iron = mesh(t('dungeon.3d.iron'), 'iron');
+    const doors = mesh(t('dungeon.3d.doors'), MAT.steel ? 'steel' : 'wood'), iron = mesh(t('dungeon.3d.iron'), 'iron');
     const secret = mesh(t('dungeon.3d.secret'), 'rock'), lintels = mesh(t('dungeon.3d.lintels'), 'rock');
     for (const l of m.links) {
       const d = l.door, x = X(d.x), s = S(d.y), ang = d.vertical ? 90 : 0;
@@ -1131,7 +1590,7 @@
 
     // Furniture.
     const by = {};
-    const of = (mat) => by[mat] || (by[mat] = mesh(t('dungeon.3d.furniture') + ' · ' + MAT3D[mat].name, mat));
+    const of = (mat) => by[mat] || (by[mat] = mesh(t('dungeon.3d.furniture') + ' · ' + MAT[mat].name, mat));
     const rng = new Carto.Random(m.seed + 7);
     for (const r of m.rooms) {
       for (const f of r.features || []) {
@@ -1147,6 +1606,8 @@
               const a0 = (i / 32) * Math.PI * 2, a1 = ((i + 1) / 32) * Math.PI * 2, rr = f.r * C;
               of('accent').boxAt(fx + Math.cos((a0 + a1) / 2) * rr, fs + Math.sin((a0 + a1) / 2) * rr, rr * (a1 - a0) * 1.05, 0.08, 0, 0.01, ((a0 + a1) / 2) * (180 / Math.PI) + 90);
             }
+            // A holographic ring floats above the floor.
+            if (f.ring) of('gold').cylinder(fx, fs, f.r * C * 0.45, 0, 0.05, 24);
             break;
           case 'shelf': case 'rack2': {
             const len = Math.hypot(f.x1 - f.x0, f.y1 - f.y0) * C;
@@ -1218,10 +1679,20 @@
             }
             break;
           }
+          // Present day and cyberpunk.
+          case 'server': of('dark').boxAt(fx, fs, (f.ang ? 0.7 : 1) * C, (f.ang ? 1 : 0.7) * C, 0, 2.1); of('accent').boxAt(fx, fs, (f.ang ? 0.72 : 0.3) * C, (f.ang ? 0.3 : 0.72) * C, 1.6, 1.66); break;
+          case 'console': of('dark').boxAt(fx, fs, (f.ang ? 0.55 : 0.9) * C, (f.ang ? 0.9 : 0.55) * C, 0, 1.0); of('gold').boxAt(fx, fs, (f.ang ? 0.3 : 0.8) * C, (f.ang ? 0.8 : 0.3) * C, 1.0, 1.04); break;
+          case 'lamp': of('iron').cylinder(fx, fs, 0.03, 2.3, HW, 6); of('stone').cylinder(fx, fs, 0.5 * C, 2.2, 2.3, 16); break;
+          case 'car':
+            of('steel').boxAt(fx, fs, (f.ang ? 2.6 : 1.1) * C, (f.ang ? 1.1 : 2.6) * C, 0.2, 0.85);
+            of('dark').boxAt(fx, fs, (f.ang ? 1.2 : 1.0) * C, (f.ang ? 1.0 : 1.2) * C, 0.85, 1.4);
+            break;
+          case 'machine': of('iron').boxAt(fx, fs, f.w * C, f.h * C, 0, 1.6); of('dark').cylinder(fx, fs, Math.min(f.w, f.h) * 0.3 * C, 1.6, 2.4, 14); break;
+          case 'vat': of('iron').cylinder(fx, fs, f.r * C * 1.1, 0, 0.25, 16); of('water').cylinder(fx, fs, f.r * C, 0.25, 2.1, 16); of('iron').cylinder(fx, fs, f.r * C * 1.1, 2.1, 2.3, 16); break;
         }
       }
     }
-    return { name: titleText(m), groups: [{ name: titleText(m), parts }], materials: MAT3D };
+    return { name: titleText(m), groups: [{ name: titleText(m), parts }], materials: MAT };
   }
 
   function notes(m) {
