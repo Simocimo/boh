@@ -29,6 +29,37 @@ Le modifiche si salvano da sole nel browser, legate a quella mappa (seme e opzio
 Nella legenda trovi **Esporta progetto** (un file JSON con seme, opzioni e modifiche) e **Importa progetto**:
 usali per conservare il lavoro, spostarlo su un altro computer o condividerlo.
 
+## App per iPhone e PC
+
+Il Cartografo è una **web app installabile** (PWA): una volta aperta dal sito pubblicato si installa
+come un'app vera, con la sua icona, a schermo intero, e funziona anche **senza connessione**.
+
+- **iPhone / iPad**: apri il sito in **Safari** → pulsante **Condividi** → **Aggiungi alla schermata Home**.
+- **PC (Windows, macOS, Linux)**: apri il sito in **Chrome** o **Edge** → icona **Installa** nella barra
+  dell'indirizzo (oppure il pulsante *Installa* che compare nella pagina iniziale).
+- **Android**: Chrome → menu ⋮ → **Installa app**.
+
+Sull'iPhone le esportazioni PNG/SVG/JSON aprono il foglio di condivisione, da cui puoi salvarle in *File* o in *Foto*.
+
+## Salvataggi condivisi
+
+Il pulsante **Salva** nel pannello mette la mappa (seme, opzioni e modifiche del Mondo) nella pagina
+**Salvataggi** (icona in alto). Le mappe salvate restano sul dispositivo e funzionano offline;
+quando c'è un account collegato si sincronizzano tra tutti i tuoi dispositivi (le modifiche più recenti vincono,
+le eliminazioni si propagano). Da lì puoi aprire, rinominare, esportare, eliminare, ed esportare/importare tutto in un file.
+
+- **Dentro Claude** (claude.ai, app per iPhone, desktop): la sincronizzazione è automatica con il tuo account Claude, nessuna configurazione.
+- **App installata dal sito**: serve un progetto [Supabase](https://supabase.com) gratuito, da preparare una volta sola:
+  1. Crea un progetto su supabase.com.
+  2. Apri **SQL Editor**, incolla il contenuto di `supabase/schema.sql` ed eseguilo
+     (crea la tabella `saves`, accessibile a ogni utente solo per le proprie righe).
+  3. In **Project Settings → API** copia *Project URL* e la chiave **anon public**.
+  4. Incollale in `js/config.js` (così valgono per tutti i dispositivi) oppure nella pagina **Salvataggi** dell'app.
+  5. Su ogni dispositivo crea l'account (la prima volta) o accedi con la stessa email e password.
+     Se non vuoi la mail di conferma: *Authentication → Providers → Email → Confirm email* disattivato.
+
+La chiave *anon* è pensata per stare nel browser: i dati sono protetti dalle regole RLS dello schema.
+
 ## Come si usa
 
 - **Nuova mappa** (o il tasto `N`) genera un luogo nuovo.
@@ -51,6 +82,10 @@ Apri `index.html` con un doppio clic: funziona anche senza connessione (serve in
 2. In *Build and deployment* scegli **Deploy from a branch**.
 3. Seleziona il branch (per esempio `main`) e la cartella **/ (root)**, poi **Save**.
 4. Dopo un minuto il sito è online su `https://<utente>.github.io/<repository>/`.
+   Da quell'indirizzo (https) si può installare come app.
+
+Dopo aver modificato i file esegui `node tools/build-sw.js`: aggiorna l'elenco dei file e la versione
+della cache offline, così le app installate scaricano la nuova versione.
 
 ## Struttura
 
@@ -71,7 +106,14 @@ js/core/              libreria condivisa
   palettes.js         stili delle mappe
   fonts.js            font IM FELL incorporati (generato)
   app.js              interfaccia: percorsi, opzioni, zoom, esportazione
+  saves.js            salvataggi locali e sincronizzazione (Claude o Supabase)
+  library.js          pagina Salvataggi e invito a installare l'app
+js/config.js          URL e chiave Supabase (facoltativi)
 js/gen/               un file per generatore
+manifest.webmanifest  descrizione dell'app installabile
+sw.js                 service worker per l'uso offline (generato da tools/build-sw.js)
+icons/                icone dell'app
+supabase/schema.sql   tabella e regole per i salvataggi condivisi
 fonts/                font originali e relativa licenza (SIL OFL)
 tools/                test e utilità per lo sviluppo
 ```
@@ -119,4 +161,5 @@ node tools/build-fonts.js       # rigenera js/core/fonts.js dai file in fonts/
 (world, realm, city, village, cave/glade, dungeon, dwelling) that run entirely in the browser. Open
 `index.html`, press **New map**, tweak the options, and export to PNG or SVG. Seeds and options live
 in the URL, so maps are reproducible and shareable. The interface and the generated text are
-available in Italian and English.
+available in Italian and English. It installs as an app (PWA) on iPhone and PC, works offline, and
+syncs saved maps across devices through the Claude account (inside claude.ai) or a Supabase project.

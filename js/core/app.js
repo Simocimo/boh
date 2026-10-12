@@ -282,16 +282,74 @@
     state.opts[id] = value;
     // Options that only change the drawing do not need a new model.
     const opt = state.gen.options.find((o) => o.id === id);
-    if (opt && opt.renderOnly) renderMap(true);
-    else regenerate(false);
+    if (opt && opt.renderOnly) {
+      renderMap(true);
+      if (state.saveId) Carto.Saves.patch(state.saveId, { opts: Object.assign({}, state.opts) });
+    } else {
+      state.saveId = null;
+      regenerate(false);
+    }
     updateHash();
+    refreshSaveState();
   }
 
   function setSeed(seed) {
     state.seed = seed >>> 0 || 1;
+    state.saveId = null;
     els.seed.value = String(state.seed);
     regenerate(false);
     updateHash();
+    refreshSaveState();
+  }
+
+  // ------------------------------------------------------------------ saves
+  function saveTitle() {
+    const g = state.gen;
+    return (g.fileName && state.model ? g.fileName(state.model) : '') || t('gen.' + g.id + '.name');
+  }
+
+  function saveCurrent() {
+    if (!state.gen || !state.model || !Carto.Saves) return;
+    const g = state.gen;
+    const data = g.saveData ? g.saveData(state.model) : null;
+    const fields = { gen: g.id, seed: state.seed, opts: Object.assign({}, state.opts), data, title: saveTitle() };
+    if (state.saveId && Carto.Saves.get(state.saveId)) {
+      Carto.Saves.patch(state.saveId, fields);
+      toast(Carto.Svg.esc(t('saves.updatedToast')));
+    } else {
+      state.saveId = Carto.Saves.put(fields).id;
+      toast(Carto.Svg.esc(t('saves.savedToast')));
+    }
+    refreshSaveState();
+  }
+
+  let autosaveTimer = 0;
+  function autosave() {
+    if (!state.saveId || !state.gen || !state.gen.saveData) return;
+    clearTimeout(autosaveTimer);
+    const id = state.saveId, g = state.gen, model = state.model;
+    autosaveTimer = setTimeout(() => {
+      Carto.Saves.patch(id, { data: g.saveData(model), title: g.fileName ? g.fileName(model) : undefined });
+    }, 800);
+  }
+
+  function refreshSaveState() {
+    if (!els || !els.saveBtn) return;
+    const saved = state.saveId && Carto.Saves && Carto.Saves.get(state.saveId);
+    if (state.saveId && !saved) state.saveId = null;
+    els.saveBtn.textContent = t(saved ? 'saves.saved' : 'saves.save');
+    els.saveStatus.textContent = saved ? (state.gen && state.gen.saveData ? t('saves.autosave') : '') : t('saves.notSaved');
+  }
+
+  function openSave(save) {
+    const g = byId[save.gen];
+    if (!g) return;
+    const opts = Object.assign(defaults(g), save.opts || {});
+    if (g.loadData) g.loadData(save.seed, opts, save.data);
+    state.pendingSave = { id: save.id, gen: save.gen, seed: save.seed };
+    const h = buildHash(g, save.seed, opts);
+    if (location.hash === h) route();
+    else location.hash = h;
   }
 
   function updateHash() {
@@ -547,6 +605,7 @@
     const reopen = res.keepInspector && !els.inspector.hidden && state.lastInspect;
     if (res.regenerate) regenerate(true);
     else if (res.render) renderMap(true);
+    if (res.regenerate || res.render) autosave();
     if (reopen) showInspector(state.gen.inspect(state.model, state.lastInspect.x, state.lastInspect.y, state.opts));
     if (res.pick) {
       state.pick = res.pick;
@@ -639,6 +698,19 @@
         if (err && err.code === 'rate_limited') return;
       }
     }
+    // On iPhone and iPad the share sheet saves to Photos or Files.
+    if (!framed && navigator.canShare && (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))) {
+      try {
+        const file = new File([blob], name, { type: blob.type || 'application/octet-stream' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          els.toast.hidden = true;
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') { els.toast.hidden = true; return; }
+      }
+    }
     const url = URL.createObjectURL(blob);
     if (framed) {
       // Sandboxed frames may ignore download links: show the file for a manual save.
@@ -685,6 +757,17 @@
   // ----------------------------------------------------------------- routing
   function route() {
     const r = parseHash();
+    if (location.hash.replace(/^#/, '') === 'saves') {
+      els.gen.hidden = true;
+      els.hub.hidden = true;
+      els.saves.hidden = false;
+      document.title = t('saves.title') + ' · ' + t('brand');
+      markTabs();
+      if (Carto.Library) Carto.Library.render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    els.saves.hidden = true;
     if (!r.gen) {
       els.gen.hidden = true;
       els.hub.hidden = false;
@@ -700,11 +783,16 @@
     state.gen = r.gen;
     state.opts = r.opts;
     state.seed = r.seed || Carto.randomSeed();
+    // Opening a saved map keeps track of it, so later changes update the save.
+    const pend = state.pendingSave;
+    state.pendingSave = null;
+    state.saveId = pend && pend.gen === r.gen.id && pend.seed === state.seed ? pend.id : null;
     document.title = t('gen.' + r.gen.id + '.name') + ' · ' + t('brand');
     markTabs();
     buildPanel();
     regenerate(false);
     updateHash();
+    refreshSaveState();
     if (!sameGen) window.scrollTo(0, 0);
   }
 
@@ -725,7 +813,9 @@
       toast: $('toast'), link: $('btn-link'), langIt: $('lang-it'), langEn: $('lang-en'),
       overlay: $('save-overlay'), overlayImg: $('save-overlay-img'), overlayClose: $('save-overlay-close'),
       inspector: $('inspector'), inspectorBody: $('inspector-body'),
+      saves: $('view-saves'), saveBtn: $('btn-save'), saveStatus: $('save-status'),
     };
+    els.saveBtn.addEventListener('click', saveCurrent);
     $('inspector-close').addEventListener('click', hideInspector);
     wireActions(els.inspectorBody);
     wireActions(els.notes);
@@ -755,6 +845,7 @@
       applyLang();
       buildTabs();
       if (els.cards.children.length) { hubTexts(); if (!els.hub.hidden) renderAllPreviews(false); }
+      refreshSaveState();
       if (!els.gen.hidden && state.gen) {
         buildPanel();
         renderMap(true);
@@ -786,6 +877,14 @@
 
     window.addEventListener('hashchange', route);
     downloadsCapability();
+    if (Carto.Library) Carto.Library.start();
     route();
+  };
+
+  Carto.App = {
+    openSave,
+    saveBlob,
+    refreshSaveState,
+    toast: (text, ms) => toast(Carto.Svg.esc(text), ms),
   };
 })(window.Carto = window.Carto || {});

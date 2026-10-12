@@ -339,6 +339,13 @@
       '<button class="btn" type="submit">' + esc(t('edit.add')) + '</button></form>';
   }
 
+  // Saved maps carry the edits, so they follow the save across devices.
+  gen.saveData = (m) => {
+    const E = load(m.editKey);
+    return count(E) ? E : null;
+  };
+  gen.loadData = (seed, opts, data) => store(keyOf(seed, opts), Object.assign(blank(), data || {}));
+
   gen.notes = (m, opts) => {
     const n = m.editCount || 0;
     const tools = '<div class="edit-tools">' +
