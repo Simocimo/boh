@@ -22,6 +22,11 @@ tesori, edifici, forme di governo…) e lo stile della mappa: Pergamena per il f
 *Neon* per il cyberpunk (ogni ambientazione ricorda lo stile che scegli). L'ambientazione finisce nel link e nei
 salvataggi, e le mappe collegate (la città di un regno, il dungeon di un mondo) la ereditano.
 
+Nel 2026 e nel cyberpunk cambiano anche le forme: città a griglia con centro storico, tangenziale e ferrovia
+(o megablocchi, arcologie e superstrade sopraelevate), villaggi a lotti con villette (o baraccopoli di container),
+regni e mondi con rilievo ombreggiato e curve di livello, dungeon come edifici veri disegnati in pianta
+architettonica, miniere e fogne a gallerie dritte, palazzine con vano scala e appartamenti, capsule hotel e night club.
+
 ## Modificare il Mondo
 
 Clicca un punto della mappa del Mondo: nell'ispettore trovi, oltre alle informazioni, i moduli per modificare.
