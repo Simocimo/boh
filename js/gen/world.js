@@ -975,7 +975,7 @@
     }
 
     mark('end');
-    return {
+    const model = {
       timing: timing.map(([l, t], i) => (i ? l + ':' + (t - timing[i - 1][1]) : '')).filter(Boolean).join(' '),
       seed, W, H, KM, SEA, grid, h, lake, feature, features, coast, temp, prec, elev, lat, biome, flux, riverOf, rivers, T,
       suit, pop, cultures, culture, states, state, relations, provinces, province, religions, religion, burgs, burgAt, routes, markers,
@@ -983,6 +983,86 @@
       name: Carto.NameBases.name(rng.fork('world').pick(Carto.NameBases.ids), rng.fork('world-name'), 5, 10),
       isWater,
     };
+    const setting = Carto.Setting ? Carto.Setting.current : 'fantasy';
+    if (setting === 'modern' || setting === 'cyber') adapt(model, rng.fork('setting'), setting);
+    return model;
+  }
+
+  // ------------------------------------------------------------------ settings
+
+  // Present day and cyberpunk reuse the whole fantasy world, then change on
+  // their own random stream what reads as medieval: forms of government,
+  // corporate owners, colours, populations and extra points of interest.
+  const FORMS = {
+    modern: ['republic', 'fedrepublic', 'constmonarchy', 'federation', 'union', 'confederation', 'peoplesrepublic', 'principality', 'emirate'],
+    cyber: ['corporation', 'conglomerate', 'protectorate', 'freezone', 'machinerepublic'],
+  };
+  // Towns (thousands of inhabitants) and the countryside grow by these factors.
+  const SCALE = { modern: { burg: 30, land: 12 }, cyber: { burg: 90, land: 20 } };
+
+  function adapt(m, xr, setting) {
+    const grid = m.grid, n = grid.n;
+    const real = m.states.filter((s) => s && s.id);
+    const avg = real.reduce((s, x) => s + x.cells, 0) / Math.max(1, real.length);
+    const sorted = real.slice().sort((a, b) => b.cells - a.cells);
+    for (const s of real) {
+      const base = m.cultures[s.culture] ? m.cultures[s.culture].base : 'romance';
+      const big = sorted.indexOf(s) === 0 && s.cells > avg * 1.6, small = s.cells < avg * 0.45;
+      if (setting === 'modern') {
+        if (big) s.form = xr.weighted([['federation', 2], ['fedrepublic', 2], ['union', 1]]);
+        else if (base === 'desert') s.form = xr.bool(0.6) ? 'emirate' : 'republic';
+        else if (small) s.form = xr.weighted([['republic', 3], ['principality', 1], ['constmonarchy', 1]]);
+        else s.form = xr.weighted([['republic', 5], ['fedrepublic', 2], ['constmonarchy', 2], ['confederation', 0.8], ['peoplesrepublic', 0.8], ['union', 0.4]]);
+      } else {
+        if (big) s.form = xr.bool(0.6) ? 'corporation' : 'conglomerate';
+        else if (small) s.form = xr.bool(0.5) ? 'freezone' : 'protectorate';
+        else s.form = xr.weighted([['corporation', 3], ['conglomerate', 2], ['protectorate', 1.2], ['freezone', 1.5], ['machinerepublic', 0.8]]);
+        // Megacorporations own their land under their own name.
+        if (s.form === 'corporation' || s.form === 'conglomerate') s.name = Carto.Names.corp(xr);
+      }
+    }
+    if (setting === 'cyber') {
+      // Neon hues for the territories, and their districts.
+      const cols = colours(xr, real.length, 0.78, 0.56);
+      real.forEach((s, i) => { s.color = cols[i]; });
+      for (const p of m.provinces) if (p) p.color = shade(m.states[p.state].color, xr.float(-0.18, 0.18));
+      for (const b of m.burgs) {
+        if (!b) continue;
+        if (b.capital ? xr.bool(0.4) : xr.bool(0.1)) b.name = b.capital ? 'Neo-' + b.name : b.name + '-' + xr.int(10, 99);
+      }
+    }
+
+    // Cities of millions, crowded countryside.
+    const k = SCALE[setting];
+    m.popScale = k.burg;
+    for (const b of m.burgs) if (b) b.population = Math.round(b.population * k.burg * xr.float(0.85, 1.15) * 10) / 10;
+    for (let i = 0; i < n; i++) m.pop[i] *= k.land;
+    for (const s of real) s.pop *= k.land;
+
+    // Present-day and future landmarks.
+    const mk = m.markers;
+    const land = [];
+    for (let i = 0; i < n; i++) if (!m.isWater(i)) land.push(i);
+    const free = (c) => c !== undefined && c >= 0 && !m.burgAt[c] && grid.x[c] > 40 && grid.x[c] < m.W - 40 && grid.y[c] > 50 && grid.y[c] < m.H - 40 &&
+      !mk.some((q) => Math.hypot(q.x - grid.x[c], q.y - grid.y[c]) < 30);
+    const add = (type, c) => {
+      if (!free(c)) return;
+      mk.push({ id: mk.length + 1, type, cell: c, x: grid.x[c], y: grid.y[c], seed: Carto.hashString(m.seed + ':m:' + mk.length), v: xr.int(0, 2),
+        name: Carto.NameBases.name((m.cultures[m.culture[c]] || m.cultures[1]).base, xr, 4, 9) });
+    };
+    const pick = (filter, count) => xr.shuffle(land.filter(filter)).slice(0, count);
+    // A land cell a short drive away from a town.
+    const outside = (b) => xr.pick(land.filter((c) => { const d = Math.hypot(grid.x[c] - b.x, grid.y[c] - b.y); return d > 16 && d < 42; }));
+    const capitals = m.burgs.filter((b) => b && b.capital).sort((a, b) => b.population - a.population);
+    if (setting === 'modern') {
+      for (const b of capitals.slice(0, 4)) add('airport', outside(b));
+      for (const c of pick((c) => m.riverOf[c] && m.h[c] > 30 && m.h[c] < 60, xr.int(1, 2))) add('powerplant', c);
+      for (const c of pick((c) => m.coast[c] === 1 && m.h[c] < 32 && m.suit[c] > 0, 1)) add('nuclear', c);
+    } else {
+      for (const b of capitals.slice(0, xr.int(1, 2))) add('spaceport', outside(b));
+      for (const c of pick((c) => m.suit[c] > 20 && m.h[c] < 45, xr.int(1, 2))) add('arcology', c);
+      for (const c of pick((c) => m.suit[c] < 15 && m.h[c] < 60, 1)) add('crashed', c);
+    }
   }
 
   function shade(hex, amt) {
@@ -991,5 +1071,5 @@
     return '#' + ch.map((c) => c.toString(16).padStart(2, '0')).join('');
   }
 
-  Carto.World = { generate, BIOMES, TEMPLATES, buildGrid, shade, poles, W, H, SEA, KM };
+  Carto.World = { generate, BIOMES, TEMPLATES, FORMS, SCALE, buildGrid, shade, poles, W, H, SEA, KM };
 })(window.Carto = window.Carto || {});

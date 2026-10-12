@@ -53,6 +53,16 @@
       'edit.local': 'Le modifiche restano in questo browser: esporta il progetto per conservarle o condividerle.',
       'edit.worldName': 'Nome del mondo',
       'edit.noteMarker': 'Descrizione',
+      // Present day and cyberpunk.
+      'edit.form@cyber': 'Forma di controllo',
+      'edit.state@modern': 'Nazione', 'edit.state@cyber': 'Territorio',
+      'edit.religion@cyber': 'Credo', 'edit.province@modern': 'Area amministrativa', 'edit.province@cyber': 'Distretto',
+      'edit.free@modern': 'Territori non rivendicati', 'edit.free@cyber': 'Zone fuori controllo',
+      'edit.addTown@modern': 'Aggiungi una città qui', 'edit.addTown@cyber': 'Aggiungi uno sprawl qui',
+      'edit.addMarker@modern': 'Aggiungi un punto d’interesse qui', 'edit.addMarker@cyber': 'Aggiungi un punto caldo qui',
+      'edit.notesHint@modern': 'Appunti tuoi: cronaca, personaggi, segreti…', 'edit.notesHint@cyber': 'Appunti tuoi: fixer, corporazioni, segreti…',
+      'edit.none@modern': 'Nessuna modifica: clicca un punto della mappa per rinominare, ricolorare o spostare nazioni, città e luoghi.',
+      'edit.none@cyber': 'Nessuna modifica: clicca un punto della mappa per rinominare, ricolorare o spostare territori, sprawl e punti caldi.',
     },
     en: {
       'edit.title': 'Edit',
@@ -97,17 +107,45 @@
       'edit.local': 'Edits stay in this browser: export the project to keep or share them.',
       'edit.worldName': 'World name',
       'edit.noteMarker': 'Description',
+      'edit.form@cyber': 'Form of control',
+      'edit.state@modern': 'Nation', 'edit.state@cyber': 'Territory',
+      'edit.religion@cyber': 'Creed', 'edit.province@modern': 'Administrative area', 'edit.province@cyber': 'District',
+      'edit.free@modern': 'Unclaimed land', 'edit.free@cyber': 'Lawless zones',
+      'edit.addTown@modern': 'Add a city here', 'edit.addTown@cyber': 'Add a sprawl here',
+      'edit.addMarker@cyber': 'Add a hot spot here',
+      'edit.notesHint@modern': 'Your own notes: news, characters, secrets…', 'edit.notesHint@cyber': 'Your own notes: fixers, corporations, secrets…',
+      'edit.none@modern': 'No edits yet: click a point of the map to rename, recolour or move nations, cities and places.',
+      'edit.none@cyber': 'No edits yet: click a point of the map to rename, recolour or move territories, sprawls and hot spots.',
     },
   });
 
   const FORMS = ['kingdom', 'empire', 'duchy', 'grandduchy', 'principality', 'county', 'march', 'republic', 'theocracy', 'khaganate', 'sultanate', 'emirate'];
   const MARKER_TYPES = ['ruins', 'dungeon', 'cave', 'mine', 'volcano', 'springs', 'grove', 'battlefield', 'lighthouse', 'monster', 'wreck'];
   const GEN_KEYS = ['template', 'cells', 'climate', 'states', 'cultures', 'religions', 'towns'];
+  // Present day and cyberpunk: their own forms and points of interest.
+  const MARKERS_BY = {
+    modern: ['airport', 'powerplant', 'nuclear', 'battlefield', 'ruins', 'dungeon', 'cave', 'mine', 'volcano', 'springs', 'grove', 'lighthouse', 'monster', 'wreck'],
+    cyber: ['arcology', 'spaceport', 'crashed', 'dungeon', 'cave', 'springs', 'ruins', 'mine', 'battlefield', 'volcano', 'grove', 'lighthouse', 'monster', 'wreck'],
+  };
+  const S = Carto.Setting;
+  const fantasy = () => !S || S.current === 'fantasy';
+  const formsNow = () => (fantasy() ? FORMS : World.FORMS[S.current]);
+  const markersNow = () => (fantasy() ? MARKER_TYPES : MARKERS_BY[S.current]);
+  // Most inhabitants a town may be given (thousands).
+  const maxPop = (m) => 2000 * (m.popScale || 1);
+  // Edits made outside the generator's own calls still read in the map's setting.
+  function within(m, fn) {
+    if (!S) return fn();
+    const prev = S.current;
+    S.use((m && m.setting) || 'fantasy');
+    try { return fn(); } finally { S.use(prev); }
+  }
 
   // ------------------------------------------------------------------ storage
 
   const blank = () => ({ v: 1, names: {}, colors: {}, forms: {}, notes: {}, cells: {}, burgs: {}, added: [], markers: {}, addedMarkers: [] });
-  const keyOf = (seed, opts) => 'carto.world.edits:' + seed + ':' + GEN_KEYS.map((k) => opts[k]).join(':');
+  // Fantasy keeps its historical key; the other settings get their own edits.
+  const keyOf = (seed, opts) => 'carto.world.edits:' + seed + ':' + GEN_KEYS.map((k) => opts[k]).join(':') + (opts.setting && opts.setting !== 'fantasy' ? ':' + opts.setting : '');
   const history = new Map(); // storage key -> stack of previous JSON states
 
   function load(key) {
@@ -273,11 +311,11 @@
     return section(t('edit.state') + ': ' + Txt.stateName(s),
       nameForm('state:' + s.id, s.name) +
       '<div class="edit-row">' + field(t('edit.form'), '<select data-act="form" data-id="' + s.id + '">' +
-        FORMS.map((f) => '<option value="' + f + '"' + (f === s.form ? ' selected' : '') + '>' + esc(t('form.' + f, { n: '…' })) + '</option>').join('') + '</select>') +
+        formsNow().map((f) => '<option value="' + f + '"' + (f === s.form ? ' selected' : '') + '>' + esc(fantasy() ? t('form.' + f, { n: '…' }) : t('ftype.' + f)) + '</option>').join('') + '</select>') +
       colorInput('state:' + s.id, s.color) + '</div>' + notesForm(m, 'state:' + s.id));
   }
 
-  gen.inspect = (m, x, y, opts) => {
+  gen.inspect = (m, x, y, opts) => within(m, () => {
     const base = baseInspect(m, x, y, opts);
     const tg = pickTarget(m, x, y);
     if (!base || !tg) return base;
@@ -294,7 +332,7 @@
       const b = tg.b;
       h += nameForm('burg:' + b.id, b.name);
       h += '<form class="edit-row" data-act="burg" data-id="' + b.id + '">' +
-        field(t('edit.population'), '<input name="population" type="number" min="0.1" max="2000" step="0.1" value="' + b.population + '">') +
+        field(t('edit.population'), '<input name="population" type="number" min="0.1" max="' + maxPop(m) + '" step="0.1" value="' + b.population + '">') +
         '<label class="edit-check"><input type="checkbox" name="port"' + (b.port ? ' checked' : '') + '> ' + esc(t('edit.port')) + '</label>' +
         '<button class="btn" type="submit">' + esc(t('edit.save')) + '</button></form>';
       h += notesForm(m, 'burg:' + b.id);
@@ -327,11 +365,11 @@
         h += section(t('edit.addTown'), '<form class="edit-row" data-act="add-burg" data-x="' + x.toFixed(1) + '" data-y="' + y.toFixed(1) + '">' +
           field(t('edit.name'), '<input name="name" maxlength="40" placeholder="' + esc(Carto.NameBases.name((k || m.cultures[1]).base, new Carto.Random(c * 7 + 1))) + '">') +
           '<button class="btn" type="submit">' + esc(t('edit.add')) + '</button></form>');
-        h += section(t('edit.addMarker'), markerAdder(x, y, MARKER_TYPES));
+        h += section(t('edit.addMarker'), markerAdder(x, y, markersNow()));
       }
     }
     return Object.assign({}, base, { html: base.html + '<div class="edit-area">' + h + '</div>' });
-  };
+  });
 
   function markerAdder(x, y, types) {
     return '<form class="edit-row" data-act="add-marker" data-x="' + x.toFixed(1) + '" data-y="' + y.toFixed(1) + '">' +
@@ -346,7 +384,7 @@
   };
   gen.loadData = (seed, opts, data) => store(keyOf(seed, opts), Object.assign(blank(), data || {}));
 
-  gen.notes = (m, opts) => {
+  gen.notes = (m, opts) => within(m, () => {
     const n = m.editCount || 0;
     const tools = '<div class="edit-tools">' +
       nameForm('world', m.name, t('edit.worldName')) +
@@ -358,11 +396,13 @@
       (n ? '<button class="btn ghost danger" type="button" data-act="reset">' + esc(t('edit.reset')) + '</button>' : '') +
       '</div><p class="tag">' + esc(t('edit.local')) + '</p></div>';
     return tools + baseNotes(m, opts);
-  };
+  });
 
   // ------------------------------------------------------------------ actions
 
-  gen.act = (m, a, ctx) => {
+  gen.act = (m, a, ctx) => within(m, () => act(m, a, ctx));
+
+  function act(m, a, ctx) {
     const key = m.editKey;
     let E = load(key);
     const push = () => {
@@ -398,7 +438,7 @@
         if (!b) return null;
         push();
         const e = E.burgs[a.id] || (E.burgs[a.id] = {});
-        e.population = Math.max(0.1, Math.min(2000, parseFloat(a.population) || b.population));
+        e.population = Math.max(0.1, Math.min(maxPop(m), parseFloat(a.population) || b.population));
         e.port = a.port === 'on';
         if (b.added) Object.assign(E.added.find((q) => q.uid === b.added), { population: e.population, port: e.port });
         b.population = e.population; b.port = e.port;
@@ -418,7 +458,7 @@
         if (c < 0) return { toast: t('edit.notLand') };
         push();
         const k = m.cultures[m.culture[c]] || m.cultures[1];
-        const add = { uid: Date.now().toString(36) + Math.floor(Math.random() * 1e4), x, y, cell: c, population: 2.5, port: false,
+        const add = { uid: Date.now().toString(36) + Math.floor(Math.random() * 1e4), x, y, cell: c, population: 2.5 * (m.popScale || 1), port: false,
           name: String(a.name || '').trim().slice(0, 40) || Carto.NameBases.name(k.base, new Carto.Random(c * 7 + 1)) };
         E.added.push(add);
         addBurg(m, add);
@@ -505,7 +545,8 @@
         return { regenerate: true, toast: t('edit.cleared') };
       }
       case 'export': {
-        const data = { app: 'il-cartografo-errante', generator: 'world', version: 1, seed: m.seed, opts: Object.fromEntries(GEN_KEYS.map((k) => [k, ctx.opts[k]])), edits: E };
+        const keys = fantasy() ? GEN_KEYS : GEN_KEYS.concat('setting');
+        const data = { app: 'il-cartografo-errante', generator: 'world', version: 1, seed: m.seed, opts: Object.fromEntries(keys.map((k) => [k, ctx.opts[k]])), edits: E };
         const name = (m.name || 'world').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + m.seed + '.json';
         return { download: { name, blob: new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }) } };
       }
@@ -519,5 +560,5 @@
       }
     }
     return null;
-  };
+  }
 })(window.Carto = window.Carto || {});
