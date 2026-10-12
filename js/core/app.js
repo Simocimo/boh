@@ -251,6 +251,7 @@
     }
     buildSwatches();
     els.link.hidden = framed;
+    $('export-3d').hidden = !state.gen.heightfield;
   }
 
   function buildSwatches() {
@@ -746,6 +747,28 @@
     }
   }
 
+  async function export3d() {
+    if (!state.model || !state.gen.heightfield) return;
+    toast(Carto.Svg.esc(t('ui.3dWorking')), 0);
+    try {
+      // Let the toast paint before the heavy work starts.
+      await new Promise((r) => setTimeout(r, 30));
+      const g = state.gen;
+      const renderPng = (extra) => {
+        const o = Object.assign({ palette: Carto.Palettes.parchment, paletteId: 'parchment', exporting: true }, state.opts, extra);
+        if (!extra.bare) { o.palette = Carto.Palettes[state.palette]; o.paletteId = state.palette; }
+        const svg = g.render(state.model, o).replace(/^<svg([^>]*)>/, (m, a) => '<svg' + a + '><style>' + Carto.FONT_CSS + '</style>');
+        return svgToPng(svg, state.mapW, state.mapH);
+      };
+      const title = (g.fileName ? g.fileName(state.model) : '') || t('gen.' + g.id + '.name');
+      const blob = await Carto.Relief3D.build(g, state.model, renderPng, title);
+      await saveBlob(fileBase() + '-3d.zip', blob);
+    } catch (err) {
+      console.error(err);
+      toast(Carto.Svg.esc(t('ui.error')));
+    }
+  }
+
   function copyLink() {
     const url = location.href.split('#')[0] + buildHash(state.gen, state.seed, state.opts);
     const manual = () => toast(Carto.Svg.esc(t('ui.linkManual')) + '<input readonly value="' + Carto.Svg.esc(url) + '">', 8000);
@@ -834,6 +857,7 @@
     });
     $('btn-png').addEventListener('click', () => exportAs('png'));
     $('btn-svg').addEventListener('click', () => exportAs('svg'));
+    $('btn-3d').addEventListener('click', export3d);
     els.link.addEventListener('click', copyLink);
     els.overlayClose.addEventListener('click', () => {
       els.overlay.hidden = true;

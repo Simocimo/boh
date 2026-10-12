@@ -425,7 +425,7 @@
       name: opts.name || Carto.Names.place(rng.fork('realm')),
       kind: rng.fork('kind').int(0, 4),
       coast, lakes: lakeLines, ripples, forests, rivers, roads, mountains, hills, trees, settlements, features,
-      T,
+      T, elev: e,
     };
   }
 
@@ -514,6 +514,16 @@
     svg.path(ld, { fill: pal.paper, fillRule: 'evenodd' });
 
     svg.open({ clipPath: 'url(#' + landClip + ')' });
+    // The 3D texture tints the land by elevation, as the illustrated
+    // mountains are left out.
+    if (o.bare) {
+      const tints = [[0.02, '#c3cb93'], [0.15, '#d2cc99'], [0.3, '#cdb98b'], [0.45, '#b99f7b'], [0.6, '#a08b77'], [0.74, '#a8a49d'], [0.87, '#ebe9e4']];
+      for (const [level, col] of tints) {
+        const b = new Svg.Batch();
+        for (const l of Contour.trace(m.elev, GW, GH, level, CELL, 0, 0)) b.smooth(G.chaikin(l.points, 1, true), true);
+        svg.path(b.toString(), { fill: col, fillRule: 'evenodd' });
+      }
+    }
     // Forest floors.
     const fb = new Svg.Batch();
     for (const l of m.forests) fb.smooth(G.chaikin(l.points, 1, l.closed), l.closed);
@@ -546,8 +556,9 @@
       svg.path(rb.toString(), { fill: 'none', stroke: pal.inkSoft, strokeWidth: 1.1, strokeDasharray: '4 3', strokeLinecap: 'round' });
     }
 
-    // Relief and trees, drawn back to front.
+    // Relief and trees, drawn back to front (left out of the 3D texture).
     const items = [];
+    if (o.bare) return svg.toString();
     for (const mt of m.mountains) items.push({ y: mt.y, k: 'm', v: mt });
     for (const hl of m.hills) items.push({ y: hl.y, k: 'h', v: hl });
     for (const tr of m.trees) items.push({ y: tr.y, k: 't', v: tr });
@@ -671,6 +682,26 @@
     return svg.toString();
   }
 
+  // Heights for the 3D export: the elevation grid resampled, softened and
+  // given fine detail on land. Sea level sits at a third of the range.
+  function heightfield(m) {
+    const cols = 2000, rows = 1440;
+    const R = Carto.Relief3D;
+    const data = R.fromGrid(m.elev, GW, GH, cols, rows);
+    const coast = Uint8Array.from(data, (v) => (v >= 0 ? 1 : 0));
+    R.blur(data, cols, rows, 3, 2);
+    const noise = new Carto.Noise(m.seed + ':relief3d');
+    for (let p = 0; p < data.length; p++) {
+      let v = data[p];
+      if (coast[p]) {
+        const x = ((p % cols) / (cols - 1)) * W, y = (Math.floor(p / cols) / (rows - 1)) * H;
+        v = Math.max(0.003, v + noise.fbm(x / 8, y / 8, 4, 2.1, 0.5) * (0.003 + v * 0.025));
+      } else v = Math.min(v, -0.003);
+      data[p] = Math.max(0, Math.min(1, (v + 0.5) / 1.5));
+    }
+    return { cols, rows, data, sea: 1 / 3, width: W, height: H, scale: 1.1, water: '#3f6f8a' };
+  }
+
   // Towns open in the city generator, villages in the village generator.
   function settlementLink(s) {
     if (s.type === 'village') {
@@ -696,6 +727,7 @@
   Carto.register({
     id: 'realm',
     order: 1,
+    heightfield,
     options: [
       { id: 'shape', type: 'select', values: ['island', 'coast', 'archipelago', 'continent'], def: 'coast' },
       { id: 'density', type: 'select', values: ['few', 'normal', 'many'], def: 'normal' },

@@ -596,7 +596,7 @@
 
     // State or theme names under everything else that is lettered.
     const taken = [];
-    const showLabels = o.labels !== false;
+    const showLabels = o.labels !== false && !o.bare;
     if (showLabels && !o.preview) {
       const groupLabel = (cell, text, size) => {
         if (cell < 0 || cell === undefined) return;
@@ -655,7 +655,9 @@
     if (o.markers !== false && !o.preview) for (const mk of m.markers) markerGlyph(svg, mk, pal);
 
     // Sheet furniture.
-    if (!o.preview) {
+    if (o.bare) {
+      // Texture for the 3D export: no lettering or frame.
+    } else if (!o.preview) {
       const title = m.name;
       const sub = t('world.sub.' + view);
       const tw = Draw.textBox(0, 0, title, 30, { title: true }).x1 * 2;
@@ -768,6 +770,42 @@
     return { html: '<h3>' + esc(title) + '</h3><dl>' + rows + '</dl>', poly: cellPoly(grid, c) };
   }
 
+  // ------------------------------------------------------------------ 3D export
+
+  // Heights for the 3D export: cell heights interpolated across the sheet,
+  // softened, given fine detail on land, and clamped so the coastline falls
+  // on the same cell edges as the drawn map.
+  function heightfield(m) {
+    const cols = 2048, rows = 1280, grid = m.grid, SEA = m.SEA;
+    const sx = cols / m.W, sy = rows / m.H;
+    const R = Carto.Relief3D;
+    const { data, near } = R.fromPoints(grid.x, grid.y, m.h, grid.n, sx, sy, cols, rows, grid.find);
+    R.blur(data, cols, rows, 3, 3);
+    const ocean = new Uint8Array(data.length);
+    for (let p = 0; p < data.length; p++) ocean[p] = m.isWater(near[p]) && !m.lake[near[p]] ? 1 : 0;
+    // Land rises gently from the shore instead of ending in a cliff.
+    const shore = Carto.Contour.distanceField(ocean, cols, rows);
+    const noise = new Carto.Noise(m.seed + ':relief3d');
+    const eps = 0.25;
+    let top = 100;
+    for (let p = 0; p < data.length; p++) {
+      let v = data[p];
+      if (ocean[p]) v = Math.min(v, SEA - eps);
+      else {
+        const k = Math.min(1, shore[p] / 16), ramp = k * k * (3 - 2 * k);
+        v = SEA + eps + Math.max(0, v - SEA) * ramp;
+        if (!m.lake[near[p]]) {
+          const x = (p % cols) / sx, y = Math.floor(p / cols) / sy;
+          v = Math.max(SEA + eps, v + noise.fbm(x / 9, y / 9, 4, 2.1, 0.5) * (0.3 + (v - SEA) * 0.05) * ramp);
+        }
+      }
+      data[p] = v;
+      if (v > top) top = v;
+    }
+    for (let p = 0; p < data.length; p++) data[p] = Math.max(0, data[p]) / top;
+    return { cols, rows, data, sea: SEA / top, width: m.W, height: m.H, scale: 1.4, water: '#3f6f8a' };
+  }
+
   Carto.WorldText = { stateName, provName, relName, markerNote, burgLink, markerLink, regionLoops };
 
   Carto.register({
@@ -798,5 +836,7 @@
     notes,
     inspect,
     fileName: (m) => m.name,
+    heightfield,
+    texture3d: { view: 'biomes', relief: false, borders: false, roads: false, burgs: false, markers: false, labels: false, grid: false },
   });
 })(window.Carto = window.Carto || {});

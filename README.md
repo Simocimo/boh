@@ -29,6 +29,20 @@ Le modifiche si salvano da sole nel browser, legate a quella mappa (seme e opzio
 Nella legenda trovi **Esporta progetto** (un file JSON con seme, opzioni e modifiche) e **Importa progetto**:
 usali per conservare il lavoro, spostarlo su un altro computer o condividerlo.
 
+## Modelli 3D (Blender)
+
+Nel Mondo e nel Regno il pulsante **Modello 3D (Blender)** scarica uno ZIP con:
+
+- `heightmap.png`: le altitudini in scala di grigi a **16 bit** (65 536 livelli, nessuno scalino);
+- `texture.png`: i colori del terreno senza scritte (biomi nel Mondo, fasce d'altitudine nel Regno);
+- `mappa.png`: la mappa così come la vedi;
+- `crea-plastico.py`: uno script che in **Blender** costruisce il plastico con mare, sole e camera;
+- `LEGGIMI.txt`: le istruzioni.
+
+In Blender (3.0 o successivo): estrai lo ZIP, scheda **Scripting** → *Text → Open* → `crea-plastico.py` →
+**Run Script**, poi `F12` per il render. In cima allo script puoi cambiare l'altezza del rilievo, la texture e il mare.
+La heightmap si importa anche in Unity, Unreal, Godot, Gaea e World Machine.
+
 ## App per iPhone e PC
 
 Il Cartografo è una **web app installabile** (PWA): una volta aperta dal sito pubblicato si installa
@@ -108,6 +122,7 @@ js/core/              libreria condivisa
   app.js              interfaccia: percorsi, opzioni, zoom, esportazione
   saves.js            salvataggi locali e sincronizzazione (Claude o Supabase)
   library.js          pagina Salvataggi e invito a installare l'app
+  relief3d.js         export 3D: heightmap a 16 bit, ZIP e script per Blender
 js/config.js          URL e chiave Supabase (facoltativi)
 js/gen/               un file per generatore
 manifest.webmanifest  descrizione dell'app installabile
@@ -135,6 +150,7 @@ Carto.register({
   notes(model)         { /* facoltativo: HTML per la legenda */ },
   inspect(model, x, y) { /* facoltativo: { html } per il clic sulla mappa */ },
   fileName(model)      { /* facoltativo: nome del file esportato */ },
+  heightfield(model)   { /* facoltativo: altitudini per l'export 3D (vedi relief3d.js) */ },
 });
 ```
 
