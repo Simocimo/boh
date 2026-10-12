@@ -78,11 +78,11 @@ Apri `index.html` con un doppio clic: funziona anche senza connessione (serve in
 
 ### Pubblicarlo su GitHub Pages
 
-1. Nel repository su GitHub apri **Settings → Pages**.
-2. In *Build and deployment* scegli **Deploy from a branch**.
-3. Seleziona il branch (per esempio `main`) e la cartella **/ (root)**, poi **Save**.
-4. Dopo un minuto il sito è online su `https://<utente>.github.io/<repository>/`.
-   Da quell'indirizzo (https) si può installare come app.
+Il workflow `.github/workflows/pages.yml` pubblica il sito a ogni push sul branch principale.
+Se Pages non è ancora attivo: **Settings → Pages → Build and deployment → Source: GitHub Actions**,
+poi in **Actions** rilancia "Pubblica su GitHub Pages". Il sito è online su
+`https://<utente>.github.io/<repository>/`.
+Da quell'indirizzo (https) si può installare come app.
 
 Dopo aver modificato i file esegui `node tools/build-sw.js`: aggiorna l'elenco dei file e la versione
 della cache offline, così le app installate scaricano la nuova versione.
