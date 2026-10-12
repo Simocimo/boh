@@ -251,7 +251,12 @@
     }
     buildSwatches();
     els.link.hidden = framed;
-    $('export-3d').hidden = !state.gen.heightfield;
+    const g3 = state.gen, b3 = $('btn-3d');
+    $('export-3d').hidden = !g3.heightfield && !g3.model3d;
+    b3.dataset.i18n = g3.heightfield ? 'ui.3d' : 'ui.3dGlb';
+    b3.dataset.i18nTitle = g3.heightfield ? 'ui.3dHint' : 'ui.3dGlbHint';
+    b3.textContent = t(b3.dataset.i18n);
+    b3.title = t(b3.dataset.i18nTitle);
   }
 
   function buildSwatches() {
@@ -748,12 +753,17 @@
   }
 
   async function export3d() {
-    if (!state.model || !state.gen.heightfield) return;
+    if (!state.model || (!state.gen.heightfield && !state.gen.model3d)) return;
     toast(Carto.Svg.esc(t('ui.3dWorking')), 0);
     try {
       // Let the toast paint before the heavy work starts.
       await new Promise((r) => setTimeout(r, 30));
       const g = state.gen;
+      if (g.model3d) {
+        const sc = g.model3d(state.model);
+        await saveBlob(fileBase() + '.glb', Carto.Mesh3D.glb(sc.groups, sc.materials, sc.name));
+        return;
+      }
       const renderPng = (extra) => {
         const o = Object.assign({ palette: Carto.Palettes.parchment, paletteId: 'parchment', exporting: true }, state.opts, extra);
         if (!extra.bare) { o.palette = Carto.Palettes[state.palette]; o.paletteId = state.palette; }

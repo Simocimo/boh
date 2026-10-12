@@ -9,6 +9,15 @@
   I18n.add({
     it: {
       'gen.dwelling.name': 'Dimora',
+      'dwelling.3d.floor': 'Pavimento',
+      'dwelling.3d.outer': 'Muri esterni',
+      'dwelling.3d.inner': 'Muri interni',
+      'dwelling.3d.windows': 'Finestre',
+      'dwelling.3d.doors': 'Porte',
+      'dwelling.3d.stairs': 'Scale',
+      'dwelling.3d.furniture': 'Arredi',
+      'dwelling.3d.roof': 'Tetto',
+      'dwelling.3d.ground': 'Terreno',
       'gen.dwelling.desc': 'Piante di edifici su più piani: locande, case, ville e botteghe, arredate stanza per stanza.',
       'dwelling.opt.type': 'Edificio',
       'dwelling.opt.type.auto': 'Casuale',
@@ -56,6 +65,15 @@
     },
     en: {
       'gen.dwelling.name': 'Dwelling',
+      'dwelling.3d.floor': 'Floor',
+      'dwelling.3d.outer': 'Outer walls',
+      'dwelling.3d.inner': 'Inner walls',
+      'dwelling.3d.windows': 'Windows',
+      'dwelling.3d.doors': 'Doors',
+      'dwelling.3d.stairs': 'Stairs',
+      'dwelling.3d.furniture': 'Furniture',
+      'dwelling.3d.roof': 'Roof',
+      'dwelling.3d.ground': 'Ground',
       'gen.dwelling.desc': 'Multi-storey floor plans: taverns, houses, manors and shops, furnished room by room.',
       'dwelling.opt.type': 'Building',
       'dwelling.opt.type.auto': 'Random',
@@ -322,7 +340,7 @@
     else name = { key: { cottage: 'dwelling.cottage', shop: 'dwelling.shop', manor: 'dwelling.manor' }[type] || 'dwelling.house', n: Carto.Names.person(nr) };
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const b of blocks) { x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h); }
-    return { seed, type, foot: Array.from(foot), floors, stairs, bounds: { x0, y0, x1, y1 }, name };
+    return { seed, type, foot: Array.from(foot), blocks, floors, stairs, bounds: { x0, y0, x1, y1 }, name };
   }
 
   // Place furniture against free walls and in the middle of rooms.
@@ -653,6 +671,185 @@
     return svg.toString();
   }
 
+  // ------------------------------------------------------------- 3D model
+
+  // Floors stacked 3 m apart, walls with door and window openings, stairs,
+  // furniture and a gabled roof. 1 square = 1.5 m.
+  const MAT3D = {
+    stone: { name: 'Pietra', color: '#9a9184' },
+    boards: { name: 'Assi', color: '#8a6440' },
+    plaster: { name: 'Intonaco', color: '#ddd2bc' },
+    inner: { name: 'Pareti interne', color: '#e8dfcc' },
+    cellarWall: { name: 'Muri di cantina', color: '#7d766b', roughness: 0.95 },
+    wood: { name: 'Legno', color: '#6e4a2c' },
+    door: { name: 'Porte', color: '#5a3a22' },
+    glass: { name: 'Vetro', color: '#9cc3d5', alpha: 0.35, roughness: 0.05 },
+    cloth: { name: 'Stoffa', color: '#b8a98a' },
+    rug: { name: 'Tappeti', color: '#8e3b2e' },
+    iron: { name: 'Ferro', color: '#3a3a40', metallic: 0.7, roughness: 0.45 },
+    water: { name: 'Acqua', color: '#5b8fa8', alpha: 0.7, roughness: 0.1 },
+    roof: { name: 'Tetto', color: '#7b3f2c', doubleSided: true },
+    grass: { name: 'Prato', color: '#7f9a5c', roughness: 1 },
+  };
+
+  function model3d(m) {
+    const C = 1.5, FH = 3, SLAB = 0.2, TE = 0.25, TI = 0.12, DOORH = 2.1, SILL = 0.9, WTOP = 2.1;
+    const M = Carto.Mesh3D.Mesh;
+    const b = m.bounds;
+    const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
+    const X = (v) => v * C + ox, S = (v) => v * C + os;
+    const levels = m.floors.map((f) => f.level);
+    const top = Math.max(...levels);
+    const eave = top * FH + FH - SLAB;
+    const stairKeys = new Set(m.stairs.map(([x, y]) => key(x, y)));
+    const groups = [];
+
+    for (const fl of m.floors) {
+      const z = fl.level * FH, wallTop = z + FH - SLAB;
+      const parts = [];
+      const mesh = (name, material) => { const me = new M(); parts.push({ name, mesh: me, material }); return me; };
+      const slab = mesh(t('dwelling.3d.floor'), fl.level <= 0 ? 'stone' : 'boards');
+      const outer = mesh(t('dwelling.3d.outer'), fl.level < 0 ? 'cellarWall' : 'plaster');
+      const inner = mesh(t('dwelling.3d.inner'), fl.level < 0 ? 'cellarWall' : 'inner');
+      const glass = mesh(t('dwelling.3d.windows'), 'glass');
+      const leaves = mesh(t('dwelling.3d.doors'), 'door');
+      const steps = mesh(t('dwelling.3d.stairs'), 'wood');
+      const by = {};
+      const furn = (mat) => by[mat] || (by[mat] = mesh(t('dwelling.3d.furniture') + ' · ' + MAT3D[mat].name, mat));
+
+      // Floor, with a hole where the stairs come up from below.
+      const hole = levels.includes(fl.level - 1) ? stairKeys : new Set();
+      for (const r of fl.rooms) {
+        const cells = cellsOf(r);
+        if (!cells.some(([x, y]) => hole.has(key(x, y)))) slab.box(X(r.x), S(r.y), X(r.x + r.w), S(r.y + r.h), z - SLAB, z);
+        else for (const [x, y] of cells) if (!hole.has(key(x, y))) slab.box(X(x), S(y), X(x + 1), S(y + 1), z - SLAB, z);
+      }
+
+      // Walls on every edge between two rooms or facing outside. Each edge
+      // stops short of the corner posts, so no two solids overlap (overlaps
+      // render as dark stripes). Outer walls also cover the next floor's slab.
+      const at = new Map();
+      for (const r of fl.rooms) for (const [x, y] of cellsOf(r)) at.set(key(x, y), r);
+      const edgeKey = (vertical, x, y) => (vertical ? 'v' : 'h') + x + ',' + y;
+      const doorAt = new Map(fl.doors.map((d) => [edgeKey(d.vertical, d.x, d.y), d]));
+      const windowAt = new Set(fl.windows.map((w) => edgeKey(w.vertical, w.x, w.y)));
+      const outerTop = fl.level === top ? wallTop : z + FH;
+      const edges = new Map();
+      for (const r of fl.rooms) {
+        for (const [x, y] of cellsOf(r)) {
+          for (const [dx, dy, vertical, ex, ey] of [[0, -1, false, x, y], [0, 1, false, x, y + 1], [-1, 0, true, x, y], [1, 0, true, x + 1, y]]) {
+            const other = at.get(key(x + dx, y + dy));
+            if (other === r) continue;
+            const ek = edgeKey(vertical, ex, ey);
+            if (!edges.has(ek)) edges.set(ek, { vertical, ex, ey, ext: !other });
+          }
+        }
+      }
+      const posts = new Map();
+      const post = (x, y, e) => {
+        const pk = key(x, y), p = posts.get(pk) || { x, y, th: 0, top: wallTop, ext: false };
+        p.th = Math.max(p.th, e.ext ? TE : TI);
+        if (e.ext) { p.ext = true; p.top = outerTop; }
+        posts.set(pk, p);
+      };
+      for (const e of edges.values()) {
+        post(e.ex, e.ey, e);
+        post(e.vertical ? e.ex : e.ex + 1, e.vertical ? e.ey + 1 : e.ey, e);
+      }
+      for (const p of posts.values()) (p.ext ? outer : inner).box(X(p.x) - p.th / 2, S(p.y) - p.th / 2, X(p.x) + p.th / 2, S(p.y) + p.th / 2, z, p.top);
+      for (const [ek, e] of edges) {
+        const { vertical, ex, ey, ext } = e;
+        const th = ext ? TE : TI, me = ext ? outer : inner, h1 = ext ? outerTop : wallTop;
+        const p0 = posts.get(key(ex, ey)).th / 2, p1 = posts.get(vertical ? key(ex, ey + 1) : key(ex + 1, ey)).th / 2;
+        const piece = (h0, hTop, thick = th, inset = 0, target = me) => {
+          if (vertical) target.box(X(ex) - thick / 2, S(ey) + p0 + inset, X(ex) + thick / 2, S(ey + 1) - p1 - inset, h0, hTop);
+          else target.box(X(ex) + p0 + inset, S(ey) - thick / 2, X(ex + 1) - p1 - inset, S(ey) + thick / 2, h0, hTop);
+        };
+        const door = doorAt.get(ek);
+        if (door) {
+          piece(z + DOORH, h1);
+          if (door.type === 'front' || door.type === 'back') piece(z, z + DOORH - 0.03, 0.07, 0.04, leaves);
+        } else if (windowAt.has(ek) && fl.level >= 0) {
+          piece(z, z + SILL);
+          piece(z + WTOP, h1);
+          piece(z + SILL, z + WTOP, 0.03, 0, glass);
+        } else piece(z, h1);
+      }
+
+      // Stairs up to the next floor, climbing towards the back of the hall.
+      if (levels.includes(fl.level + 1) && m.stairs.length) {
+        const cells = m.stairs.slice().sort((p, q) => p[1] - q[1]);
+        const sx = cells[0][0], y0 = cells[0][1], y1 = cells[cells.length - 1][1] + 1;
+        const n = 7 * cells.length, run = ((y1 - y0) * C) / n;
+        for (let i = 0; i < n; i++) {
+          const s1 = S(y1) - i * run;
+          steps.box(X(sx) + 0.12, s1 - run, X(sx + 1) - 0.12, s1, z, z + ((i + 1) * FH) / n);
+        }
+      }
+
+      // Furniture.
+      for (const it of fl.items) {
+        const horizWall = it.side === 'n' || it.side === 's';
+        const hug = (d, inset = 0.12) => {
+          const len = (it.len || 1) - inset * 2;
+          if (horizWall) return [it.x + inset, it.side === 'n' ? it.y + inset : it.y + 1 - inset - d, len, d];
+          return [it.side === 'w' ? it.x + inset : it.x + 1 - inset - d, it.y + inset, d, len];
+        };
+        const put = (mat, r, h0, h1) => furn(mat).box(X(r[0]), S(r[1]), X(r[0] + r[2]), S(r[1] + r[3]), z + h0, z + h1);
+        const shrink = (r, k) => [r[0] + k, r[1] + k, r[2] - 2 * k, r[3] - 2 * k];
+        const round = (mat, r, rad, h) => furn(mat).cylinder(X(r[0] + r[2] / 2), S(r[1] + r[3] / 2), rad * C, z, z + h, 14);
+        switch (it.kind) {
+          case 'bed': { const r = hug(0.85); put('wood', r, 0, 0.32); put('cloth', shrink(r, 0.04), 0.32, 0.52); break; }
+          case 'chest': put('wood', hug(0.45), 0, 0.5); break;
+          case 'wardrobe': put('wood', hug(0.5), 0, 2.0); break;
+          case 'cabinet': put('wood', hug(0.5), 0, 1.2); break;
+          case 'hearth': { const r = hug(0.45, 0.05); put('stone', r, 0, 1.3); break; }
+          case 'barrel': round('wood', hug(0.7), 0.32, 0.95); break;
+          case 'crate': put('wood', hug(0.65), 0, 0.6); break;
+          case 'sack': round('cloth', hug(0.6), 0.25, 0.5); break;
+          case 'rack': put('wood', hug(0.4), 0, 1.8); break;
+          case 'counter': case 'bar': put('wood', hug(0.55), 0, 1.05); break;
+          case 'bench': put('wood', hug(0.55), 0, 0.85); break;
+          case 'shelf': put('wood', hug(0.35), 0, 2.0); break;
+          case 'altar': put('stone', hug(0.55), 0, 1.0); break;
+          case 'anvil': put('iron', shrink(hug(0.4), 0.15), 0, 0.8); break;
+          case 'desk': put('wood', hug(0.6), 0, 0.76); break;
+          case 'chair': put('wood', hug(0.45, 0.28), 0, 0.46); break;
+          case 'tub': { const r = hug(0.75); put('wood', r, 0, 0.6); furn('water').box(X(r[0] + 0.05), S(r[1] + 0.05), X(r[0] + r[2] - 0.05), S(r[1] + r[3] - 0.05), z + 0.6, z + 0.61); break; }
+          case 'table': case 'longtable': put('wood', [it.x + 0.15, it.y + 0.2, it.w - 0.3, it.h - 0.4], 0, 0.76); break;
+          case 'roundtable': furn('wood').cylinder(X(it.x + 0.5), S(it.y + 0.5), 0.3 * C, z, z + 0.76, 16); break;
+          case 'rug': put('rug', [it.x + 0.15, it.y + 0.15, it.w - 0.3, it.h - 0.3], 0, 0.015); break;
+          case 'pews': for (let y = it.y; y < it.y + it.h; y++) put('wood', [it.x + 0.2, y + 0.3, it.w - 0.4, 0.35], 0, 0.45); break;
+        }
+      }
+      groups.push({ name: floorName(fl.level), parts });
+    }
+
+    // Gabled roof over each block of the building.
+    const roof = new M();
+    const pitch = Math.tan((38 * Math.PI) / 180), over = 0.45;
+    for (const bl of m.blocks) {
+      const x0 = X(bl.x) - TE / 2, x1 = X(bl.x + bl.w) + TE / 2, s0 = S(bl.y) - TE / 2, s1 = S(bl.y + bl.h) + TE / 2;
+      if (bl.w >= bl.h) {
+        const mid = (s0 + s1) / 2, ridge = eave + ((s1 - s0) / 2) * pitch, low = eave - over * pitch;
+        roof.quad([x0 - over, s0 - over, low], [x1 + over, s0 - over, low], [x1 + over, mid, ridge], [x0 - over, mid, ridge]);
+        roof.quad([x0 - over, s1 + over, low], [x1 + over, s1 + over, low], [x1 + over, mid, ridge], [x0 - over, mid, ridge]);
+        roof.tri([x0, s0, eave], [x0, s1, eave], [x0, mid, ridge], [-1, 0]);
+        roof.tri([x1, s0, eave], [x1, s1, eave], [x1, mid, ridge], [1, 0]);
+      } else {
+        const mid = (x0 + x1) / 2, ridge = eave + ((x1 - x0) / 2) * pitch, low = eave - over * pitch;
+        roof.quad([x0 - over, s0 - over, low], [x0 - over, s1 + over, low], [mid, s1 + over, ridge], [mid, s0 - over, ridge]);
+        roof.quad([x1 + over, s0 - over, low], [x1 + over, s1 + over, low], [mid, s1 + over, ridge], [mid, s0 - over, ridge]);
+        roof.tri([x0, s0, eave], [x1, s0, eave], [mid, s0, ridge], [0, -1]);
+        roof.tri([x0, s1, eave], [x1, s1, eave], [mid, s1, ridge], [0, 1]);
+      }
+    }
+    groups.push({ name: t('dwelling.3d.roof'), parts: [{ name: t('dwelling.3d.roof'), mesh: roof, material: 'roof' }] });
+    const ground = new M().prism([[X(b.x0) - 5, S(b.y0) - 5], [X(b.x1) + 5, S(b.y0) - 5], [X(b.x1) + 5, S(b.y1) + 5], [X(b.x0) - 5, S(b.y1) + 5]], -0.25, -0.1, { sides: false });
+    groups.push({ name: t('dwelling.3d.ground'), parts: [{ name: t('dwelling.3d.ground'), mesh: ground, material: 'grass' }] });
+    return { name: title(m), groups, materials: MAT3D };
+  }
+
   function notes(m) {
     const esc = Svg.esc;
     let h = '<h3>' + esc(title(m)) + '</h3><dl><dt>' + esc(t('dwelling.floors')) + '</dt><dd>' + m.floors.length + '</dd></dl>';
@@ -669,6 +866,7 @@
   Carto.register({
     id: 'dwelling',
     order: 6,
+    model3d,
     options: [
       { id: 'type', type: 'select', values: ['auto', 'cottage', 'townhouse', 'tavern', 'shop', 'manor'], def: 'auto' },
       { id: 'cellar', type: 'bool', def: true },

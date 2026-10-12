@@ -9,6 +9,13 @@
   I18n.add({
     it: {
       'gen.dungeon.name': 'Dungeon',
+      'dungeon.3d.corridors': 'Corridoi',
+      'dungeon.3d.rock': 'Roccia',
+      'dungeon.3d.doors': 'Porte',
+      'dungeon.3d.iron': 'Grate e serrature',
+      'dungeon.3d.secret': 'Porte segrete',
+      'dungeon.3d.lintels': 'Architravi',
+      'dungeon.3d.furniture': 'Arredi',
       'gen.dungeon.desc': 'Sotterranei su una pagina: stanze, corridoi, porte segrete e una legenda pronta da giocare.',
       'dungeon.opt.size': 'Dimensione',
       'dungeon.opt.size.small': 'Piccolo',
@@ -30,6 +37,13 @@
     },
     en: {
       'gen.dungeon.name': 'Dungeon',
+      'dungeon.3d.corridors': 'Corridors',
+      'dungeon.3d.rock': 'Rock',
+      'dungeon.3d.doors': 'Doors',
+      'dungeon.3d.iron': 'Bars and locks',
+      'dungeon.3d.secret': 'Secret doors',
+      'dungeon.3d.lintels': 'Lintels',
+      'dungeon.3d.furniture': 'Furniture',
       'gen.dungeon.desc': 'One-page dungeons: rooms, corridors, secret doors and a key ready to play.',
       'dungeon.opt.size': 'Size',
       'dungeon.opt.size.small': 'Small',
@@ -1022,6 +1036,194 @@
     return svg.toString();
   }
 
+  // ------------------------------------------------------------- 3D model
+
+  // Walls of solid rock around the floors, 1 square = 1.5 m, 3 m high.
+  const MAT3D = {
+    floor: { name: 'Pavimento', color: '#8d8476' },
+    rock: { name: 'Roccia', color: '#5f5850', roughness: 0.95 },
+    wood: { name: 'Legno', color: '#6e4a2c' },
+    iron: { name: 'Ferro', color: '#34343a', metallic: 0.7, roughness: 0.45 },
+    stone: { name: 'Pietra lavorata', color: '#a39b8c' },
+    dark: { name: 'Pietra scura', color: '#45403a' },
+    water: { name: 'Acqua', color: '#2f6a86', alpha: 0.75, roughness: 0.1 },
+    accent: { name: 'Sigillo', color: '#9c2a24' },
+    bone: { name: 'Ossa', color: '#ddd3b8' },
+    fungus: { name: 'Funghi', color: '#7a9a52' },
+    gold: { name: 'Oro', color: '#c99a2e', metallic: 0.9, roughness: 0.35 },
+  };
+
+  function model3d(m) {
+    const C = 1.5, HW = 3, M = Carto.Mesh3D.Mesh;
+    const b = m.bounds;
+    const ox = -((b.x0 + b.x1) / 2) * C, os = -((b.y0 + b.y1) / 2) * C;
+    const X = (v) => v * C + ox, S = (v) => v * C + os;
+    const floor = new Set();
+    const k = (x, y) => x + ',' + y;
+    for (const a of m.areas) {
+      const cells = a.cells || [];
+      if (!a.cells) for (let y = a.y; y < a.y + a.h; y++) for (let x = a.x; x < a.x + a.w; x++) cells.push([x, y]);
+      for (const [x, y] of cells) floor.add(k(x, y));
+    }
+    const parts = [];
+    const mesh = (name, material) => { const me = new M(); parts.push({ name, mesh: me, material }); return me; };
+
+    // Floors: one object per room, named after the key, so rooms can be picked out.
+    const corridors = mesh(t('dungeon.3d.corridors'), 'floor');
+    for (const a of m.areas) {
+      if (a.kind === 'corridor') { for (const [x, y] of a.cells) corridors.box(X(x), S(y), X(x + 1), S(y + 1), -0.2, 0); continue; }
+      const me = mesh(a.num + '. ' + roomText(m, a).head, 'floor');
+      me.box(X(a.x), S(a.y), X(a.x + a.w), S(a.y + a.h), -0.2, 0);
+    }
+
+    // Rock: every empty square touching a floor, as one block with only the
+    // faces that can be seen.
+    const rock = new Set(), rockCells = [];
+    for (const key of floor) {
+      const [x, y] = key.split(',').map(Number);
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const q = k(x + dx, y + dy);
+        if (!floor.has(q) && !rock.has(q)) { rock.add(q); rockCells.push([x + dx, y + dy]); }
+      }
+    }
+    const walls = mesh(t('dungeon.3d.rock'), 'rock');
+    for (const [x, y] of rockCells) walls.face([[X(x), HW, S(y)], [X(x + 1), HW, S(y)], [X(x + 1), HW, S(y + 1)], [X(x), HW, S(y + 1)]], [0, 1, 0]);
+    for (const r of Carto.Mesh3D.boundaryRuns((x, y) => rock.has(k(x, y)), rockCells)) {
+      walls.face([[X(r.x0), 0, S(r.s0)], [X(r.x1), 0, S(r.s1)], [X(r.x1), HW, S(r.s1)], [X(r.x0), HW, S(r.s0)]], [r.nx, 0, r.ns]);
+    }
+    // Round rooms: rock fills the corners of their square.
+    for (const a of m.areas) {
+      if (a.shape !== 'round') continue;
+      const cx = a.x + a.w / 2, cy = a.y + a.h / 2, r = a.w / 2;
+      for (let q = 0; q < 4; q++) {
+        const sx = q === 0 || q === 3 ? 1 : -1, sy = q < 2 ? 1 : -1;
+        const corner = [X(cx + sx * r), S(cy + sy * r)];
+        const arc = [];
+        const a0 = Math.atan2(sy, 0), a1 = Math.atan2(0, sx);
+        let da = a1 - a0;
+        if (da > Math.PI) da -= 2 * Math.PI;
+        if (da < -Math.PI) da += 2 * Math.PI;
+        for (let i = 0; i <= 10; i++) { const ang = a0 + (da * i) / 10; arc.push([X(cx + Math.cos(ang) * r), S(cy + Math.sin(ang) * r)]); }
+        walls.prism([corner, ...arc], 0, HW, { center: corner });
+      }
+    }
+
+    // Doors.
+    const doors = mesh(t('dungeon.3d.doors'), 'wood'), iron = mesh(t('dungeon.3d.iron'), 'iron');
+    const secret = mesh(t('dungeon.3d.secret'), 'rock'), lintels = mesh(t('dungeon.3d.lintels'), 'rock');
+    for (const l of m.links) {
+      const d = l.door, x = X(d.x), s = S(d.y), ang = d.vertical ? 90 : 0;
+      if (l.type === 'door' || l.type === 'locked') {
+        doors.boxAt(x, s, C * 0.82, 0.12, 0, 2.3, ang);
+        lintels.boxAt(x, s, C, 0.5, 2.3, HW, ang);
+        if (l.type === 'locked') iron.boxAt(x, s, 0.22, 0.2, 1.0, 1.25, ang);
+      } else if (l.type === 'secret') {
+        secret.boxAt(x, s, C, 0.6, 0, HW, ang);
+      } else if (l.type === 'bars') {
+        for (let i = -2; i <= 2; i++) {
+          const off = (i * C) / 5.5;
+          iron.cylinder(x + (d.vertical ? 0 : off), s + (d.vertical ? off : 0), 0.035, 0, 2.6, 8);
+        }
+        iron.boxAt(x, s, C, 0.08, 2.5, 2.6, ang);
+        lintels.boxAt(x, s, C, 0.5, 2.6, HW, ang);
+      }
+    }
+
+    // Furniture.
+    const by = {};
+    const of = (mat) => by[mat] || (by[mat] = mesh(t('dungeon.3d.furniture') + ' · ' + MAT3D[mat].name, mat));
+    const rng = new Carto.Random(m.seed + 7);
+    for (const r of m.rooms) {
+      for (const f of r.features || []) {
+        const fx = X(f.x), fs = S(f.y);
+        switch (f.t) {
+          case 'column': of('stone').cylinder(fx, fs, 0.32 * C, 0, HW, 14); break;
+          case 'statue': of('stone').boxAt(fx, fs, 0.8 * C, 0.8 * C, 0, 0.5); of('stone').cylinder(fx, fs, 0.28 * C, 0.5, 2.3, 10); break;
+          case 'sarcophagus': of('stone').boxAt(fx, fs, 0.85 * C, 1.9 * C, 0, 0.85, f.ang); break;
+          case 'skull': of('bone').boxAt(fx, fs, 0.18, 0.18, 0, 0.16, rng.float(0, 90)); break;
+          case 'altar': of('dark').boxAt(fx, fs, 1.8 * C, 0.8 * C, 0, 1.0, f.ang); break;
+          case 'circle':
+            for (let i = 0; i < 32; i++) {
+              const a0 = (i / 32) * Math.PI * 2, a1 = ((i + 1) / 32) * Math.PI * 2, rr = f.r * C;
+              of('accent').boxAt(fx + Math.cos((a0 + a1) / 2) * rr, fs + Math.sin((a0 + a1) / 2) * rr, rr * (a1 - a0) * 1.05, 0.08, 0, 0.01, ((a0 + a1) / 2) * (180 / Math.PI) + 90);
+            }
+            break;
+          case 'shelf': case 'rack2': {
+            const len = Math.hypot(f.x1 - f.x0, f.y1 - f.y0) * C;
+            of('wood').boxAt(X((f.x0 + f.x1) / 2), S((f.y0 + f.y1) / 2), f.ang ? 0.4 * C : len, f.ang ? len : 0.4 * C, 0, 2.0);
+            break;
+          }
+          case 'table': of('wood').boxAt(fx, fs, (f.ang ? 0.8 : 1.6) * C, (f.ang ? 1.6 : 0.8) * C, 0, 0.78); break;
+          case 'stool': of('wood').cylinder(fx, fs, 0.22 * C, 0, 0.45, 10); break;
+          case 'barrel': of('wood').cylinder(fx, fs, 0.3 * C, 0, 0.95, 14); break;
+          case 'crate': of('wood').boxAt(fx, fs, 0.6 * C, 0.6 * C, 0, 0.6 * C); break;
+          case 'chest': of('wood').boxAt(fx, fs, (f.ang ? 0.5 : 0.8) * C, (f.ang ? 0.8 : 0.5) * C, 0, 0.55); of('gold').boxAt(fx, fs, 0.15, 0.15, 0.55, 0.62); break;
+          case 'bed': { const v = f.side === 'n' || f.side === 's'; of('wood').boxAt(fx, fs, (v ? 0.75 : 1.5) * C, (v ? 1.5 : 0.75) * C, 0, 0.5); break; }
+          case 'rack': of('wood').boxAt(fx, fs, (f.ang ? 0.9 : 2) * C, (f.ang ? 2 : 0.9) * C, 0, 0.9); break;
+          case 'throne': of('dark').boxAt(fx, fs, 0.9 * C, 0.9 * C, 0, 0.55); of('gold').boxAt(fx, fs, 0.9 * C, 0.9 * C, 0.55, 0.62); break;
+          case 'water': {
+            const pts = [];
+            for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2; pts.push([fx + Math.cos(a) * f.rx * C * 0.92, fs + Math.sin(a) * f.ry * C * 0.92]); }
+            of('water').prism(pts, 0, 0.04, { sides: false });
+            break;
+          }
+          case 'rubble': of('rock').boxAt(fx, fs, f.r * 2 * C, f.r * 1.6 * C, 0, f.r * C * rng.float(0.6, 1.4), rng.float(0, 90)); break;
+          case 'well': {
+            const ring = [], inner = [];
+            for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; ring.push([fx + Math.cos(a) * 0.75 * C, fs + Math.sin(a) * 0.75 * C]); }
+            of('dark').prism(ring, 0, 0.8);
+            for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; inner.push([fx + Math.cos(a) * 0.5 * C, fs + Math.sin(a) * 0.5 * C]); }
+            of('water').prism(inner, 0.8, 0.81, { sides: false });
+            break;
+          }
+          case 'nest': of('wood').cylinder(fx, fs, f.r * C, 0, 0.3, 14); break;
+          case 'bone': of('bone').boxAt(fx, fs, 0.6, 0.08, 0, 0.06, f.ang); break;
+          case 'hearth': { const v = f.side === 'e' || f.side === 'w'; of('dark').boxAt(fx, fs, (v ? 0.7 : 1.6) * C, (v ? 1.6 : 0.7) * C, 0, 1.2); break; }
+          case 'rails': {
+            const { x, y, w, h, horiz } = f;
+            const c = horiz ? y + h / 2 : x + w / 2;
+            for (const o of [-0.25, 0.25]) {
+              if (horiz) of('iron').box(X(x), S(c + o) - 0.03, X(x + w), S(c + o) + 0.03, 0, 0.08);
+              else of('iron').box(X(c + o) - 0.03, S(y), X(c + o) + 0.03, S(y + h), 0, 0.08);
+            }
+            break;
+          }
+          case 'mushroom': of('fungus').cylinder(fx, fs, f.r * C * 0.3, 0, f.r * 1.6, 8); of('fungus').cylinder(fx, fs, f.r * C, f.r * 1.6, f.r * 1.9, 12); break;
+          case 'cells': {
+            const { x, y, w, h } = f.room;
+            const horiz = f.side === 'n' || f.side === 's';
+            const depth = Math.min(2, Math.max(1, Math.floor((horiz ? h : w) / 2)));
+            const len = horiz ? w : h;
+            const line = f.side === 'n' ? y + depth : f.side === 's' ? y + h - depth : f.side === 'w' ? x + depth : x + w - depth;
+            for (let i = 1.5; i < len; i += 1.5) {
+              if (horiz) of('rock').box(X(x + i) - 0.12, S(f.side === 'n' ? y : y + h - depth), X(x + i) + 0.12, S(f.side === 'n' ? y + depth : y + h), 0, HW);
+              else of('rock').box(X(f.side === 'w' ? x : x + w - depth), S(y + i) - 0.12, X(f.side === 'w' ? x + depth : x + w), S(y + i) + 0.12, 0, HW);
+            }
+            for (let i = 0.15; i < len; i += 0.3) {
+              if (horiz) of('iron').cylinder(X(x + i), S(line), 0.03, 0, HW, 6);
+              else of('iron').cylinder(X(line), S(y + i), 0.03, 0, HW, 6);
+            }
+            break;
+          }
+          case 'stairs': {
+            const v = f.side === 'n' || f.side === 's';
+            const n = 8, w = (v ? 1 : 2) * C, d = (v ? 2 : 1) * C;
+            // Steps climb towards the wall.
+            for (let i = 0; i < n; i++) {
+              const tt = (i + 0.5) / n - 0.5;
+              const dir = { n: [0, -1], s: [0, 1], w: [-1, 0], e: [1, 0] }[f.side] || [0, -1];
+              const along = v ? d : w;
+              const cxs = fx + dir[0] * tt * along, css = fs + dir[1] * tt * along;
+              of('stone').boxAt(cxs, css, v ? w : along / n, v ? along / n : d, 0, ((i + 1) / n) * (f.down ? 0.9 : 1.8));
+            }
+            break;
+          }
+        }
+      }
+    }
+    return { name: titleText(m), groups: [{ name: titleText(m), parts }], materials: MAT3D };
+  }
+
   function notes(m) {
     const esc = Svg.esc;
     let h = '<h3>' + esc(titleText(m)) + '</h3><p class="story">' + esc(storyText(m)) + '</p><ol>';
@@ -1035,6 +1237,7 @@
   Carto.register({
     id: 'dungeon',
     order: 5,
+    model3d,
     options: [
       { id: 'size', type: 'select', values: ['small', 'medium', 'large'], def: 'medium' },
       { id: 'theme', type: 'select', values: ['auto', 'tomb', 'temple', 'lair', 'prison', 'mine', 'sanctum'], def: 'auto' },

@@ -43,6 +43,16 @@ In Blender (3.0 o successivo): estrai lo ZIP, scheda **Scripting** → *Text →
 **Run Script**, poi `F12` per il render. In cima allo script puoi cambiare l'altezza del rilievo, la texture e il mare.
 La heightmap si importa anche in Unity, Unreal, Godot, Gaea e World Machine.
 
+Nel **Dungeon** e nella **Dimora** il pulsante **Modello 3D (GLB)** scarica un file glTF binario in metri reali
+(1 quadretto = 1,5 m), che si apre in Blender (*File → Import → glTF 2.0*), Unity, Godot, Unreal e nei visualizzatori 3D.
+
+- **Dungeon**: pavimenti (un oggetto per stanza, con il numero e il nome della legenda), roccia alta 3 m attorno
+  a stanze e corridoi, porte con architrave, serrature, grate, porte segrete come blocchi di roccia separati,
+  e gli arredi: colonne, statue, sarcofagi, altari, pozze d'acqua, celle, scale e altro.
+- **Dimora**: un gruppo per piano (cantina, piano terra, piani superiori) con pavimenti, muri esterni e interni,
+  porte, finestre con vetri, scale e arredi, più il tetto a due falde e il prato. In Blender nascondi il tetto
+  e i piani superiori per guardare dentro.
+
 ## App per iPhone e PC
 
 Il Cartografo è una **web app installabile** (PWA): una volta aperta dal sito pubblicato si installa
@@ -123,6 +133,7 @@ js/core/              libreria condivisa
   saves.js            salvataggi locali e sincronizzazione (Claude o Supabase)
   library.js          pagina Salvataggi e invito a installare l'app
   relief3d.js         export 3D: heightmap a 16 bit, ZIP e script per Blender
+  mesh3d.js           modelli 3D delle piante e scrittura dei file glTF (.glb)
 js/config.js          URL e chiave Supabase (facoltativi)
 js/gen/               un file per generatore
 manifest.webmanifest  descrizione dell'app installabile
@@ -151,6 +162,7 @@ Carto.register({
   inspect(model, x, y) { /* facoltativo: { html } per il clic sulla mappa */ },
   fileName(model)      { /* facoltativo: nome del file esportato */ },
   heightfield(model)   { /* facoltativo: altitudini per l'export 3D (vedi relief3d.js) */ },
+  model3d(model)       { /* facoltativo: modello 3D da salvare in .glb (vedi mesh3d.js) */ },
 });
 ```
 
