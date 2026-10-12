@@ -20,3 +20,6 @@ create policy "saves: read own" on public.saves for select using (auth.uid() = u
 create policy "saves: insert own" on public.saves for insert with check (auth.uid() = user_id);
 create policy "saves: update own" on public.saves for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "saves: delete own" on public.saves for delete using (auth.uid() = user_id);
+
+-- Newer projects may not expose new tables to the API automatically.
+grant select, insert, update, delete on public.saves to authenticated;
