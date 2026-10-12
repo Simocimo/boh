@@ -25,6 +25,27 @@
       'cave.title.cave': 'Grotte di {n}',
       'cave.title.glade': 'Radura di {n}',
       'cave.entrance': 'Ingresso',
+      'cave.title.mine': 'Miniera di {n}',
+      'cave.title.show': 'Grotte di {n}',
+      'cave.title.drain': 'Collettore di {n}',
+      'cave.title.park': 'Parco di {n}',
+      'cave.title.undercity': 'Sottocittà di {n}',
+      'cave.title.den': 'Covo di {n}',
+      'cave.title.grotto': 'Grotta tossica di {n}',
+      'cave.title.deadwood': 'Bosco morto di {n}',
+      'cave.sub.mine': 'miniera abbandonata',
+      'cave.sub.show': 'grotta turistica',
+      'cave.sub.drain': 'canale scolmatore',
+      'cave.sub.park': 'riserva naturale',
+      'cave.sub.undercity': 'gallerie sotto l’arcologia',
+      'cave.sub.den': 'covo di contrabbandieri',
+      'cave.sub.grotto': 'zona contaminata',
+      'cave.sub.deadwood': 'zona di quarantena',
+      'cave.opt.type.cave@modern': 'Sotterraneo',
+      'cave.opt.type.glade@modern': 'Bosco',
+      'cave.opt.type.cave@cyber': 'Sottosuolo',
+      'cave.opt.type.glade@cyber': 'Bosco morto',
+      'cave.entrance@cyber': 'Accesso',
     },
     en: {
       'gen.cave.name': 'Cave',
@@ -42,6 +63,27 @@
       'cave.title.cave': 'Caves of {n}',
       'cave.title.glade': '{n} Glade',
       'cave.entrance': 'Entrance',
+      'cave.title.mine': '{n} Mine',
+      'cave.title.show': '{n} Caverns',
+      'cave.title.drain': '{n} Storm Drain',
+      'cave.title.park': '{n} Park',
+      'cave.title.undercity': '{n} Undercity',
+      'cave.title.den': '{n} Smugglers’ Den',
+      'cave.title.grotto': '{n} Toxic Grotto',
+      'cave.title.deadwood': '{n} Deadwood',
+      'cave.sub.mine': 'abandoned mine',
+      'cave.sub.show': 'show cave',
+      'cave.sub.drain': 'flood relief culvert',
+      'cave.sub.park': 'nature reserve',
+      'cave.sub.undercity': 'tunnels under the arcology',
+      'cave.sub.den': 'smugglers’ den',
+      'cave.sub.grotto': 'contaminated zone',
+      'cave.sub.deadwood': 'quarantine zone',
+      'cave.opt.type.cave@modern': 'Underground',
+      'cave.opt.type.glade@modern': 'Woods',
+      'cave.opt.type.cave@cyber': 'Underground',
+      'cave.opt.type.glade@cyber': 'Deadwood',
+      'cave.entrance@cyber': 'Access',
     },
   });
 
@@ -75,6 +117,129 @@
       altar: ['Altare druidico. Una pietra piatta macchiata di vino e sangue.', 'Druid altar. A flat stone stained with wine and blood.'],
       pond: ['Stagno. Rane e libellule; sul fondo luccica qualcosa.', 'Pond. Frogs and dragonflies; something glints on the bottom.'],
     },
+    // Present day (2026): the same places and props under other names.
+    mine: {
+      mouth: ['Imbocco della galleria. Una grata divelta e il cartello «Pericolo, vietato l’accesso».', 'Adit. A torn-off grate and a sign: “Danger, no entry”.'],
+      dripstone: ['Camera a pilastri. Colonne di roccia lasciate a reggere la volta, segnate con vernice spray.', 'Room and pillar. Rock columns left to hold up the roof, marked with spray paint.'],
+      lake: ['Livello allagato. L’acqua di falda ha invaso la galleria; sul bordo arrugginisce una pompa.', 'Flooded level. Groundwater has filled the drift; a pump rusts at the edge.'],
+      den: ['Deposito attrezzi. Picconi, elmetti con la lampada rotta e un carrello rovesciato.', 'Tool store. Picks, helmets with broken lamps and an overturned mine cart.'],
+      spiders: ['Cavi elettrici. Una ragnatela di vecchi cavi pende dal soffitto; alcuni sono ancora in tensione.', 'Power cables. A web of old cables hangs from the roof; some are still live.'],
+      fungi: ['Muffa. Una patina bianca copre le armature di legno marcite.', 'Mould. A white film covers the rotting timber props.'],
+      crystals: ['Vena di minerale. Il filone scintilla dove i minatori hanno smesso di scavare.', 'Ore vein. The lode glitters where the miners stopped digging.'],
+      bats: ['Colonia di pipistrelli. Specie protetta: un cartello vieta di disturbarli.', 'Bat colony. A protected species; a sign forbids disturbing them.'],
+      shrine: ['Nicchia di santa Barbara. La statuetta della patrona dei minatori e qualche lumino spento.', 'Saint Barbara’s niche. A statuette of the miners’ patron saint and a few burnt-out candles.'],
+      camp: ['Bivacco di esploratori urbani. Una lampada da campeggio, sacchi a pelo e lattine vuote.', 'Urban explorers’ camp. A camping lantern, sleeping bags and empty cans.'],
+      chasm: ['Pozzo. Un fornello senza protezioni scende al livello inferiore.', 'Winze. An unguarded shaft drops to the level below.'],
+      echo: ['Galleria di carreggio. I binari si perdono nel buio; ogni passo rimbomba.', 'Haulage drift. The rails run off into the dark; every step echoes.'],
+      hoard: ['Cassaforte della direzione. Buste paga mai ritirate e il registro dei crolli.', 'Manager’s safe. Uncollected pay packets and the log of the cave-ins.'],
+    },
+    show: {
+      mouth: ['Biglietteria. Tornelli, un negozio di souvenir e il percorso illuminato che scende.', 'Ticket office. Turnstiles, a gift shop and the lit path leading down.'],
+      dripstone: ['Sala delle stalattiti. Faretti colorati sulle colonne di calcite; vietato toccare.', 'Dripstone hall. Coloured spotlights on the calcite columns; do not touch.'],
+      lake: ['Lago sotterraneo. Una passerella d’acciaio corre sopra l’acqua verde.', 'Underground lake. A steel walkway runs over the green water.'],
+      den: ['Zona chiusa al pubblico. Transenne, attrezzi dei manutentori e un cartello di lavori in corso.', 'Closed section. Barriers, maintenance tools and a “works in progress” sign.'],
+      spiders: ['Stazione di ricerca. Sensori e cavi tesi tra le rocce misurano umidità e radon.', 'Research station. Sensors and cables strung between the rocks measure humidity and radon.'],
+      fungi: ['Lampenflora. Muschi e alghe verdi crescono attorno ai faretti.', 'Lampenflora. Moss and green algae grow around the spotlights.'],
+      crystals: ['Sala dei cristalli. Cristalli di aragonite brillano dietro un vetro di protezione.', 'Crystal room. Aragonite crystals glitter behind protective glass.'],
+      bats: ['Grotta dei pipistrelli. Qui le luci sono rosse, per non disturbare la colonia.', 'Bat grotto. The lights here are red, so as not to disturb the colony.'],
+      shrine: ['Presepe. Ogni Natale le statuine vengono sistemate su una lastra di pietra.', 'Nativity scene. Every Christmas the figurines are set out on a stone slab.'],
+      camp: ['Punto di sosta. Panchine, una lampada d’emergenza e la cassetta del pronto soccorso.', 'Rest stop. Benches, an emergency lamp and a first-aid box.'],
+      chasm: ['Abisso. Un parapetto e un cartello: profondità 80 metri.', 'Abyss. A railing and a sign: 80 metres deep.'],
+      echo: ['Sala dei concerti. Una volta all’anno qui suona un’orchestra.', 'Concert hall. Once a year an orchestra plays here.'],
+      hoard: ['Ramo inesplorato. Oltre la transenna, monete antiche tra le ossa di un orso delle caverne.', 'Unexplored branch. Beyond the barrier, old coins among the bones of a cave bear.'],
+    },
+    drain: {
+      mouth: ['Sbocco. Una grata arrugginita sul canale, intasata dai rifiuti dell’ultima piena.', 'Outfall. A rusty grate over the channel, clogged with debris from the last flood.'],
+      dripstone: ['Sala dei pilastri. Pilastri di cemento reggono la volta; dalle crepe pendono stalattiti di calcare.', 'Pillar hall. Concrete pillars hold up the vault; limescale straws hang from the cracks.'],
+      lake: ['Vasca di laminazione. Acqua stagnante e schiuma grigia; il livello sale quando piove.', 'Retention basin. Stagnant water and grey foam; the level rises when it rains.'],
+      den: ['Rifugio di senzatetto. Cartoni, coperte e un carrello della spesa.', 'Rough sleepers’ shelter. Cardboard, blankets and a shopping trolley.'],
+      spiders: ['Nodo di cavi. Fibra ottica e linee elettriche corrono lungo le pareti in fasci aggrovigliati.', 'Cable junction. Fibre and power lines run along the walls in tangled bundles.'],
+      fungi: ['Muffe. Chiazze verdastre e un odore che toglie il fiato.', 'Mould. Greenish patches and a stench that takes your breath away.'],
+      crystals: ['Galleria dei graffiti. Tag fluorescenti brillano alla luce della torcia.', 'Graffiti tunnel. Fluorescent tags glow in the torchlight.'],
+      bats: ['Colonia di ratti. Il pavimento si muove; occhi rossi nel buio.', 'Rat colony. The floor moves; red eyes in the dark.'],
+      shrine: ['Quadro di comando. Un armadio elettrico che manovra le paratoie del canale.', 'Control cabinet. An electrical box that works the sluice gates.'],
+      camp: ['Punto di manutenzione. Una lampada da lavoro e una scala alla marinara fino a un tombino.', 'Maintenance point. A work lamp and a ladder up to a manhole.'],
+      chasm: ['Pozzo di caduta. L’acqua precipita verso il livello inferiore.', 'Drop shaft. The water plunges to the level below.'],
+      echo: ['Grande collettore. Una volta in mattoni dove ogni rumore rimbomba.', 'Main sewer. A brick vault where every sound echoes.'],
+      hoard: ['Nascondiglio. Borsoni con il bottino di una rapina e un telefono usa e getta.', 'Stash. Holdalls with the loot from a robbery and a burner phone.'],
+    },
+    park: {
+      mouth: ['Parcheggio. Uno sterrato, una sbarra e la bacheca con la mappa dei sentieri.', 'Car park. A gravel lot, a barrier and a board with the trail map.'],
+      stones: ['Cerchio di massi. Sette massi disposti in tondo, dove si ritrovano gli scout.', 'Boulder ring. Seven boulders set in a circle, where the scouts meet.'],
+      spring: ['Fontanella. Acqua potabile da un rubinetto di ghisa.', 'Drinking fountain. Fresh water from a cast-iron tap.'],
+      oak: ['Quercia monumentale. Albero protetto, con una staccionata e un cartello.', 'Heritage oak. A protected tree with a fence and a sign.'],
+      camp: ['Area campeggio. Piazzole per le tende e un barbecue in muratura.', 'Campsite. Tent pitches and a brick barbecue.'],
+      fairy: ['Cerchio di funghi. Un fotografo naturalista si apposta qui all’alba.', 'Fairy ring. A wildlife photographer lies in wait here at dawn.'],
+      hut: ['Casetta della forestale. Una radio, un estintore e il registro dei visitatori.', 'Ranger station. A radio, an extinguisher and the visitors’ log.'],
+      graves: ['Discarica abusiva. Sacchi di rifiuti, pneumatici e un frigorifero abbandonato.', 'Fly-tipping. Rubbish bags, tyres and a dumped fridge.'],
+      thicket: ['Macchia. Rovi fitti; un cinghiale grufola nel sottobosco.', 'Thicket. Dense brambles; a wild boar roots in the undergrowth.'],
+      altar: ['Tavolo da picnic. Iniziali incise nel legno e una geocache nascosta sotto.', 'Picnic table. Initials carved into the wood and a geocache taped underneath.'],
+      pond: ['Laghetto. Ninfee, rane e un pontile per la pesca sportiva.', 'Pond. Water lilies, frogs and a jetty for anglers.'],
+    },
+    // Cyberpunk.
+    undercity: {
+      mouth: ['Accesso di servizio. Una botola della metropolitana dismessa, con il sigillo forzato.', 'Service access. A hatch from the abandoned metro, its seal forced.'],
+      dripstone: ['Fondamenta. Piloni di cemento armato reggono l’arcologia sopra; gocciola condensa.', 'Foundations. Ferroconcrete piers hold up the arcology above; condensation drips.'],
+      lake: ['Cisterna allagata. Acqua nera, riflessi d’olio e una luce che pulsa sul fondo.', 'Flooded cistern. Black water, an oily sheen and a light pulsing on the bottom.'],
+      den: ['Tana di scavenger. Ossa, protesi strappate e i graffiti di una gang.', 'Scavenger nest. Bones, ripped-out prosthetics and gang tags.'],
+      spiders: ['Nido di cavi. Fasci di fibra pirata tessuti come una ragnatela; un netrunner ci ha innestato un nodo.', 'Cable nest. Bundles of pirate fibre woven like a web; a netrunner has spliced a node into it.'],
+      fungi: ['Coltura idroponica. Funghi bioluminescenti cresciuti sotto lampade UV rubate.', 'Hydroponic farm. Bioluminescent fungi grown under stolen UV lamps.'],
+      crystals: ['Server farm abusiva. Rack ronzanti tra le rocce, LED magenta che lampeggiano.', 'Rogue server farm. Racks humming among the rocks, magenta LEDs blinking.'],
+      bats: ['Stormo di droni. Microdroni appesi al soffitto come pipistrelli, in ricarica.', 'Drone roost. Microdrones hang from the ceiling like bats, recharging.'],
+      shrine: ['Altare della Macchina. Un vecchio mainframe venerato da un culto di tecnoasceti.', 'Machine altar. An old mainframe worshipped by a cult of techno-ascetics.'],
+      camp: ['Accampamento di sbandati. Un bidone acceso, brande e una radio pirata.', 'Squatter camp. A burning barrel, cots and a pirate radio.'],
+      chasm: ['Pozzo di ventilazione. Un condotto senza fondo; dal reattore sale aria calda.', 'Vent shaft. A bottomless duct; hot air rises from the reactor.'],
+      echo: ['Stazione fantasma. Banchine della vecchia metro e schermi pubblicitari che si accendono da soli.', 'Ghost station. Old metro platforms and ad screens that flicker on by themselves.'],
+      hoard: ['Cache. Chip di credito, impianti ancora sigillati e un deck militare.', 'Cache. Credit chips, still-sealed implants and a military-grade deck.'],
+    },
+    den: {
+      mouth: ['Ingresso nascosto. Dietro un distributore automatico rotto, una porta blindata.', 'Hidden entrance. Behind a broken vending machine, an armoured door.'],
+      dripstone: ['Deposito di fusti. Bidoni di solvente, e di chissà cos’altro.', 'Drum store. Barrels of solvent, and who knows what else.'],
+      lake: ['Vasca di raffreddamento. Acqua tiepida in cui si raffreddano i rack di contrabbando.', 'Cooling pool. Warm water cooling the smuggled racks.'],
+      den: ['Branda delle guardie. Mozziconi, lattine di energetico e un fucile smart.', 'Guards’ bunk. Cigarette ends, energy-drink cans and a smart rifle.'],
+      spiders: ['Rete d’allarme. Fili laser tesi attraverso il passaggio.', 'Tripwire grid. Laser wires strung across the passage.'],
+      fungi: ['Serra di droghe sintetiche. Muffe modificate sotto una luce viola.', 'Synth-drug farm. Engineered moulds under a violet light.'],
+      crystals: ['Laboratorio di chip. Wafer pirata e una stampante di circuiti.', 'Chip lab. Pirate wafers and a circuit printer.'],
+      bats: ['Nido dei droni corrieri. Quadricotteri pronti a decollare da un camino.', 'Courier drone roost. Quadcopters ready to lift off up a chimney.'],
+      shrine: ['Banco del ricettatore. Una lastra di metallo, una bilancia e un lettore di chip.', 'Fence’s counter. A metal slab, a pair of scales and a chip reader.'],
+      camp: ['Sala comune. Un fornello, un oloschermo e un tavolo da poker.', 'Common room. A hotplate, a holoscreen and a poker table.'],
+      chasm: ['Scarico. Un pozzo dove finiscono le prove scomode.', 'Dump shaft. A pit where awkward evidence disappears.'],
+      echo: ['Molo sotterraneo. Un canale dove attraccano barchini a luci spente.', 'Underground dock. A canal where skiffs moor with their lights off.'],
+      hoard: ['Caveau. Crediti non tracciabili e un prototipo rubato a una corporazione.', 'Vault. Untraceable credits and a prototype stolen from a corp.'],
+    },
+    grotto: {
+      mouth: ['Imboccatura. Cartelli di rischio biologico e una tuta protettiva strappata.', 'Mouth. Biohazard signs and a torn hazmat suit.'],
+      dripstone: ['Sala delle stalattiti. Gocce acide scavano punte di pietra corrosa.', 'Dripstone hall. Acid drops eat away at corroded stone spikes.'],
+      lake: ['Lago di percolato. Liquido verde e fosforescente, scaricato da una fabbrica.', 'Leachate lake. Phosphorescent green fluid, dumped by a factory.'],
+      den: ['Tana dei mutanti. Ossa e stracci attorno a un giaciglio.', 'Mutant lair. Bones and rags around a bedding.'],
+      spiders: ['Nido di ragni mutati. Tele spesse e appiccicose come resina.', 'Mutant spider nest. Webs as thick and sticky as resin.'],
+      fungi: ['Funghi luminosi. Una foresta di funghi fluorescenti, nutrita dalle scorie.', 'Glowing fungi. A forest of fluorescent mushrooms, fed by the waste.'],
+      crystals: ['Cristalli di scorie. Concrezioni tossiche che brillano di magenta.', 'Slag crystals. Toxic growths glowing magenta.'],
+      bats: ['Colonia di pipistrelli. Senza pelo, con gli occhi lattiginosi.', 'Bat roost. Hairless, with milky eyes.'],
+      shrine: ['Fusti abbandonati. Un bancale di bidoni con il logo di una corporazione grattato via.', 'Dumped drums. A pallet of barrels, a corp logo scratched off.'],
+      camp: ['Campo di raccoglitori. Un fuoco, maschere antigas e sacchi di rottami.', 'Scavengers’ camp. A fire, gas masks and sacks of scrap.'],
+      chasm: ['Faglia. Vapori acri salgono da una fenditura senza fondo.', 'Fault. Acrid fumes rise from a bottomless crack.'],
+      echo: ['Sala dell’eco. Il contatore Geiger crepita e l’eco lo moltiplica.', 'Echo hall. The Geiger counter crackles, and the echo multiplies it.'],
+      hoard: ['Relitto. Un drone corriere precipitato, con la valigetta blindata ancora chiusa.', 'Wreck. A crashed courier drone, its armoured case still locked.'],
+    },
+    deadwood: {
+      mouth: ['Breccia. Un varco nella recinzione elettrificata, segnato da nastro di quarantena.', 'Breach. A gap in the electric fence, marked with quarantine tape.'],
+      stones: ['Cerchio di antenne. Sette ripetitori arrugginiti trasmettono ancora un segnale.', 'Antenna ring. Seven rusting relays still broadcast a signal.'],
+      spring: ['Pozza di condensa. Acqua distillata da un vecchio scambiatore di calore.', 'Condensate pool. Water distilled by an old heat exchanger.'],
+      oak: ['Albero ingegnerizzato. L’unico ancora vivo: corteccia metallica e foglie che ronzano.', 'Engineered tree. The only one still alive: metallic bark and humming leaves.'],
+      camp: ['Campo nomade. Moto elettriche, un fuoco e una tenda termica.', 'Nomad camp. Electric bikes, a fire and a thermal tent.'],
+      fairy: ['Anello di funghi luminosi. Chi ne respira le spore sente voci nel rumore bianco.', 'Glowing ring. Whoever breathes its spores hears voices in white noise.'],
+      hut: ['Bunker. Un container blindato, rifugio di un netrunner eremita.', 'Bunker. An armoured container, the hideout of a hermit netrunner.'],
+      graves: ['Cimitero di droni. Cumuli di rottami e carcasse di robot.', 'Drone graveyard. Heaps of scrap and robot husks.'],
+      thicket: ['Rovi sintetici. Spine di polimero; dentro qualcosa si muove.', 'Synthetic briars. Polymer thorns; something moves inside.'],
+      altar: ['Terminale abbandonato. Uno schermo incrinato chiede ancora una password.', 'Abandoned terminal. A cracked screen still asks for a password.'],
+      pond: ['Stagno chimico. Acqua iridescente e rane con tre occhi.', 'Chemical pond. Iridescent water and three-eyed frogs.'],
+    },
+  };
+  // The variants of each setting, by type of map.
+  const THEMES = {
+    modern: { cave: ['mine', 'show', 'drain'], glade: ['park'] },
+    cyber: { cave: ['undercity', 'den', 'grotto'], glade: ['deadwood'] },
   };
   const WEIGHTS = {
     cave: { dripstone: 3, lake: 1.5, den: 1.5, spiders: 1, fungi: 1.5, crystals: 1, bats: 1, shrine: 0.7, camp: 1, chasm: 0.8, echo: 1 },
@@ -85,6 +250,14 @@
   const DWELLERS = {
     cave: [['Vi dorme un orso delle caverne.', 'A cave bear sleeps here.'], ['Tre coboldi fanno la guardia.', 'Three kobolds stand guard.'], ['Una melma grigia striscia lungo le pareti.', 'A grey ooze creeps along the walls.'], ['Trogloditi in agguato dietro le rocce.', 'Troglodytes lurk behind the rocks.'], ['Uno sciame di pipistrelli giganti.', 'A swarm of giant bats.'], ['Un ragno gigante attende immobile.', 'A giant spider waits, motionless.']],
     glade: [['Un branco di lupi riposa all’ombra.', 'A wolf pack rests in the shade.'], ['Folletti dispettosi osservano dai rami.', 'Mischievous sprites watch from the branches.'], ['Banditi hanno teso qui un’imboscata.', 'Bandits have set an ambush here.'], ['Un cervo bianco appare e scompare.', 'A white stag appears and vanishes.'], ['Un druido raccoglie erbe in silenzio.', 'A druid gathers herbs in silence.'], ['Un orso cerca miele nei tronchi.', 'A bear looks for honey in the trunks.']],
+    mine: [['Un gruppo di speleologi ha perso l’orientamento.', 'A group of cavers has lost its bearings.'], ['Un custode con un fucile da caccia fa la ronda.', 'A caretaker with a shotgun makes his rounds.'], ['Grisù: il rilevatore di gas comincia a suonare.', 'Firedamp: the gas detector starts beeping.'], ['Un trafficante nasconde qui la merce.', 'A trafficker stashes his goods here.'], ['Un cane randagio ringhia dal buio.', 'A stray dog growls from the dark.'], ['Qualcuno ha lasciato accesa una fototrappola.', 'Someone has left a trail camera running.']],
+    show: [['Una scolaresca in gita, rumorosissima.', 'A very noisy school trip.'], ['Una guida racconta le leggende della grotta.', 'A guide tells the legends of the cave.'], ['Un turista si è staccato dal gruppo.', 'A tourist has wandered off from the group.'], ['Un addetto alla sicurezza con la torcia.', 'A security guard with a torch.'], ['Due speleologi preparano una discesa in corda.', 'Two cavers rig a rope descent.'], ['Blackout: si accendono le luci d’emergenza.', 'Power cut: the emergency lights come on.']],
+    drain: [['Un tecnico dell’acquedotto ispeziona le tubature.', 'A water-board technician inspects the pipes.'], ['Una banda di ragazzi gira un video per i social.', 'A bunch of kids shoot a video for social media.'], ['Uno spacciatore aspetta un cliente.', 'A dealer waits for a customer.'], ['Centinaia di ratti affamati.', 'Hundreds of hungry rats.'], ['Un senzatetto sa più di quanto dice.', 'A homeless man knows more than he lets on.'], ['Un drone d’ispezione ronza lungo il canale.', 'An inspection drone buzzes along the channel.']],
+    park: [['Una famiglia fa un picnic.', 'A family is having a picnic.'], ['Una guardia forestale controlla i permessi.', 'A ranger checks permits.'], ['Un branco di cinghiali in cerca di cibo.', 'A herd of wild boar looking for food.'], ['Un escursionista si è slogato una caviglia.', 'A hiker has sprained an ankle.'], ['Un cercatore di funghi, diffidente.', 'A wary mushroom forager.'], ['Un ragazzo pilota un drone sopra gli alberi.', 'A kid flies a drone over the trees.']],
+    undercity: [['Una gang di sbandati con lame impiantate.', 'A gang of drifters with implanted blades.'], ['Un drone di sicurezza corporativo, smarrito.', 'A lost corporate security drone.'], ['Un netrunner in trance, collegato ai cavi.', 'A netrunner in a trance, jacked into the cables.'], ['Ratti modificati con occhi ottici.', 'Modded rats with optic eyes.'], ['Un androide guasto ripete sempre la stessa frase.', 'A broken android repeats the same sentence over and over.'], ['Un medico clandestino offre impianti di seconda mano.', 'A back-alley doc offers second-hand implants.']],
+    den: [['Contrabbandieri contano la merce.', 'Smugglers tally the goods.'], ['Un ricettatore tratta con un cliente nervoso.', 'A fence haggles with a nervous buyer.'], ['Una guardia con un braccio cibernetico.', 'A guard with a cyberarm.'], ['Una torretta automatica ruota lentamente.', 'An automated turret slowly turns.'], ['Un informatore della polizia corporativa.', 'An informant for the corporate police.'], ['Un cane cibernetico dorme accanto alle casse.', 'A cyber-dog sleeps by the crates.']],
+    grotto: [['Un mutante cieco segue gli odori.', 'A blind mutant follows the smells.'], ['Una squadra di bonifica corporativa, in tuta stagna.', 'A corporate clean-up crew in sealed suits.'], ['Ratti grandi come cani.', 'Rats the size of dogs.'], ['Uno scavenger con un contatore Geiger.', 'A scavenger with a Geiger counter.'], ['Una melma chimica striscia lungo le pareti.', 'A chemical sludge creeps along the walls.'], ['Un drone di sorveglianza con la batteria quasi scarica.', 'A surveillance drone with an almost flat battery.']],
+    deadwood: [['Una banda di nomadi in moto.', 'A gang of nomads on bikes.'], ['Un drone da caccia corporativo pattuglia la zona.', 'A corporate hunter drone patrols the area.'], ['Cani selvatici con innesti cibernetici.', 'Feral dogs with cybernetic implants.'], ['Una botanica clandestina raccoglie campioni.', 'An underground botanist gathers samples.'], ['Un cervo albino, forse un ologramma.', 'An albino stag, maybe a hologram.'], ['Una squadra di mercenari tende un’imboscata.', 'A merc team sets an ambush.']],
   };
 
   const GW = 120, GH = 90, CELL = 5;
@@ -93,6 +266,10 @@
   function generate(seed, opts) {
     const rng = new Carto.Random(seed);
     const type = opts.type || 'cave';
+    const setting = Carto.Setting.current;
+    // Present day and cyberpunk: which kind of place this is (a mine, a
+    // storm drain, an undercity...), from a stream of its own.
+    const theme = setting === 'fantasy' ? type : rng.fork('theme').pick(THEMES[setting][type]);
     const noise = new Carto.Noise(rng.fork('noise'));
     const count = { small: [4, 5], medium: [6, 8], large: [9, 12] }[opts.size] || [6, 8];
     const n = rng.int(count[0], count[1]);
@@ -229,7 +406,7 @@
         c.kind = pr.weighted(avail.length ? avail : weights);
       }
       used[c.kind] = 1;
-      if (k > 0 && pr.bool(0.4)) c.dweller = pr.int(0, DWELLERS[type].length - 1);
+      if (k > 0 && pr.bool(0.4)) c.dweller = pr.int(0, DWELLERS[theme].length - 1);
     });
 
     // Features.
@@ -291,11 +468,47 @@
     }
 
     const name = Carto.Names.place(rng.fork('name'));
-    return {
+    const model = {
       seed, type, name, chambers: orderIdx.map((i) => chambers[i]), outline, mask, dist, passages,
       edge: { x: (edgeP.x + 0.5) * CELL, y: (edgeP.y + 0.5) * CELL, from: { x: (chambers[ent].x + 0.5) * CELL, y: (chambers[ent].y + 0.5) * CELL } },
       water, rocks, spikes, marks, webs, crystals, shrooms, fires, stones, bigTrees, huts, mounds, chasms,
     };
+    if (setting !== 'fantasy') model.theme = theme;
+    return model;
+  }
+
+  // Present day and cyberpunk: what runs along the passages (rails in a
+  // mine, a lit walkway with lamps in a show cave, the water channel of a
+  // drain, cables in the undercity).
+  function passageLines(svg, m, pal) {
+    const lines = new Svg.Batch(), lamps = new Svg.Batch();
+    for (const ps of m.passages) {
+      const pts = ps.map((p) => ({ x: (p.x + 0.5) * CELL, y: (p.y + 0.5) * CELL }));
+      lines.smooth(pts.filter((_, i) => i % 3 === 0 || i === pts.length - 1), false);
+      for (let i = 10; i < pts.length - 6; i += 22) lamps.circle(pts[i].x, pts[i].y, 1.8);
+    }
+    const ls = lines.toString(), round = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' };
+    if (m.theme === 'mine') {
+      // Sleepers, then two rails.
+      svg.path(ls, { stroke: pal.inkSoft, strokeWidth: 6, strokeDasharray: '1.4 3', fill: 'none' });
+      svg.path(ls, Object.assign({ stroke: pal.ink, strokeWidth: 3.6 }, round));
+      svg.path(ls, Object.assign({ stroke: pal.floor, strokeWidth: 2.2 }, round));
+    } else if (m.theme === 'show') {
+      svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 4, opacity: 0.35 }, round));
+      svg.path(ls, Object.assign({ stroke: pal.inkSoft, strokeWidth: 1, strokeDasharray: '4 3' }, round));
+      svg.path(lamps.toString(), { fill: pal.accent, stroke: pal.ink, strokeWidth: 0.5 });
+    } else if (m.theme === 'drain') {
+      svg.path(ls, Object.assign({ stroke: pal.water, strokeWidth: 5 }, round));
+      svg.path(ls, Object.assign({ stroke: pal.waterInk, strokeWidth: 1, strokeDasharray: '6 4', opacity: 0.8 }, round));
+    } else if (m.theme === 'undercity' || m.theme === 'den') {
+      svg.path(ls, Object.assign({ stroke: pal.accent, strokeWidth: 3, opacity: 0.2 }, round));
+      svg.path(ls, Object.assign({ stroke: pal.accent, strokeWidth: 0.8 }, round));
+      svg.path(lamps.toString(), { fill: pal.ink, opacity: 0.9 });
+    } else if (m.theme === 'grotto') {
+      // A trickle of toxic seepage.
+      svg.path(ls, Object.assign({ stroke: pal.greenInk, strokeWidth: 4, opacity: 0.25 }, round));
+      svg.path(ls, Object.assign({ stroke: pal.greenInk, strokeWidth: 1, strokeDasharray: '2 5' }, round));
+    }
   }
 
   function render(m, o) {
@@ -344,6 +557,7 @@
       for (let y = 0; y <= H; y += 15) grid.line({ x: 0, y }, { x: W, y });
       svg.path(grid.toString(), { stroke: pal.grid, strokeWidth: 0.5, fill: 'none' });
     }
+    if (m.theme && !glade) passageLines(svg, m, pal);
     if (glade) {
       // Grass tufts and the trodden paths.
       const tufts = new Svg.Batch();
@@ -398,6 +612,14 @@
       thin.line(G.mid(r[0], r[3]), G.mid(r[1], r[2]));
     }
     for (const mo of m.mounds) light.smooth(G.rect(mo.x, mo.y, 14, 7, mo.a), true);
+    // Cyberpunk: crystals, fungi and fires glow.
+    if (Carto.Setting.current === 'cyber') {
+      const glow = new Svg.Batch();
+      for (const c of m.crystals) glow.circle(c.x, c.y, c.r * 1.8);
+      for (const s of m.shrooms) glow.circle(s.x, s.y, s.r * 2);
+      for (const f of m.fires) glow.circle(f.x, f.y, 7);
+      svg.path(glow.toString(), { fill: pal.accent, opacity: 0.18 });
+    }
     svg.path(light.toString(), { fill: pal.rock, stroke: pal.ink, strokeWidth: 0.8, strokeLinejoin: 'round' });
     svg.path(green.toString(), { fill: pal.tree, stroke: pal.greenInk, strokeWidth: 0.6 });
     svg.path(accent.toString(), { fill: pal.accent, stroke: pal.ink, strokeWidth: 0.6, opacity: 0.85 });
@@ -434,9 +656,11 @@
       }
     }
     if (!o.preview) {
-      const title = t('cave.title.' + m.type, { n: m.name });
-      Draw.title(svg, W / 2, 30, title, 22, pal);
+      const title = titleOf(m);
+      // Present day and cyberpunk: a line under the title says what the place is.
+      Draw.title(svg, W / 2, 30, title, 22, pal, m.theme ? t('cave.sub.' + m.theme) : undefined);
       taken.push(Draw.textBox(W / 2, 30, title, 22, { title: true }));
+      if (m.theme) taken.push(Draw.textBox(W / 2, 30 + 22 * 0.85, t('cave.sub.' + m.theme), 22 * 0.42, {}));
       const e = m.edge;
       const ex = Math.max(14, Math.min(W - 14, e.x)), ey = Math.max(16, Math.min(H - 14, e.y));
       const inward = G.norm(G.sub(e.from, { x: ex, y: ey }));
@@ -446,20 +670,25 @@
         offsets: [[0, 0], [0, -1.4], [0, 1.4], [1, 0], [-1, 0], [0, -2.6], [0, 2.6]], gap: 12,
       }], Object.assign({}, pal, { paper: glade ? pal.green : pal.paper }), taken, { x0: 8, y0: 8, x1: W - 8, y1: H - 8 });
       Draw.frame(svg, W, H, pal, 5);
-      Draw.scaleBar(svg, 20, H - 26, 75, 50, I18n.lang === 'it' ? 'piedi' : 'ft', pal, 5);
+      // Fifty feet, or fifteen metres outside fantasy.
+      if (m.theme) Draw.scaleBar(svg, 20, H - 26, 75, 15, 'm', pal, 5);
+      else Draw.scaleBar(svg, 20, H - 26, 75, 50, I18n.lang === 'it' ? 'piedi' : 'ft', pal, 5);
     }
     return svg.toString();
   }
 
+  const titleOf = (m) => t('cave.title.' + (m.theme || m.type), { n: m.name });
+
   function notes(m) {
     const esc = Svg.esc;
     const l = I18n.lang === 'it' ? 0 : 1;
-    let h = '<h3>' + esc(t('cave.title.' + m.type, { n: m.name })) + '</h3><ol>';
+    const theme = m.theme || m.type;
+    let h = '<h3>' + esc(titleOf(m)) + '</h3>' + (m.theme ? '<p class="tag">' + esc(t('cave.sub.' + m.theme)) + '</p>' : '') + '<ol>';
     for (const c of m.chambers) {
-      const txt = PLACES[m.type][c.kind][l];
+      const txt = PLACES[theme][c.kind][l];
       const dot = txt.indexOf('. ');
       h += '<li value="' + c.num + '"><strong>' + esc(txt.slice(0, dot)) + '.</strong> ' + esc(txt.slice(dot + 2)) +
-        (c.dweller !== undefined ? ' ' + esc(DWELLERS[m.type][c.dweller][l]) : '') + '</li>';
+        (c.dweller !== undefined ? ' ' + esc(DWELLERS[theme][c.dweller][l]) : '') + '</li>';
     }
     return h + '</ol>';
   }
@@ -477,7 +706,7 @@
     generate,
     render,
     notes,
-    fileName: (m) => t('cave.title.' + m.type, { n: m.name }),
+    fileName: titleOf,
   });
 
   Carto.Cave = { generate, render };
