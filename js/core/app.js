@@ -258,6 +258,8 @@
     let group = null;
     for (const opt of g.options) {
       if (opt.hidden) continue;
+      // Options that only make sense in some settings (opt.settings: ['modern', 'cyber']).
+      if (opt.settings && !opt.settings.includes(curSetting())) continue;
       if (opt.group && opt.group !== group) {
         group = opt.group;
         const hd = document.createElement('h3');
