@@ -302,6 +302,7 @@
 
   function regenerate(keepView) {
     const g = state.gen;
+    if (!keepView) state.pick = null;
     try {
       state.model = g.generate(state.seed, state.opts);
     } catch (err) {
@@ -452,11 +453,19 @@
         location.hash = link.getAttribute('data-link');
         return;
       }
-      if (state.gen && state.gen.inspect && state.model && state.svgEl) {
+      if (state.gen && state.model && state.svgEl && (state.pick || state.gen.inspect)) {
         const pt = state.svgEl.createSVGPoint();
         pt.x = e.clientX;
         pt.y = e.clientY;
         const p = pt.matrixTransform(state.svgEl.getScreenCTM().inverse());
+        if (state.pick) {
+          const pick = state.pick;
+          state.pick = null;
+          els.viewport.classList.remove('picking');
+          runAction(Object.assign({}, pick, { x: Math.round(p.x * 10) / 10, y: Math.round(p.y * 10) / 10 }));
+          return;
+        }
+        state.lastInspect = { x: p.x, y: p.y };
         showInspector(state.gen.inspect(state.model, p.x, p.y, state.opts));
       }
     }, true);
@@ -511,6 +520,69 @@
     if (!els || !els.inspector) return;
     els.inspector.hidden = true;
     if (state.svgEl) state.svgEl.querySelectorAll('.pick').forEach((n) => n.remove());
+  }
+
+  // ---------------------------------------------------------------- editing
+  /* Generators with an act(model, action, ctx) hook can offer forms in the
+     inspector and in the key. Elements carry data-act; the result says what
+     to refresh. */
+  function runAction(payload, source) {
+    if (!state.gen || !state.gen.act || !state.model) return;
+    let res;
+    try {
+      res = state.gen.act(state.model, payload, { seed: state.seed, opts: state.opts });
+    } catch (err) {
+      console.error(err);
+      toast(Carto.Svg.esc(t('ui.error')));
+      return;
+    }
+    if (!res) return;
+    if (res.confirm && source) {
+      source.dataset.confirmed = '1';
+      source.textContent = res.confirm.label;
+      return;
+    }
+    if (res.download) saveBlob(res.download.name, res.download.blob);
+    if (res.hash && location.hash !== res.hash) { location.hash = res.hash; if (res.toast) toast(Carto.Svg.esc(res.toast)); return; }
+    const reopen = res.keepInspector && !els.inspector.hidden && state.lastInspect;
+    if (res.regenerate) regenerate(true);
+    else if (res.render) renderMap(true);
+    if (reopen) showInspector(state.gen.inspect(state.model, state.lastInspect.x, state.lastInspect.y, state.opts));
+    if (res.pick) {
+      state.pick = res.pick;
+      els.viewport.classList.add('picking');
+      toast(Carto.Svg.esc(res.toast || ''), 0);
+      return;
+    }
+    if (res.toast) toast(Carto.Svg.esc(res.toast));
+  }
+
+  function wireActions(root) {
+    root.addEventListener('submit', (e) => {
+      const form = e.target.closest('form[data-act]');
+      if (!form) return;
+      e.preventDefault();
+      const data = Object.assign({}, form.dataset);
+      new FormData(form).forEach((v, k) => { data[k] = v; });
+      runAction(data, form);
+    });
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn || btn.type === 'submit') return;
+      runAction(Object.assign({}, btn.dataset), btn);
+    });
+    root.addEventListener('change', (e) => {
+      const el = e.target;
+      if (!el.matches('[data-act]') || el.closest('form[data-act]') && el.form && el.form.dataset.act) return;
+      if (el.type === 'file') {
+        const file = el.files && el.files[0];
+        if (!file) return;
+        file.text().then((text) => runAction(Object.assign({}, el.dataset, { text })));
+        el.value = '';
+        return;
+      }
+      runAction(Object.assign({}, el.dataset, { value: el.value }), el);
+    });
   }
 
   // ----------------------------------------------------------------- export
@@ -655,6 +727,8 @@
       inspector: $('inspector'), inspectorBody: $('inspector-body'),
     };
     $('inspector-close').addEventListener('click', hideInspector);
+    wireActions(els.inspectorBody);
+    wireActions(els.notes);
     els.inspectorBody.addEventListener('click', (e) => { if (e.target.closest('a')) hideInspector(); });
     applyLang();
     buildTabs();
@@ -689,9 +763,21 @@
     });
 
     document.addEventListener('keydown', (e) => {
-      if (els.gen.hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (els.gen.hidden) return;
       const tag = (e.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.key === 'Escape' && state.pick) {
+        state.pick = null;
+        els.viewport.classList.remove('picking');
+        els.toast.hidden = true;
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && state.gen && state.gen.act) {
+        e.preventDefault();
+        runAction({ act: 'undo' });
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.key === 'n' || e.key === 'N') setSeed(Carto.randomSeed());
       else if (e.key === '+' || e.key === '=') els.zoomIn.click();
       else if (e.key === '-') els.zoomOut.click();

@@ -14,6 +14,21 @@ Tutto gira nel browser: niente server, niente installazione, niente build.
 | **Dungeon** | Sotterranei "su una pagina": stanze, corridoi, porte (anche segrete e chiuse a chiave), tratteggio della roccia e legenda delle stanze con mostri, tesori e trappole. |
 | **Dimora** | Piante di edifici su più piani (casolari, case di città, locande, botteghe, ville) con porte, finestre, scale e arredi. |
 
+## Modificare il Mondo
+
+Clicca un punto della mappa del Mondo: nell'ispettore trovi, oltre alle informazioni, i moduli per modificare.
+
+- **Rinominare** stati, città, province, culture, religioni, fiumi, mari, laghi, luoghi notevoli e il mondo stesso.
+- **Ricolorare** stati, province, culture e religioni; cambiare la **forma di governo** (Regno, Impero, Repubblica…).
+- **Spostare i confini**: "Assegna questa zona a" passa un'area (con il raggio scelto) a un altro stato o alle terre libere.
+- **Città**: aggiungerne una nel punto cliccato, spostarla, eliminarla, cambiarne gli abitanti o renderla un porto.
+- **Luoghi notevoli**: aggiungerli, spostarli, eliminarli e riscriverne la descrizione.
+- **Note dell'autore** su città, stati e luoghi: storia, personaggi, segreti.
+
+Le modifiche si salvano da sole nel browser, legate a quella mappa (seme e opzioni). `Ctrl+Z` annulla l'ultima.
+Nella legenda trovi **Esporta progetto** (un file JSON con seme, opzioni e modifiche) e **Importa progetto**:
+usali per conservare il lavoro, spostarlo su un altro computer o condividerlo.
+
 ## Come si usa
 
 - **Nuova mappa** (o il tasto `N`) genera un luogo nuovo.

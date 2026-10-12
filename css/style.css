@@ -416,6 +416,34 @@ p { margin: 0; }
 .notes .legend li { display: flex; gap: 8px; align-items: flex-start; }
 .swatch-dot { flex: none; width: 14px; height: 14px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--line); }
 
+/* ---------------------------------------------------------------- editing */
+.edit-area { display: flex; flex-direction: column; gap: 6px; }
+details.edit { border-top: 1px solid var(--line); padding-top: 6px; }
+details.edit > summary { cursor: pointer; font-weight: 500; font-size: var(--step--1); color: var(--accent); }
+details.edit[open] > summary { margin-bottom: 8px; }
+details.edit > * + * { margin-top: 8px; }
+.edit-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.edit-col { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.edit-field { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; font-size: var(--step--1); color: var(--muted); }
+.edit-col .edit-field { width: 100%; }
+.edit-field input:not([type="color"]), .edit-field select, .edit-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--fg);
+  font: var(--step--1) var(--font-body);
+}
+.edit-field textarea { resize: vertical; }
+.edit-field input[type="color"] { width: 44px; height: 32px; padding: 2px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+.edit-check { display: flex; align-items: center; gap: 6px; font-size: var(--step--1); min-height: 36px; }
+.btn.danger { color: #b3412f; border-color: #d9a39a; }
+.edit-tools { display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px; }
+.file-btn { position: relative; }
+.viewport.picking { cursor: crosshair; }
+
 /* --------------------------------------------------------------- toast */
 .toast {
   position: fixed;

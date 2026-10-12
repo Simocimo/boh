@@ -991,5 +991,5 @@
     return '#' + ch.map((c) => c.toString(16).padStart(2, '0')).join('');
   }
 
-  Carto.World = { generate, BIOMES, TEMPLATES, buildGrid, shade, W, H, SEA };
+  Carto.World = { generate, BIOMES, TEMPLATES, buildGrid, shade, poles, W, H, SEA, KM };
 })(window.Carto = window.Carto || {});

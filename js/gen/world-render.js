@@ -239,8 +239,9 @@
   // ------------------------------------------------------------------ names
 
   const stateName = (s) => t('form.' + s.form, { n: s.name });
-  const provName = (m, p) => t('prov.' + p.form, { n: m.burgs[p.burg].name });
-  const relName = (m, r) => (r.kind === 'folk' ? t('world.folk', { n: m.cultures[r.culture].name }) : t((r.kind === 'cult' ? 'cult.' : 'rel.') + r.form, { n: r.deity }));
+  const provName = (m, p) => p.customName || t('prov.' + p.form, { n: m.burgs[p.burg] ? m.burgs[p.burg].name : p.seatName || '?' });
+  const relName = (m, r) => r.customName || (r.kind === 'folk' ? t('world.folk', { n: m.cultures[r.culture].name }) : t((r.kind === 'cult' ? 'cult.' : 'rel.') + r.form, { n: r.deity }));
+  const markerNote = (mk) => mk.note || t('note.' + mk.type + '.' + mk.v, { n: mk.name });
   const fmt = (v) => Math.round(v).toLocaleString(I18n.lang);
   const popText = (v) => (v >= 1e6 ? (v / 1e6).toLocaleString(I18n.lang, { maximumFractionDigits: 1 }) + (L() === 0 ? ' mln' : ' M') : fmt(v));
 
@@ -642,9 +643,9 @@
       svg.path(caps.toString(), { fill: pal.paper, stroke: pal.ink, strokeWidth: 1.1 });
       svg.path(dots.toString(), { fill: pal.ink });
       if (showLabels && !o.preview) {
-        const labels = m.burgs.filter((b) => b).sort((a, b) => b.capital - a.capital || b.population - a.population).map((b) => ({
+        const labels = m.burgs.filter((b) => b).sort((a, b) => b.capital - a.capital || !!b.added - !!a.added || b.population - a.population).map((b) => ({
           x: b.x, y: b.y, text: b.name, size: b.capital ? 11.5 : b.population > 10 ? 9 : 7.5, title: b.capital,
-          offsets: [[1, 0], [-1, 0], [0, -1.15], [0, 1.15]], gap: b.capital ? 6 : 4,
+          offsets: [[1, 0], [-1, 0], [0, -1.5], [0, 1.5]], gap: b.capital ? 7.5 : 5.5,
         }));
         Draw.placeLabels(svg, labels, pal, taken, { x0: 8, y0: 8, x1: W - 8, y1: H - 8 });
       }
@@ -706,7 +707,7 @@
     h += '</ol></details><details><summary>' + esc(t('world.markers')) + '</summary><ul>';
     for (const mk of m.markers) {
       const link = markerLink(mk);
-      const text = t('note.' + mk.type + '.' + mk.v, { n: mk.name });
+      const text = markerNote(mk);
       h += '<li>' + (link ? '<a href="' + esc(link) + '">' + esc(text) + '</a>' : esc(text)) + '</li>';
     }
     return h + '</ul></details>';
@@ -719,7 +720,7 @@
     if (mk) {
       const link = markerLink(mk);
       return {
-        html: '<h3>' + esc(t('marker.' + mk.type)) + '</h3><p>' + esc(t('note.' + mk.type + '.' + mk.v, { n: mk.name })) + '</p>' + (link ? '<p><a class="btn primary" href="' + esc(link) + '">' + esc(t(mk.type === 'dungeon' ? 'world.openDungeon' : 'world.openCave')) + '</a></p>' : ''),
+        html: '<h3>' + esc(t('marker.' + mk.type)) + '</h3><p>' + esc(markerNote(mk)) + '</p>' + (link ? '<p><a class="btn primary" href="' + esc(link) + '">' + esc(t(mk.type === 'dungeon' ? 'world.openDungeon' : 'world.openCave')) + '</a></p>' : ''),
         mark: { x: mk.x, y: mk.y - 12, r: 9 },
       };
     }
@@ -766,6 +767,8 @@
     rows += '<dt>' + esc(t('world.coords')) + '</dt><dd>' + coords + '</dd>';
     return { html: '<h3>' + esc(title) + '</h3><dl>' + rows + '</dl>', poly: cellPoly(grid, c) };
   }
+
+  Carto.WorldText = { stateName, provName, relName, markerNote, burgLink, markerLink, regionLoops };
 
   Carto.register({
     id: 'world',
