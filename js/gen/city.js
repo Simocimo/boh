@@ -144,6 +144,33 @@
       'city.skyway': 'Sopraelevata',
       'ward.station@cyber': 'Stazione maglev',
       'ward.stadium@cyber': 'Arena',
+      // City plans (present day and cyberpunk only).
+      'city.opt.plan': 'Pianta',
+      'city.opt.plan.auto': 'Casuale',
+      'city.opt.plan.grid': 'A scacchiera',
+      'city.opt.plan.radial': 'Radiocentrica',
+      'city.opt.plan.linear': 'Lineare',
+      'city.opt.plan.organic': 'Stratificata',
+      'city.opt.plan.bay': 'Ad anfiteatro',
+      'city.opt.plan.grid@cyber': 'Megagriglia',
+      'city.opt.plan.radial@cyber': 'Guglia centrale',
+      'city.opt.plan.linear@cyber': 'Megastruttura',
+      'city.opt.plan.organic@cyber': 'Enclave murata',
+      'city.opt.plan.bay@cyber': 'Città allagata',
+      'ward.campus': 'Città universitaria',
+      'ward.campus@cyber': 'Campus di ricerca',
+      'ward.resort': 'Zona alberghiera',
+      'ward.airport': 'Aeroporto',
+      'ward.airport@cyber': 'Spazioporto',
+      'ward.float': 'Palafitte',
+      'ward.float@cyber': 'Baraccopoli galleggiante',
+      'ward.citadel': 'Cittadella',
+      'ward.citadel@cyber': 'Cittadella corporativa',
+      'city.spine': 'Megastruttura {n}',
+      'city.lake': 'Lago',
+      'city.promenade': 'Lungomare',
+      'city.lakefront': 'Lungolago',
+      'city.canals': 'Canali',
     },
     en: {
       'gen.city.name': 'City',
@@ -282,6 +309,33 @@
       'city.skyway': 'Skyway',
       'ward.station@cyber': 'Maglev station',
       'ward.stadium@cyber': 'Arena',
+      // City plans (present day and cyberpunk only).
+      'city.opt.plan': 'Plan',
+      'city.opt.plan.auto': 'Random',
+      'city.opt.plan.grid': 'Grid',
+      'city.opt.plan.radial': 'Radial',
+      'city.opt.plan.linear': 'Linear',
+      'city.opt.plan.organic': 'Patchwork',
+      'city.opt.plan.bay': 'Amphitheatre',
+      'city.opt.plan.grid@cyber': 'Megagrid',
+      'city.opt.plan.radial@cyber': 'Central spire',
+      'city.opt.plan.linear@cyber': 'Megastructure',
+      'city.opt.plan.organic@cyber': 'Walled enclave',
+      'city.opt.plan.bay@cyber': 'Flooded city',
+      'ward.campus': 'University campus',
+      'ward.campus@cyber': 'Research campus',
+      'ward.resort': 'Hotel district',
+      'ward.airport': 'Airport',
+      'ward.airport@cyber': 'Spaceport',
+      'ward.float': 'Stilt houses',
+      'ward.float@cyber': 'Floating slum',
+      'ward.citadel': 'Citadel',
+      'ward.citadel@cyber': 'Corporate citadel',
+      'city.spine': '{n} Megastructure',
+      'city.lake': 'Lake',
+      'city.promenade': 'Seafront promenade',
+      'city.lakefront': 'Lakefront',
+      'city.canals': 'Canals',
     },
   });
 
@@ -1390,7 +1444,8 @@
     if (x && (x.mayor || x.corp)) {
       h = h.replace(/<\/dl>$/, '<dt>' + esc(t(x.mayor ? 'city.mayor' : 'city.corp')) + '</dt><dd>' + esc(x.mayor || x.corp) + '</dd></dl>');
     }
-    const order = ['market', 'temple', 'castle', 'administration', 'oldtown', 'merchant', 'patriciate', 'craftsmen', 'harbour', 'fair', 'military', 'park', 'slum', 'shanty', 'industrial', 'stadium', 'station'];
+    if (m.plan) h = h.replace(/<\/dl>$/, '<dt>' + esc(t('city.opt.plan')) + '</dt><dd>' + esc(t('city.opt.plan.' + m.plan)) + '</dd></dl>');
+    const order = ['market', 'temple', 'castle', 'administration', 'oldtown', 'merchant', 'patriciate', 'craftsmen', 'harbour', 'resort', 'fair', 'campus', 'military', 'park', 'slum', 'shanty', 'float', 'industrial', 'stadium', 'station', 'airport'];
     const items = order.filter((k) => m.census[k]).map((k) => '<li>' + esc(t('ward.' + k)) + (m.census[k] > 1 ? ' <span class="tag">×' + m.census[k] + '</span>' : '') + '</li>');
     if (items.length) h += '<p class="tag">' + esc(t('city.districts')) + '</p><ul>' + items.join('') + '</ul>';
     const outer = x && x.outer ? ['shanty', 'industrial', 'farm', 'wood'].filter((k) => x.outer[k]) : [];
@@ -1401,6 +1456,8 @@
       if (m.ring && m.ring.length) keys.push('▬ ' + t('city.ring'));
       if (m.sky && m.sky.length) keys.push('▬ ' + t('city.skyway'));
       if (m.rail) keys.push('┅ ' + t('city.rail'));
+      if (m.canals && m.canals.length) keys.push('≈ ' + t('city.canals'));
+      if (m.wall) keys.push('▬ ' + t('city.opt.walls'));
       if (keys.length) h += '<p class="tag">' + esc(keys.join(' · ')) + '</p>';
     }
     return h;
@@ -1799,7 +1856,7 @@
             }
             put('lawns', G.insetConvex(B, 4));
           }
-        } else if (w.d > 0.55 && r.bool(0.5)) {
+        } else if (w.d > X.leafy && r.bool(0.5)) {
           houses(r.float(30, 38), r.float(28, 34), 20, 13, 0, 0.2);
         } else {
           const d = perimeter(r.float(12, 16), 13, 28, r.bool(0.35) ? 3 : 0, r.bool(0.3) ? 1.1 : 0);
@@ -1944,6 +2001,47 @@
         for (const t2 of trees(r, inner, X.tree, X.tr[0], X.tr[1])) if (!near(t2)) put('trees', t2);
         break;
       }
+      case 'campus': {
+        // Faculties round a quad, a library in the middle, paths across, trees.
+        put('lawns', G.insetConvex(B, 3));
+        const inner = G.insetConvex(B, 9);
+        if (inner.length < 3) break;
+        const depth = cy ? 34 : 20;
+        for (const lot of frontLots(r, inner, depth, cy ? 50 : 32, cy ? 95 : 64)) {
+          if (!r.bool(0.7)) continue;
+          const b = G.insetConvex(lot.poly, r.float(3, 6));
+          if (b.length >= 3 && G.area(b) > 150 && G.compactness(b) > 0.25) w.buildings.push(b);
+        }
+        const quad = G.insetConvex(inner, depth + 10);
+        if (quad.length >= 3) {
+          const qf = flong(gframe(quad, X.U));
+          for (const s of G.stripes(quad, qf.u, qf.h / 2, 0.5).concat(G.stripes(quad, qf.v, qf.w / 2, 0.5))) put('paths', s);
+          for (const b of scatter(r, G.insetConvex(quad, 8), qf, 1, cy ? 34 : 24, cy ? 52 : 36, 0, 0.35)) w.special.push(b);
+          const near = (p) => w.special.some((b) => G.contains(G.scalePoly(b, 1.4), p)) || (w.paths || []).some((pa) => G.distToPolyline(p, pa) < 4);
+          for (const t2 of trees(r, quad, X.tree * 1.3, X.tr[0], X.tr[1])) if (!near(t2)) put('trees', t2);
+        }
+        break;
+      }
+      case 'resort': {
+        // Hotels with their pools and gardens by the sea.
+        put('lawns', G.insetConvex(B, 2));
+        const hotels = scatter(r, G.insetConvex(B, 6), fl, r.int(2, 4), 18, 32, 16);
+        for (const h of hotels) {
+          add(h);
+          const hf = gframe(h, X.U), pc = G.add(hf.c, G.scale(fl.v, (hf.h / 2 + 8) * r.sign()));
+          const pool = G.rect(pc.x, pc.y, 14, 7, Math.atan2(fl.u.y, fl.u.x));
+          if (inside(G.insetConvex(B, 3), pool) && !hotels.some((o) => G.convexOverlap(o, pool, 2))) put('pools', pool);
+        }
+        const busy = (p) => hotels.some((b) => G.contains(G.scalePoly(b, 1.3), p)) || (w.pools || []).some((b) => G.contains(G.scalePoly(b, 1.6), p));
+        for (const t2 of trees(r, G.insetConvex(B, 4), X.tree * 1.4, X.tr[0], X.tr[1])) if (!busy(t2)) put('trees', t2);
+        break;
+      }
+      case 'flood': {
+        // Cyberpunk: drowned fields, with the stumps of what stood there.
+        w.flood = true;
+        if (r.bool(0.5)) for (const t2 of scatter(r, G.insetConvex(B, 10), f, r.int(1, 3), 16, 40, 10)) put('ruins', t2);
+        break;
+      }
       case 'forecourt': {
         w.square = true;
         for (const t2 of trees(r, G.insetConvex(B, 4), X.tree * 1.5, X.tr[0] * 0.8, X.tr[1] * 0.8)) if (G.distToPolyline(t2, B, true) < 9) put('trees', t2);
@@ -2076,10 +2174,91 @@
     }
   }
 
+  // ------------------------------------------------------------- city plans
+
+  /* A present-day or cyberpunk town is laid out on one of five plans (piante),
+     drawn from the seed unless the user picks one:
+       grid     one street grid, sometimes with chamfered corners (a megagrid in cyberpunk);
+       radial   ring boulevards on the old walls and radial avenues to the gates
+                (cyberpunk: a colossal spire with radial skyways, poorer rings outwards);
+       linear   stretched along a valley or a coast, a main street down its length
+                (cyberpunk: one megastructure across the map, the sprawl hugging it);
+       organic  grids of different eras meeting at seams, curvy suburbs with cul-de-sacs
+                (cyberpunk: a walled corporate citadel ringed by an irregular slum);
+       bay      rings fanning round a bay or a lake (cyberpunk: a flooded city of canals).
+     The land between the main avenues is cut into convex regions, each with its own
+     street grid: the blocks are the grid cells clipped to their region. */
+  const PLANS = ['grid', 'radial', 'linear', 'organic', 'bay'];
+  function pickPlan(opts, cyber, r) {
+    const water = opts.water || 'river', sea = water === 'coast' || water === 'both';
+    const w = cyber
+      ? { grid: 3, radial: 3, linear: 2.2, organic: 3, bay: sea ? 2.6 : 1.2 }
+      : { grid: 2.6, radial: 3, linear: water === 'none' ? 1.4 : 2.4, organic: 3, bay: sea ? 3 : 1 };
+    const auto = r.weighted(PLANS.map((p) => [p, w[p]]));
+    return PLANS.includes(opts.plan) ? opts.plan : auto;
+  }
+
+  // Voronoi cells of seeds inside a convex box: convex regions that tile it.
+  function voronoiCells(seeds, box) {
+    return seeds.map((s, i) => {
+      let poly = box;
+      for (let j = 0; j < seeds.length && poly.length >= 3; j++) {
+        if (j === i) continue;
+        const m = G.mid(s, seeds[j]);
+        poly = G.clipHalfPlane(poly, m, G.add(m, G.perp(G.sub(seeds[j], s))));
+      }
+      return poly;
+    });
+  }
+
+  // A polyline used as an axis: point and frame at arc length s (0 at the projection
+  // of `zero`), extended straight beyond its ends, and the projection of a point on it.
+  function polyAxis(pts, zero) {
+    const cum = [0];
+    for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + G.dist(pts[i - 1], pts[i]));
+    const tan = pts.slice(0, -1).map((p, i) => G.norm(G.sub(pts[i + 1], p)));
+    const near = (p) => {
+      let best = null;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const a = pts[i], e = tan[i];
+        let u = G.dot(G.sub(p, a), e);
+        if (i > 0) u = Math.max(0, u);
+        if (i + 2 < pts.length) u = Math.min(cum[i + 1] - cum[i], u);
+        const d2 = G.dist2(p, G.add(a, G.scale(e, u)));
+        if (!best || d2 < best.d2) best = { d2, s: cum[i] + u, d: G.cross(e, G.sub(p, a)) };
+      }
+      return best;
+    };
+    const s0 = near(zero).s;
+    return {
+      pts,
+      at(s) {
+        s += s0;
+        let i = 0;
+        while (i + 2 < pts.length && cum[i + 1] < s) i++;
+        return { p: G.add(pts[i], G.scale(tan[i], s - cum[i])), t: tan[i], n: G.perp(tan[i]) };
+      },
+      proj(p) {
+        const b = near(p);
+        return { s: b.s - s0, d: b.d };
+      },
+    };
+  }
+
+  // The part of segment a-b inside a convex polygon, or null.
+  function clipSeg(a, b, poly) {
+    const L = G.dist(a, b);
+    if (L < 1e-6) return null;
+    const d = G.scale(G.sub(b, a), 1 / L), ch = G.lineConvex(poly, a, d);
+    if (!ch) return null;
+    const t0 = Math.max(0, G.dot(G.sub(ch[0], a), d)), t1 = Math.min(L, G.dot(G.sub(ch[1], a), d));
+    return t1 - t0 > 0.5 ? [G.add(a, G.scale(d, t0)), G.add(a, G.scale(d, t1))] : null;
+  }
+
   function generateGrid(seed, opts) {
     const setting = Carto.Setting.current, cyber = setting === 'cyber';
     const size = LAYOUT.modern[opts.size] ? opts.size : 'medium';
-    const P = LAYOUT[cyber ? 'cyber' : 'modern'][size], Q = STREETS[cyber ? 'cyber' : 'modern'];
+    const P = LAYOUT[cyber ? 'cyber' : 'modern'][size], Q0 = STREETS[cyber ? 'cyber' : 'modern'];
     const big = size === 'large' || size === 'huge';
     const root = new Carto.Random(seed);
     const fork = (l) => root.fork('grid:' + l);
@@ -2087,112 +2266,158 @@
     const M = P.M, Ru = P.Ru;
     const water = opts.water || 'river';
     const hasRiver = water === 'river' || water === 'both', hasCoast = water === 'coast' || water === 'both';
-    const Rcore = cyber ? 0 : Math.sqrt((P.core * 2000) / Math.PI);
+    const plan = pickPlan(opts, cyber, fork('plan'));
     const O = { x: 0, y: 0 };
+    const each = (pts, closed, fn) => { for (let i = 0; i + 1 < pts.length + (closed ? 1 : 0); i++) fn(pts[i], pts[(i + 1) % pts.length]); };
 
-    // The built-up area is a noisy disc: d < 1 is town.
-    const fr = (a) => Ru * (1 + 0.2 * noise.fbm(Math.cos(a) * 1.4 + 5.5, Math.sin(a) * 1.4 + 2.5, 3));
-    const dOf = (p) => G.len(p) / fr(G.angle(p)) + 0.07 * noise.get(p.x * 0.0035 + 9.1, p.y * 0.0035 - 4.7);
+    // 0. What sets this town apart from the next: block sizes, parks, how leafy it is,
+    //    its vocation, an airport, where it sits on the sheet.
+    const vr = fork('vary');
+    const bs = vr.float(0.86, 1.2);
+    const Q = Object.assign({}, Q0, { bu: Q0.bu.map((x) => x * bs), bv: Q0.bv.map((x) => x * bs), canal: 26 });
+    const parkK = vr.float(0.5, 1.8), leafy = vr.float(0.35, 0.8);
+    const flavour = vr.weighted(cyber
+      ? [['plain', 3], ['corporate', 2], ['industrial', 2], ['decay', 2], ['campus', 1.2]]
+      : [['plain', 3], ['industrial', 2], ['tourist', hasCoast || plan === 'bay' ? 4 : 0], ['campus', 2]]);
+    const airport = big && vr.bool(size === 'huge' ? 0.6 : 0.4);
+    const Rcore = cyber ? 0 : Math.sqrt((P.core * vr.float(0.7, 1.3) * 2000) / Math.PI);
+    const hubR = cyber && plan === 'radial' ? { small: 125, medium: 175, large: 235, huge: 300 }[size] * vr.float(0.9, 1.15) : 0;
+    const citR = cyber && plan === 'organic' ? Ru * vr.float(0.27, 0.34) : 0;
+    const spineW = cyber && plan === 'linear' ? { small: 70, medium: 90, large: 110, huge: 130 }[size] * vr.float(0.9, 1.2) : 0;
+    let view = G.fromAngle(vr.float(0, Math.PI * 2), M * vr.float(0, 0.12));
+    const fAng = vr.float(0, Math.PI), asp = vr.float(1, 1.3);
 
-    // 1. Coast: the sea lies beyond a wavy line, nearly straight along the town's quays.
-    let coast = null, sH = 0;
-    if (hasCoast) {
-      const cr = fork('coast');
-      const n = G.fromAngle(cr.float(0, Math.PI * 2)), tg = G.perp(n);
-      const reach = Math.max(Rcore * 1.9 + 60, Ru * cr.float(0.38, 0.6));
-      const amp = (s) => Ru * ((cyber ? 0.012 : 0.03) + 0.3 * clamp01((Math.abs(s) - Ru * 0.75) / Ru));
-      const off = (s) => noise.fbm(s * 0.0022 + 17.3, 4.1, 3) * amp(s);
-      const pts = [];
-      for (let s = -M * 1.9; s <= M * 1.9; s += 20) pts.push(G.add(G.scale(tg, s), G.scale(n, reach + off(s))));
-      coast = { n, t: tg, reach, off, pts };
-      sH = cr.sign() * Ru * cr.float(0.12, 0.4);
+    // 1. Where the sea (or the lake) lies, the river's course, the axis of a linear town.
+    const cr = fork('coast'), rv = fork('river');
+    const seaKind = hasCoast ? (cyber && plan === 'bay' ? 'lagoon' : 'line') : plan === 'bay' && !cyber ? 'lake' : null;
+    const n0 = G.fromAngle(cr.float(0, Math.PI * 2));
+    const apex = Rcore * 1.3 + Q.avenue + 45;
+    const bayDepth = Ru * cr.float(0.6, 0.85), bayW = Ru * cr.float(1.05, 1.35), Rl = Ru * cr.float(0.4, 0.55);
+    const Bc = plan === 'bay' && !cyber ? G.scale(n0, seaKind === 'lake' ? apex + Rl : apex + bayDepth * 0.55) : null;
+    const riverDir = hasRiver ? (seaKind === 'line' ? G.rotate(n0, rv.float(-0.4, 0.4)) : G.fromAngle(rv.float(0, Math.PI * 2))) : null;
+    if (Bc) view = G.add(G.scale(Bc, 0.5), G.scale(view, 0.4));
+    let axis = null, La = 0, Wa = 0;
+    if (plan === 'linear') {
+      const ar = fork('axis');
+      const h0 = seaKind === 'line' ? G.angle(G.perp(n0)) : riverDir ? G.angle(riverDir) : ar.float(0, Math.PI * 2);
+      const bend = seaKind === 'line' || (cyber && ar.bool(0.5)) ? 0 : ar.float(0.12, 0.3);
+      const Ls = Ru * ar.float(0.55, 0.8), nSeg = Math.ceil((M * 2.4 + G.len(view)) / Ls);
+      const walk = (sg) => {
+        let p = G.scale(G.fromAngle(h0), (sg * Ls) / 2), h = h0;
+        const out = [p];
+        for (let k = 0; k < nSeg; k++) {
+          h += bend * ar.float(-1, 1);
+          p = G.add(p, G.scale(G.fromAngle(h), sg * Ls));
+          out.push(p);
+        }
+        return out;
+      };
+      axis = polyAxis(walk(-1).reverse().concat(walk(1)), O);
+      La = Ru * (cyber ? ar.float(1.75, 2.1) : ar.float(1.45, 1.75));
+      Wa = Ru * (cyber ? ar.float(0.48, 0.6) : ar.float(0.4, 0.5));
+      view = G.scale(view, 0.4);
     }
-    const seaAt = (p, margin = 0) => !!coast && G.dot(p, coast.n) + margin > coast.reach + coast.off(G.dot(p, coast.t));
-    const shore = (s, o = 0) => G.add(G.scale(coast.t, s), G.scale(coast.n, coast.reach + coast.off(s) + o));
+    const ext = M * 1.9 + G.len(view);
+    const inSheet = (p, pad = 0) => Math.max(Math.abs(p.x - view.x), Math.abs(p.y - view.y)) < M + pad;
 
-    // 2. The grid follows the coast, else the river.
-    const rv = fork('river'), lr = fork('grid');
-    const riverDir = hasRiver ? (coast ? G.rotate(coast.n, rv.float(-0.4, 0.4)) : G.fromAngle(rv.float(0, Math.PI * 2))) : null;
-    const theta = coast ? G.angle(coast.t) : riverDir && !cyber ? G.angle(riverDir) : lr.float(0, Math.PI);
-    const U = G.fromAngle(theta), V = G.perp(U);
-    const toW = (u, v) => ({ x: U.x * u + V.x * v, y: U.y * u + V.y * v });
-    const span = M * 1.5;
-    const makeLines = (range) => {
-      const out = [];
-      let pos = -span - range[1], q = lr.int(0, 3), gap = lr.int(Q.every[0], Q.every[1]);
-      while (pos < span + range[1]) {
-        const ave = q >= gap;
-        out.push({ pos, kind: ave ? 'avenue' : 'street', lane: lr.bool(0.12) });
-        if (ave) { q = 0; gap = lr.int(Q.every[0], Q.every[1]); } else q++;
-        pos += lr.float(range[0], range[1]);
+    // 2. The built-up area: dS(p) < 1 is town (a smooth outline), dOf adds some grain.
+    //    A disc (or an ellipse), a capsule along the axis, a crescent round the bay.
+    const Fc = Bc ? G.scale(Bc, seaKind === 'lake' ? 0.4 : 0.45) : O, Rf = Bc ? Ru * 1.15 : Ru;
+    const e1 = G.fromAngle(fAng), e2 = G.perp(e1);
+    const shape = axis
+      ? (p) => { const pr = axis.proj(p); return Math.hypot(Math.max(0, Math.abs(pr.s) - (La - Wa)), pr.d) / Wa; }
+      : (p) => { const q = G.sub(p, Fc); return Math.hypot(G.dot(q, e1) / asp, G.dot(q, e2) * asp) / Rf; };
+    const dS = (p) => shape(p) / (1 + 0.2 * noise.fbm(p.x * 1.3 / Ru + 5.5, p.y * 1.3 / Ru + 2.5, 3));
+    const dOf = (p) => dS(p) + 0.07 * noise.get(p.x * 0.0035 + 9.1, p.y * 0.0035 - 4.7);
+    // Radius of the outline dS = level along a ray from the centre of the footprint.
+    const rad = (a, level = 1) => {
+      const D = G.fromAngle(a);
+      let lo = 0, hi = Ru * 4;
+      for (let q = 0; q < 24; q++) {
+        const mid = (lo + hi) / 2;
+        if (dS(G.add(Fc, G.scale(D, mid))) < level) lo = mid; else hi = mid;
       }
-      // The line nearest the centre is the main axis, through the centre.
-      let m0 = 0;
-      out.forEach((l, i) => { if (Math.abs(l.pos) < Math.abs(out[m0].pos)) m0 = i; });
-      const shift = out[m0].pos;
-      for (const l of out) l.pos -= shift;
-      Object.assign(out[m0], { kind: 'avenue', axis: true });
-      return out;
+      return lo;
     };
-    const cols = makeLines(Q.bu), rows = makeLines(Q.bv);
-    const lineW = (l) => (l.kind === 'avenue' ? Q.avenue : l.kind === 'rail' ? Q.rail : Q.street);
 
-    // 3. River: long straight reaches between embankments in town, meanders outside;
-    //    a canal along the grid in cyberpunk.
-    let river = null;
-    if (hasRiver && !cyber) {
-      const a = riverDir, b = G.perp(a);
-      // Beside the old town, clear of its boulevard.
-      const base = rv.sign() * (Rcore * rv.float(1.25, 1.8) + Q.avenue + P.river / 2 + Ru * 0.07 + 30);
-      const K = Math.max(160, Ru * rv.float(0.35, 0.55));
+    // 3. Coast: a wavy line (with a cove, a headland or the bay), a lake, or a lagoon
+    //    round the flooded city. sdf > 0 is water.
+    let coast = null;
+    if (seaKind === 'line') {
+      const n = n0, tg = G.perp(n);
+      let reach = Math.max(Rcore * 1.9 + 60, axis ? Wa * cr.float(0.5, 0.8) : Ru * cr.float(0.38, 0.6));
+      const bumps = [];
+      if (Bc) {
+        reach = apex + bayDepth;
+        bumps.push({ s: 0, w: bayW, h: -bayDepth });
+      } else if (cr.bool(0.45)) {
+        const h = Ru * cr.float(0.12, 0.28) * cr.sign();
+        bumps.push({ s: cr.float(-0.8, 0.8) * Ru, w: Ru * cr.float(0.3, 0.6), h: Math.max(h, Rcore * 1.7 + 50 - reach) });
+      }
+      const bell = (x) => (Math.abs(x) < 1 ? 0.5 + 0.5 * Math.cos(Math.PI * x) : 0);
+      const amp = (s) => Ru * ((cyber ? 0.012 : 0.03) + 0.3 * clamp01((Math.abs(s) - Ru * 0.75) / Ru));
+      const off = (s) => noise.fbm(s * 0.0022 + 17.3, 4.1, 3) * amp(s) + bumps.reduce((acc, b) => acc + b.h * bell((s - b.s) / b.w), 0);
+      const pts = [];
+      for (let s = -ext; s <= ext; s += 20) pts.push(G.add(G.scale(tg, s), G.scale(n, reach + off(s))));
+      coast = { kind: 'line', n, t: tg, reach, off, pts, sdf: (p) => G.dot(p, n) - reach - off(G.dot(p, tg)) };
+    } else if (seaKind === 'lake') {
+      const Lc = Bc, rl = (a) => Rl * (1 + 0.14 * noise.fbm(Math.cos(a) * 1.3 + 41, Math.sin(a) * 1.3 - 7, 3));
+      const pts = [];
+      for (let i = 0; i < 90; i++) { const a = (i / 90) * Math.PI * 2; pts.push(G.add(Lc, G.fromAngle(a, rl(a)))); }
+      coast = { kind: 'lake', n: n0, c: Lc, pts, closed: true, sdf: (p) => rl(G.angle(G.sub(p, Lc))) - G.dist(p, Lc) };
+    } else if (seaKind === 'lagoon') {
+      const L = cr.float(1.07, 1.15), pts = [];
+      for (let i = 0; i < 96; i++) { const a = (i / 96) * Math.PI * 2; pts.push(G.add(Fc, G.fromAngle(a, rad(a, L)))); }
+      coast = { kind: 'lagoon', pts, closed: true, sdf: (p) => (dS(p) - L) * Ru };
+    }
+    const seaAt = (p, margin = 0) => !!coast && coast.sdf(p) + margin > 0;
+    // Seaward direction at a point.
+    const seaN = (p) => {
+      const h = 4, f = coast.sdf;
+      return G.norm({ x: f({ x: p.x + h, y: p.y }) - f({ x: p.x - h, y: p.y }), y: f({ x: p.x, y: p.y + h }) - f({ x: p.x, y: p.y - h }) });
+    };
+    const seaDir = coast && coast.kind !== 'lagoon' ? (coast.kind === 'line' ? coast.n : G.norm(coast.c)) : null;
+
+    // 4. River: long straight reaches between embankments in town, meanders outside
+    //    (down the valley of a linear town, into the lake of a lakeside one); a canal
+    //    along the grid in the cyberpunk megagrid, below.
+    let river = null, riverSide = 0;
+    const rw = P.river * rv.float(0.8, 1.25);
+    if (hasRiver && (!cyber || (plan !== 'grid' && plan !== 'bay'))) {
+      const clear = cyber ? Math.max(hubR, citR * 1.3, spineW / 2, Ru * 0.12) : Rcore;
+      let base = rv.sign() * (clear * rv.float(1.25, 1.8) + Q.avenue + rw / 2 + Ru * 0.07 + 30);
+      let frame;
+      if (axis && seaKind !== 'line') frame = (s) => axis.at(s);
+      else {
+        let a = riverDir, b = G.perp(a);
+        if (seaKind === 'lake') {
+          const D = G.len(coast.c);
+          if (Math.abs(base) > D * 0.75) base = Math.sign(base) * D * 0.6;
+          b = G.rotate(G.norm(coast.c), Math.acos(base / D));
+          a = G.perp(b);
+          if (G.dot(a, coast.c) < 0) a = G.scale(a, -1);
+        }
+        frame = (s) => ({ p: G.scale(a, s), n: b });
+      }
+      riverSide = Math.sign(base);
+      const town = axis ? La : Ru, K = Math.max(160, Ru * rv.float(0.35, 0.55)), e0 = M * 2 + G.len(view);
       const knots = [];
-      for (let s = -M * 2; s <= M * 2 + 2 * K; s += K) knots.push(base + rv.float(-1, 1) * Ru * 0.07);
+      for (let s = -e0; s <= e0 + 2 * K; s += K) knots.push(base + rv.float(-1, 1) * Ru * 0.07);
       const lin = (s) => {
-        const x = (s + M * 2) / K, i = Math.min(knots.length - 2, Math.max(0, Math.floor(x)));
+        const x = (s + e0) / K, i = Math.min(knots.length - 2, Math.max(0, Math.floor(x)));
         return knots[i] + (knots[i + 1] - knots[i]) * (x - i);
       };
       const pts = [];
-      for (let s = -M * 1.8; s <= M * 1.8; s += 15) {
-        const mea = noise.fbm(s * 0.004 + 3.7, 9.1, 3) * Ru * 0.22 * clamp01((Math.abs(s) - Ru * 0.9) / (Ru * 0.8));
-        const p = G.add(G.scale(a, s), G.scale(b, lin(s) + mea));
+      for (let s = -e0 * 0.9; s <= e0 * 0.9; s += 15) {
+        const mea = noise.fbm(s * 0.004 + 3.7, 9.1, 3) * Ru * 0.22 * clamp01((Math.abs(s) - town * 0.9) / (Ru * 0.8));
+        const f = frame(s), p = G.add(f.p, G.scale(f.n, lin(s) + mea));
         pts.push(p);
-        if (seaAt(p, -P.river)) break;
+        if (seaAt(p, -rw)) break;
       }
-      river = { pts: simplify(pts, 0.4), w: P.river };
-    } else if (hasRiver) {
-      // Along rows, or along columns down to the sea.
-      const byCol = !!coast, fam = byCol ? cols : rows, oth = byCol ? rows : cols;
-      const at = (s, o) => (byCol ? toW(o, s) : toW(s, o));
-      const cand = (list, lo, hi) => list.filter((l) => !l.axis && Math.abs(l.pos) > lo && Math.abs(l.pos) < hi);
-      for (let tries = 0; tries < 12 && !river; tries++) {
-        const c1 = rv.pick(cand(fam, Ru * 0.1, Ru * 0.6)), c2 = rv.pick(cand(fam, Ru * 0.1, Ru * 0.7)), j = rv.pick(cand(oth, 0, Ru * 0.6));
-        if (!c1) break;
-        let pts = !j || !c2 || c1 === c2 ? [at(-M * 1.8, c1.pos), at(M * 1.8, c1.pos)] : [at(-M * 1.8, c1.pos), at(j.pos, c1.pos), at(j.pos, c2.pos), at(M * 1.8, c2.pos)];
-        if (coast) {
-          if (seaAt(pts[0])) pts = pts.reverse();
-          if (pts.slice(0, -1).some((p) => seaAt(p, 40))) continue;
-          const a = pts[pts.length - 2], b = pts[pts.length - 1], L = G.dist(a, b);
-          let s = 0;
-          while (s < L && !seaAt(G.lerp(a, b, s / L), -P.river)) s += 10;
-          pts[pts.length - 1] = G.lerp(a, b, Math.min(1, s / L));
-        }
-        river = { pts, w: P.river, canal: true };
-      }
-    }
-    if (river && coast) {
-      // Keep the harbour clear of the river mouth.
-      const sm = G.dot(river.pts[river.pts.length - 1], coast.t);
-      if (Math.abs(sm - sH) < P.harbour + river.w + 60) sH = sm + Math.sign(sH - sm || 1) * (P.harbour + river.w + 70);
+      river = { pts: simplify(pts, 0.4), w: rw };
     }
 
-    // 4. Roads out of town: the main axes first, then the diagonals.
-    const er = fork('roads');
-    const dry = (D) => !seaAt(G.scale(D, M * 0.95)) && !seaAt(G.scale(D, Ru * 0.9));
-    const axes = er.shuffle([U, V, G.scale(U, -1), G.scale(V, -1)]).filter(dry).map((D) => ({ D, axis: true }));
-    const diag = er.shuffle([G.add(U, V), G.sub(U, V), G.sub(V, U), G.scale(G.add(U, V), -1)]).map((D) => G.norm(D)).filter(dry).map((D) => ({ D, axis: false }));
-    const exits = axes.concat(diag).slice(0, P.exits);
-
-    // 5. Historic core (present day): a convex outline, its ring boulevard and its gates.
+    // 5. Historic core (present day): a convex outline and its ring boulevard.
     let core = null;
     if (!cyber) {
       const kr = fork('core');
@@ -2201,23 +2426,284 @@
       const C = hull(ring0);
       const gb = opts.walls ? 18 : 3;
       core = { C, gb, rng: kr, boulevard: grow(C, gb + Q.avenue / 2), obstacle: grow(C, gb + Q.avenue + 1), gates: [] };
-      for (const D of [U, V, G.scale(U, -1), G.scale(V, -1)].concat(exits.filter((e) => !e.axis).map((e) => e.D))) {
-        const ch = G.lineConvex(C, O, D);
-        if (ch && !seaAt(ch[1], 30)) core.gates.push(ch[1]);
+    }
+
+    // 6. Regions: the plan's frame of avenues, each piece with a street grid of its own.
+    const lr = fork('grid');
+    const regions = [], seams = [], seamKeys = new Set();
+    const BOX = [{ x: view.x - M * 1.6, y: view.y - M * 1.6 }, { x: view.x + M * 1.6, y: view.y - M * 1.6 }, { x: view.x + M * 1.6, y: view.y + M * 1.6 }, { x: view.x - M * 1.6, y: view.y + M * 1.6 }];
+    const makeLines = (range, lo, hi, every) => {
+      const out = [];
+      let pos = lo - range[1] * 2, q = lr.int(0, 3), gap = lr.int(every[0], every[1]);
+      while (pos < hi + range[1] * 2) {
+        const ave = q >= gap;
+        out.push({ pos, kind: ave ? 'avenue' : 'street', lane: lr.bool(0.12) });
+        if (ave) { q = 0; gap = lr.int(every[0], every[1]); } else q++;
+        pos += lr.float(range[0], range[1]);
+      }
+      // The line nearest the region's origin is its main axis.
+      let m0 = 0;
+      out.forEach((l, i) => { if (Math.abs(l.pos) < Math.abs(out[m0].pos)) m0 = i; });
+      const shift = out[m0].pos;
+      for (const l of out) l.pos -= shift;
+      Object.assign(out[m0], { kind: 'avenue', axis: true });
+      return out;
+    };
+    const addRegion = (poly0, ang, o, spec = {}) => {
+      const poly = poly0.length >= 3 ? G.clipConvex(G.clockwise(poly0), BOX) : [];
+      if (poly.length < 3 || G.area(poly) < 3000) return null;
+      const U = G.fromAngle(ang), V = G.perp(U), sc = spec.scale || 1;
+      let u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;
+      for (const p of poly) {
+        const q = G.sub(p, o), pu = G.dot(q, U), pv = G.dot(q, V);
+        u0 = Math.min(u0, pu); u1 = Math.max(u1, pu); v0 = Math.min(v0, pv); v1 = Math.max(v1, pv);
+      }
+      const reg = Object.assign({ kind: 'grid', seamW: Q.avenue, chamfer: 0, sw: 1, excl: [] }, spec, { id: regions.length, poly, U, V, o, map: new Map() });
+      const every = spec.every || Q.every;
+      reg.cols = makeLines(Q.bu.map((x) => x * sc), u0, u1, every);
+      reg.rows = makeLines(Q.bv.map((x) => x * sc), v0, v1, every);
+      if (spec.plainAxis) for (const l of reg.cols.concat(reg.rows)) if (l.axis) l.kind = 'street';
+      reg.inner = reg.seamW ? G.insetConvex(poly, reg.seamW / 2 + 1) : poly;
+      if (reg.inner.length < 3) return null;
+      reg.toW = (u, v) => ({ x: o.x + U.x * u + V.x * v, y: o.y + U.y * u + V.y * v });
+      reg.bb = G.bbox(reg.inner);
+      regions.push(reg);
+      return reg;
+    };
+    // The edges of a region become avenues (or streets) where they cross the town.
+    const addSeams = (reg, kind, w) => {
+      if (!reg) return;
+      for (let i = 0; i < reg.poly.length; i++) {
+        const a = reg.poly[i], b = reg.poly[(i + 1) % reg.poly.length];
+        const k2 = [a, b].map((p) => Math.round(p.x) + ',' + Math.round(p.y)).sort().join('|');
+        if (seamKeys.has(k2)) continue;
+        seamKeys.add(k2);
+        seams.push({ a, b, kind, w });
+      }
+    };
+    let main = null, rad0 = null, citadel = null, hub = null;
+    if (plan === 'grid' || (cyber && plan === 'bay')) {
+      // One grid over everything, along the coast or (often) the river.
+      const theta = coast && coast.kind === 'line' ? G.angle(coast.t) : riverDir && !cyber && lr.bool(0.65) ? G.angle(riverDir) : lr.float(0, Math.PI);
+      main = addRegion(BOX, theta, O, { seamW: 0, chamfer: !cyber && lr.bool(0.3) ? lr.float(7, 11) : 0 });
+      if (cyber && plan === 'bay') {
+        // The flooded city: every second or third line is a canal, in one or both directions.
+        const step = lr.int(2, 3), both = lr.bool(0.45);
+        for (const [fam, on] of [[main.cols, true], [main.rows, both]]) {
+          if (on) fam.forEach((l, i) => { if (!l.axis && i % step === 0) l.kind = 'canal'; });
+        }
+      }
+    } else if (plan === 'radial' || plan === 'bay') {
+      // Rings and radials round the old town, the spire or the bay.
+      const rr0 = fork('radial'), Cr = Bc || O;
+      const nR = Bc ? rr0.int(8, 11) : cyber ? rr0.int(5, 8) : rr0.int(6, 9);
+      const a0 = rr0.float(0, Math.PI * 2), dirs = [];
+      for (let k = 0; k < nR; k++) dirs.push(G.fromAngle(a0 + ((k + rr0.float(-0.22, 0.22)) / nR) * Math.PI * 2));
+      const nRing = Bc ? { small: 2, medium: 3, large: 3, huge: 4 }[size] : { small: 1, medium: 2, large: rr0.int(2, 3), huge: 3 }[size];
+      const r0 = (D) => (core && !Bc ? G.dist(Cr, G.lineConvex(core.boulevard, Cr, D)[1]) : hubR ? hubR + Q.avenue / 2 + 4 : seaKind === 'lake' ? Rl * 1.2 + Q.avenue : bayDepth * 0.55 + Q.avenue + 20);
+      const rEnd = Bc ? G.len(Bc) + Ru * 1.0 : Ru * 0.9;
+      const r0m = dirs.reduce((s, D) => s + r0(D), 0) / nR;
+      const PP = [dirs.map((D) => G.add(Cr, G.scale(D, r0(D))))];
+      for (let i = 1; i <= nRing; i++) {
+        const ri = r0m + (rEnd - r0m) * Math.pow(i / nRing, 0.85);
+        PP.push(dirs.map((D) => G.add(Cr, G.scale(D, ri * rr0.float(0.95, 1.05)))));
+      }
+      const far = M * 3;
+      if (Bc) addRegion(hull(PP[0]), G.angle(n0) + Math.PI / 2, O, { band: 0, scale: 0.85 });
+      if (hubR) hub = { poly: G.insetConvex(hull(PP[0]), Q.avenue / 2 + 3) };
+      for (let i = 0; i < nRing; i++) {
+        for (let k = 0; k < nR; k++) {
+          const k2 = (k + 1) % nR, quad = [PP[i][k], PP[i][k2], PP[i + 1][k2], PP[i + 1][k]];
+          const mid = G.average(quad), bis = G.angle(G.sub(mid, Cr)), chord = G.angle(G.sub(PP[i + 1][k2], PP[i + 1][k]));
+          // Mixed orientations: along the ring, along the radial, or at an angle.
+          const ang = rr0.pick([bis, chord, chord, bis + Math.PI / 4]) + rr0.float(-0.1, 0.1);
+          addRegion(quad, ang, mid, { band: i + 1, scale: cyber ? 1 : 0.8 + 0.1 * i, every: [Q.every[0] + 1, Q.every[1] + 3] });
+        }
+      }
+      for (let k = 0; k < nR; k++) {
+        const k2 = (k + 1) % nR, A = PP[nRing][k], B = PP[nRing][k2];
+        const wedge = [A, B, G.add(Cr, G.scale(dirs[k2], far)), G.add(Cr, G.scale(dirs[k], far))];
+        const mid = G.mid(A, B), sub = !cyber && rr0.bool(Bc ? 0.4 : 0.3);
+        addRegion(wedge, rr0.pick([G.angle(G.sub(mid, Cr)), G.angle(G.sub(B, A))]) + rr0.float(-0.1, 0.1), mid, { band: nRing + 1, scale: cyber ? 1.05 : 1.1, kind: sub ? 'suburb' : 'grid' });
+      }
+      for (let i = core && !Bc ? 1 : 0; i <= nRing; i++) for (let k = 0; k < nR; k++) seams.push({ a: PP[i][k], b: PP[i][(k + 1) % nR], kind: 'avenue', w: Q.avenue });
+      for (let k = 0; k < nR; k++) {
+        for (let i = 0; i < nRing; i++) seams.push({ a: PP[i][k], b: PP[i + 1][k], kind: 'avenue', w: Q.avenue });
+        seams.push({ a: PP[nRing][k], b: G.add(Cr, G.scale(dirs[k], far)), kind: 'avenue', w: Q.avenue });
+      }
+      rad0 = { Cr, dirs, PP, nRing };
+    } else if (plan === 'linear') {
+      // Slabs along the bent axis, each with its grid along the valley; in cyberpunk
+      // the megastructure runs down the middle and the slabs are split by it.
+      const seeds = axis.pts.slice(0, -1).map((p, i) => G.mid(p, axis.pts[i + 1]));
+      const vc = voronoiCells(seeds, BOX);
+      seeds.forEach((sd, k) => {
+        const e = G.norm(G.sub(axis.pts[k + 1], axis.pts[k]));
+        if (vc[k].length < 3) return;
+        if (!cyber) { addRegion(vc[k], G.angle(e) + lr.float(-0.04, 0.04), sd, { seg: k }); return; }
+        for (const sg of [-1, 1]) {
+          const off = G.add(sd, G.scale(G.perp(e), sg * (spineW / 2 + Q.avenue / 2 + 2)));
+          const half = sg > 0 ? G.clipHalfPlane(vc[k], off, G.add(off, e)) : G.clipHalfPlane(vc[k], G.add(off, e), off);
+          addRegion(half, G.angle(e), sd, { seg: k, side: sg });
+        }
+      });
+      for (const reg of regions) addSeams(reg, 'avenue', Q.avenue);
+    } else if (!cyber) {
+      // Grids of different eras round the old town, and curvy post-war suburbs.
+      const orr = fork('organic');
+      const k = { small: 3, medium: 5, large: 7, huge: 9 }[size];
+      const seeds = [O], a0 = orr.float(0, Math.PI * 2), golden = Math.PI * (3 - Math.sqrt(5));
+      for (let i = 0; i < k; i++) seeds.push(G.fromAngle(a0 + i * golden + orr.float(-0.3, 0.3), Ru * (0.42 + 0.6 * Math.sqrt((i + 0.5) / k)) * orr.float(0.85, 1.1)));
+      for (let i = 0; i < 6; i++) seeds.push(G.fromAngle(a0 + i * 1.05 + orr.float(-0.3, 0.3), Ru * orr.float(1.7, 2.4)));
+      const vc = voronoiCells(seeds, BOX);
+      seeds.forEach((sd, i) => {
+        const r = G.len(sd) / Ru;
+        const era = i === 0 ? 'old' : r > 1.5 ? 'rural' : orr.weighted(r < 0.75 ? [['boom', 3], ['estate', 1.5], ['old', 1]] : [['boom', 2], ['estate', 2], ['suburb', 3.2]]);
+        const spec = { era, kind: era === 'suburb' ? 'suburb' : 'grid' };
+        if (era === 'old') Object.assign(spec, { scale: orr.float(0.68, 0.8), every: [2, 3] });
+        else if (era === 'boom') Object.assign(spec, { scale: orr.float(1, 1.25), chamfer: orr.bool(0.3) ? orr.float(7, 10) : 0 });
+        else if (era === 'estate') Object.assign(spec, { scale: orr.float(1.35, 1.65), every: [2, 4] });
+        else if (era === 'rural') spec.scale = orr.float(1.1, 1.5);
+        addSeams(addRegion(vc[i], orr.float(0, Math.PI), sd, spec), 'avenue', Q.avenue);
+      });
+    } else {
+      // The corporate citadel, walled, and the slum ring of small crooked grids.
+      const orr = fork('organic');
+      const ca = orr.float(0, Math.PI), cu = G.fromAngle(ca), cv = G.perp(cu);
+      const A = citR, B = citR * orr.float(0.72, 1), ch = orr.bool(0.5) ? Math.min(A, B) * 0.32 : 0;
+      const at = (x, y) => G.add(G.scale(cu, x), G.scale(cv, y));
+      const poly = G.clockwise(ch
+        ? [at(-A + ch, -B), at(A - ch, -B), at(A, -B + ch), at(A, B - ch), at(A - ch, B), at(-A + ch, B), at(-A, B - ch), at(-A, -B + ch)]
+        : [at(-A, -B), at(A, -B), at(A, B), at(-A, B)]);
+      citadel = { poly, outer: grow(poly, 34), top: at(0, -B * 0.72) };
+      citadel.reg = addRegion(poly, ca, O, { citadel: true, seamW: 14, scale: 0.85 });
+      const n = { small: 10, medium: 15, large: 22, huge: 30 }[size], gap = (Ru * 1.15) / Math.sqrt(n) * 0.9;
+      const seeds = [];
+      for (let tries = 0; seeds.length < n && tries < n * 40; tries++) {
+        const p = G.fromAngle(orr.float(0, Math.PI * 2), Ru * 1.15 * Math.sqrt(orr.next()));
+        if (G.contains(citadel.outer, p) || seeds.some((q) => G.dist(p, q) < gap)) continue;
+        seeds.push(p);
+      }
+      for (let i = 0; i < 7; i++) seeds.push(G.fromAngle(i * 0.9 + orr.float(0, 0.5), Ru * orr.float(1.6, 2.3)));
+      voronoiCells(seeds, BOX).forEach((pv, i) => {
+        const rural = G.len(seeds[i]) > Ru * 1.4;
+        const reg = addRegion(pv, orr.float(0, Math.PI), seeds[i], rural ? { scale: 1.2 }
+          : { slum: true, scale: orr.float(0.5, 0.72), every: [99, 99], plainAxis: true, seamW: Q.street * 0.8, sw: 0.75, excl: [citadel.outer] });
+        if (reg) addSeams(reg, reg.slum ? 'street' : 'avenue', reg.slum ? Q.street * 0.8 : Q.avenue);
+      });
+    }
+    const lineW = (l, reg) => (l.kind === 'avenue' ? Q.avenue : l.kind === 'rail' ? Q.rail : l.kind === 'canal' ? Q.canal : Q.street * (reg ? reg.sw : 1));
+    const regionAt = (p) => regions.find((r2) => G.contains(r2.poly, p)) || null;
+    const reg0 = main || regionAt(O) || regions[0];
+
+    // Cyberpunk megagrid and flooded city: the river is a canal along the grid.
+    if (hasRiver && cyber && main) {
+      const byCol = !!(coast && coast.kind === 'line'), fam = byCol ? main.cols : main.rows, oth = byCol ? main.rows : main.cols;
+      const at = (s, o) => (byCol ? main.toW(o, s) : main.toW(s, o));
+      const cand = (list, lo, hi) => list.filter((l) => !l.axis && l.kind !== 'canal' && Math.abs(l.pos) > lo && Math.abs(l.pos) < hi);
+      for (let tries = 0; tries < 12 && !river; tries++) {
+        const c1 = rv.pick(cand(fam, Ru * 0.1, Ru * 0.6)), c2 = rv.pick(cand(fam, Ru * 0.1, Ru * 0.7)), j = rv.pick(cand(oth, 0, Ru * 0.6));
+        if (!c1) break;
+        let pts = !j || !c2 || c1 === c2 ? [at(-ext, c1.pos), at(ext, c1.pos)] : [at(-ext, c1.pos), at(j.pos, c1.pos), at(j.pos, c2.pos), at(ext, c2.pos)];
+        if (coast && coast.kind === 'line') {
+          if (seaAt(pts[0])) pts = pts.reverse();
+          if (pts.slice(0, -1).some((p) => seaAt(p, 40))) continue;
+          const a = pts[pts.length - 2], b = pts[pts.length - 1], L = G.dist(a, b);
+          let s = 0;
+          while (s < L && !seaAt(G.lerp(a, b, s / L), -rw)) s += 10;
+          pts[pts.length - 1] = G.lerp(a, b, Math.min(1, s / L));
+        }
+        river = { pts, w: rw, canal: true };
+      }
+    }
+
+    // 7. Harbour site: on the coast clear of the river mouth, on the lagoon, by the lake.
+    let Hc = null, Ht = null;
+    if (coast && coast.kind === 'line') {
+      let sH = Bc ? cr.sign() * bayW * cr.float(0.75, 1.05) : cr.sign() * Ru * cr.float(0.12, 0.4);
+      if (river) {
+        const sm = G.dot(river.pts[river.pts.length - 1], coast.t);
+        if (Math.abs(sm - sH) < P.harbour + river.w + 60) sH = sm + Math.sign(sH - sm || 1) * (P.harbour + river.w + 70);
+      }
+      Hc = G.add(G.scale(coast.t, sH), G.scale(coast.n, coast.reach + coast.off(sH)));
+      Ht = coast.t;
+    } else if (coast) {
+      // On the lake shore facing the town, or anywhere round the lagoon inside the sheet.
+      const c0 = coast.kind === 'lake' ? coast.c : Fc;
+      for (let q = 0; q < 12 && !Hc; q++) {
+        const from = coast.kind === 'lake' ? G.rotate(G.scale(coast.n, -1), cr.sign() * cr.float(0.6, 1)) : G.fromAngle(cr.float(0, Math.PI * 2));
+        let bi = 0;
+        coast.pts.forEach((p, i) => { if (G.dot(G.sub(p, c0), from) > G.dot(G.sub(coast.pts[bi], c0), from)) bi = i; });
+        if (inSheet(coast.pts[bi], -M * 0.22)) Hc = coast.pts[bi];
+      }
+      if (!Hc) Hc = coast.pts[0];
+      Ht = G.perp(seaN(Hc));
+      if (river && G.dist(river.pts[river.pts.length - 1], Hc) < P.harbour + river.w + 60) Hc = null;
+    }
+    const marina = !cyber && (size === 'small' || flavour === 'tourist' || (coast && coast.kind === 'lake'));
+    if (coast && coast.kind === 'lake' && !marina) Hc = null;
+    const hSpan = marina ? P.harbour * 0.5 : P.harbour;
+    const harbourAt = (p) => !!Hc && Math.abs(G.dot(G.sub(p, Hc), Ht)) < hSpan && -coast.sdf(p) < (cyber ? 330 : 190);
+
+    // 8. Roads out of town: the main axes, the radials, the ends of the valley.
+    const er = fork('roads');
+    const dryD = (from, D, r1) => !seaAt(G.add(from, G.scale(D, M * 0.95))) && !seaAt(G.add(from, G.scale(D, r1)));
+    const startOn = (D) => (core ? G.lineConvex(core.boulevard, O, D)[1] : citadel ? G.lineConvex(citadel.poly, O, D)[1] : G.scale(D, Q.bu[0]));
+    let exits = [];
+    if (main) {
+      const U = main.U, V = main.V;
+      const axes = er.shuffle([U, V, G.scale(U, -1), G.scale(V, -1)]).filter((D) => dryD(O, D, Ru * 0.9)).map((D) => ({ D, axis: true }));
+      const diag = er.shuffle([G.add(U, V), G.sub(U, V), G.sub(V, U), G.scale(G.add(U, V), -1)]).map((D) => G.norm(D)).filter((D) => dryD(O, D, Ru * 0.9)).map((D) => ({ D, axis: false }));
+      const nd = Math.min(diag.length, er.int(0, size === 'small' ? 1 : 2));
+      exits = axes.slice(0, Math.max(1, P.exits - nd)).concat(diag.slice(0, nd));
+      for (const d of diag.slice(nd)) if (exits.length < P.exits) exits.push(d);
+      for (const e of exits) e.start = startOn(e.D);
+    } else if (rad0) {
+      const ks = er.shuffle(rad0.dirs.map((_, k) => k)).filter((k) => dryD(rad0.Cr, rad0.dirs[k], G.dist(rad0.Cr, rad0.PP[rad0.nRing][k]) + 60));
+      exits = ks.slice(0, P.exits + (Bc ? 1 : 0)).map((k) => ({ D: rad0.dirs[k], axis: true, start: rad0.PP[rad0.nRing][k] }));
+    } else if (axis) {
+      if (!cyber) for (const sg of [-1, 1]) { const f = axis.at(sg * (La - Wa)); exits.push({ D: G.scale(f.t, sg), axis: true, start: f.p }); }
+      for (let q = 0; q < 16 && exits.length < P.exits + (cyber ? 1 : 0); q++) {
+        const f = axis.at(er.float(-0.6, 0.6) * La), D = G.scale(f.n, er.sign());
+        const st = G.add(f.p, G.scale(D, cyber ? spineW / 2 + 4 : 0));
+        if (dryD(st, D, Wa * 1.2) && !exits.some((e) => G.dist(e.start, st) < Ru * 0.45)) exits.push({ D, axis: false, start: st });
+      }
+    } else {
+      const b0 = er.float(0, Math.PI * 2);
+      for (let i = 0; i < P.exits + 2 && exits.length < P.exits; i++) {
+        const D = G.fromAngle(b0 + (i * Math.PI * 2) / P.exits + er.float(-0.35, 0.35));
+        if (dryD(O, D, Ru * 0.9)) exits.push({ D, axis: false, start: startOn(D) });
+      }
+    }
+    if (core) {
+      // Gates of the old town where the axes and the roads leave it.
+      const gd = [reg0.U, reg0.V, G.scale(reg0.U, -1), G.scale(reg0.V, -1)].concat(exits.filter((e) => !e.axis).map((e) => e.D));
+      if (rad0 && !Bc) gd.push(...rad0.dirs);
+      for (const D of gd) {
+        const ch2 = G.lineConvex(core.C, O, D);
+        if (ch2 && !seaAt(ch2[1], 30) && !core.gates.some((g) => G.dist(g, ch2[1]) < 25)) core.gates.push(ch2[1]);
       }
     }
     const roads = [];
     for (const ex of exits) {
-      const D = ex.D;
-      const start = core ? G.lineConvex(core.boulevard, O, D)[1] : G.scale(D, Q.bu[0]);
-      let end = G.scale(D, fr(G.angle(D)) * 1.02);
-      for (let q = 0; q < 20 && seaAt(end, 60); q++) end = G.scale(end, 0.95);
+      const D = ex.D, start = ex.start;
+      let end = start;
+      for (let s = 0; s < M * 3; s += 10) {
+        end = G.add(start, G.scale(D, s));
+        if (dS(end) > 1.02 || seaAt(end, 60) || !inSheet(end, -30)) break;
+      }
       const pts = [start, end];
       let cur = end, dir = D;
-      for (let q = 0; q < 400 && Math.max(Math.abs(cur.x), Math.abs(cur.y)) < M * 1.15; q++) {
+      for (let q = 0; q < 400 && inSheet(cur, M * 0.15); q++) {
         const wob = noise.get(cur.x * 0.003 + 50, cur.y * 0.003 - 20);
         let nd = G.norm(G.add(G.scale(G.rotate(dir, wob * 0.3), 0.85), G.scale(D, 0.15)));
-        if (coast && seaAt(G.add(cur, G.scale(nd, 30)), 70)) nd = G.norm(G.sub(nd, G.scale(coast.n, G.dot(nd, coast.n) + 0.6)));
+        if (coast && seaAt(G.add(cur, G.scale(nd, 30)), 70)) {
+          // Round the shore; on the island of the flooded city the road ends at the water.
+          if (coast.kind === 'lagoon') break;
+          const sn = seaN(cur);
+          nd = G.norm(G.sub(nd, G.scale(sn, G.dot(nd, sn) + 0.6)));
+        }
+        if (q > 3 && dS(cur) < 0.9) break;
         dir = nd;
         cur = G.add(cur, G.scale(nd, 30));
         pts.push(cur);
@@ -2225,57 +2711,93 @@
       roads.push({ pts, axis: ex.axis, urban: [start, end], rural: pts.slice(1) });
     }
 
-    // 6. Railway along a grid line through town, curving gently outside; the station near the centre.
+    // 9. Railway past the centre, curving gently outside; the station near the centre.
+    //    Along a grid line in the grid plans, down the valley in a linear town, inside
+    //    the megastructure in cyberpunk.
     const rr = fork('rail');
     let rail = null, station = null;
-    {
-      const alongU = coast ? true : river ? (river.canal ? false : Math.abs(G.dot(riverDir, U)) < 0.7) : rr.bool();
-      const fam = alongU ? rows : cols;
+    if (main) {
+      const U = main.U, V = main.V, toW = main.toW;
+      const alongU = coast && coast.kind === 'line' ? true : river ? (river.canal ? false : Math.abs(G.dot(riverDir, U)) < 0.7) : rr.bool();
+      const fam = alongU ? main.rows : main.cols;
       const lo = cyber ? Ru * 0.16 : Rcore * 1.4 + 50, hi = Math.max(lo + 140, Ru * 0.5);
-      const land = coast ? -Math.sign(G.dot(alongU ? V : U, coast.n)) : 0;
+      const land = coast && coast.kind === 'line' ? -Math.sign(G.dot(alongU ? V : U, coast.n)) : 0;
       const at = (s, o) => (alongU ? toW(s, o) : toW(o, s));
-      for (const line of rr.shuffle(fam.filter((l) => !l.axis && Math.abs(l.pos) > lo && Math.abs(l.pos) < hi && (!land || l.pos * land > 0)))) {
+      for (const line of rr.shuffle(fam.filter((l) => !l.axis && l.kind !== 'canal' && Math.abs(l.pos) > lo && Math.abs(l.pos) < hi && (!land || l.pos * land > 0)))) {
         const pts = [];
-        for (let s = -M * 1.8; s <= M * 1.8; s += 30) {
+        for (let s = -ext; s <= ext; s += 30) {
           const out = Math.max(0, Math.abs(s) - Ru * 1.05);
           let p = at(s, line.pos + noise.fbm(s * 0.0011 + 61, 7.7, 2) * out * 0.35);
-          for (let g = 0; g < 40 && seaAt(p, 150); g++) p = G.sub(p, G.scale(coast.n, 15));
+          for (let g = 0; g < 40 && coast && coast.kind === 'line' && seaAt(p, 150); g++) p = G.sub(p, G.scale(coast.n, 15));
           pts.push(p);
         }
         if (river && pts.filter((p) => G.distToPolyline(p, river.pts) < river.w / 2 + 60).length > 12) continue;
         line.kind = 'rail';
-        rail = { pts: simplify(pts, 0.4), alongU, pos: line.pos, dir: alongU ? U : V };
+        rail = { pts: simplify(pts, 0.4) };
         break;
       }
+    } else if (axis && cyber) {
+      rail = { pts: axis.pts.slice(), spine: true };
+    } else {
+      for (let tries = 0; tries < 10 && !rail; tries++) {
+        const lo = cyber ? Math.max(Ru * 0.16, hubR + 80, citR * 1.45 + 50) : Rcore * 1.4 + 50, hi = Math.max(lo + 140, Ru * 0.5);
+        let off = rr.sign() * rr.float(lo, hi), frame;
+        if (axis) {
+          off = (riverSide ? -riverSide : rr.sign()) * Wa * rr.float(0.35, 0.6);
+          frame = (s) => axis.at(s);
+        } else {
+          const D = seaKind === 'line' ? coast.t : rr.bool(0.5) ? reg0.U : G.fromAngle(rr.float(0, Math.PI)), N = G.perp(D);
+          // On the landward side of the town.
+          if (seaDir && G.dot(N, seaDir) * off > 0) off = -off;
+          frame = (s) => ({ p: G.scale(D, s), n: N });
+        }
+        const pts = [];
+        for (let s = -ext; s <= ext; s += 30) {
+          const out = Math.max(0, Math.abs(s) - (axis ? La : Ru) * 1.05), f = frame(s);
+          let p = G.add(f.p, G.scale(f.n, off + noise.fbm(s * 0.0011 + 61, 7.7, 2) * out * 0.35));
+          for (let g = 0; g < 40 && coast && coast.kind !== 'lagoon' && seaAt(p, 150); g++) p = G.sub(p, G.scale(seaN(p), 15));
+          pts.push(p);
+        }
+        if (river && pts.filter((p) => G.distToPolyline(p, river.pts) < river.w / 2 + 60).length > 12) continue;
+        if (citadel && pts.some((p) => G.contains(citadel.outer, p))) continue;
+        rail = { pts: simplify(pts, 0.4) };
+      }
     }
-    if (rail) {
-      const L = P.station, sc = cyber ? 1.15 : 1;
-      const e = rail.dir, nC = G.scale(rail.alongU ? V : U, -Math.sign(rail.pos));
-      // Beside the main axis, clear of the river and the sea.
-      const sg = rr.sign();
-      let R0 = null, zone = null;
-      for (const ss of [1, -1, 2.6, -2.6, 4.2, -4.2].map((x) => sg * x * (L / 2 + Q.avenue))) {
-        R0 = rail.alongU ? toW(ss, rail.pos) : toW(rail.pos, ss);
+    if (rail && !rail.spine) {
+      const ax = polyAxis(rail.pts, O);
+      const L = P.station, sc = cyber ? 1.15 : 1, sg = rr.sign();
+      let R0 = null, zone = null, e = null, nC = null;
+      const bad = (z) => z.some((p) => seaAt(p, 30)) || (river && river.pts.some((p, i) => i && segPolyDist(z, river.pts[i - 1], p) < river.w)) ||
+        (core && G.convexOverlap(z, core.obstacle)) || (hub && G.convexOverlap(z, hub.poly, 20)) || (citadel && G.convexOverlap(z, citadel.outer));
+      for (const ss of [0.6, -0.6, 1, -1, 2.6, -2.6, 4.2, -4.2].map((x) => sg * x * (L / 2 + Q.avenue))) {
+        const f = ax.at(ss);
+        R0 = f.p; e = f.t; nC = G.dot(f.n, G.sub(Fc, f.p)) >= 0 ? f.n : G.scale(f.n, -1);
         const pt = (x, y) => G.add(R0, G.add(G.scale(e, x), G.scale(nC, y * sc)));
         zone = G.clockwise([pt(-L / 2, -Q.rail / 2 / sc - 2), pt(L / 2, -Q.rail / 2 / sc - 2), pt(L / 2, 58), pt(-L / 2, 58)]);
-        if (!zone.some((p) => seaAt(p, 30)) && !(river && river.pts.some((p, i) => i && segPolyDist(zone, river.pts[i - 1], p) < river.w))) break;
+        if (!bad(zone)) break;
+        zone = null;
       }
-      const pt = (x, y) => G.add(R0, G.add(G.scale(e, x), G.scale(nC, y * sc)));
-      const ang = Math.atan2(e.y, e.x), bc = pt(0, 48);
-      station = {
-        zone, R0,
-        building: G.rect(bc.x, bc.y, L * 0.42, 16 * sc, ang),
-        platforms: [12, 29, 38].map((o) => { const c = pt(0, o); return G.rect(c.x, c.y, L * (o > 30 ? 0.5 : 0.74), o > 30 ? 3.5 * sc : 5 * sc, ang); }),
-        tracks: [7, 17, 24, 34].map((o) => [pt(-L / 2, 0), pt(-L / 2 + 16 + o * 2, o), pt(L / 2 - 16 - o * 2, o), pt(L / 2, 0)]),
-        label: pt(0, 72),
-      };
+      if (zone) {
+        const pt = (x, y) => G.add(R0, G.add(G.scale(e, x), G.scale(nC, y * sc)));
+        const ang = Math.atan2(e.y, e.x), bc = pt(0, 48);
+        station = {
+          zone, R0,
+          building: G.rect(bc.x, bc.y, L * 0.42, 16 * sc, ang),
+          platforms: [12, 29, 38].map((o) => { const c = pt(0, o); return G.rect(c.x, c.y, L * (o > 30 ? 0.5 : 0.74), o > 30 ? 3.5 * sc : 5 * sc, ang); }),
+          tracks: [7, 17, 24, 34].map((o) => [pt(-L / 2, 0), pt(-L / 2 + 16 + o * 2, o), pt(L / 2 - 16 - o * 2, o), pt(L / 2, 0)]),
+          label: pt(0, 72),
+        };
+      }
+      rail.dir0 = ax.at(0).t;
     }
 
-    // 7. Ring road round the town (present-day cities), skyways on the diagonals (cyberpunk).
+    // 10. Ring road round the town (present day), skyways (cyberpunk), the corporate wall.
+    const kr2 = fork('ring');
     let ring = [];
-    if (!cyber && big) {
+    const ringP = !cyber ? (big ? { grid: 0.7, radial: 0.85, organic: 0.6, linear: 0.45, bay: 0.6 }[plan] : size === 'medium' ? 0.2 : 0) : 0;
+    if (kr2.bool(ringP)) {
       const pts = [];
-      for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; pts.push(G.fromAngle(a, fr(a) * 1.06 + 70)); }
+      for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2; pts.push(G.add(Fc, G.fromAngle(a, rad(a) * 1.06 + 70))); }
       const sm = G.chaikin(pts, 3, true), ok = (p) => !seaAt(p, 90);
       if (sm.every(ok)) ring = [{ pts: sm, closed: true }];
       else {
@@ -2291,105 +2813,183 @@
     const sky = [];
     if (cyber) {
       const sk = fork('sky');
-      const n = size === 'small' ? 1 : size === 'huge' ? 3 : 2;
-      let off0 = 0;
-      for (let i = 0; i < n; i++) {
-        const dir = G.norm(i % 2 ? G.sub(U, V) : G.add(U, V));
-        const off = i === 2 ? -Math.sign(off0) * Math.max(sk.float(0.3, 0.45) * Ru, 380) : sk.sign() * Math.max(sk.float(0.12, 0.3) * Ru, 230);
-        if (i === 0) off0 = off;
-        const c0 = G.scale(G.perp(dir), off);
-        let a = G.sub(c0, G.scale(dir, M * 2)), b = G.add(c0, G.scale(dir, M * 2));
-        if (coast) {
-          // Stop at the shore.
+      // Out from the middle until the shore.
+      const ray = (a, D) => {
+        let s = 0;
+        while (s < M * 3 && !seaAt(G.add(a, G.scale(D, s)), 40)) s += 10;
+        return s > 120 ? [a, G.add(a, G.scale(D, s))] : null;
+      };
+      const across = (c0, dir) => {
+        let a = G.sub(c0, G.scale(dir, M * 2.4)), b = G.add(c0, G.scale(dir, M * 2.4));
+        if (coast && coast.kind === 'line') {
           const L = G.dist(a, b);
           let s1 = L / 2, s2 = L / 2;
           while (s1 > 0 && !seaAt(G.lerp(a, b, s1 / L), 40)) s1 -= 10;
           while (s2 < L && !seaAt(G.lerp(a, b, s2 / L), 40)) s2 += 10;
           [a, b] = [G.lerp(a, b, Math.max(0, s1) / L), G.lerp(a, b, Math.min(L, s2) / L)];
         }
-        if (!seaAt(c0)) sky.push([a, b]);
+        if (!seaAt(c0) || (coast && coast.kind === 'lagoon')) sky.push([a, b]);
+      };
+      if (main) {
+        const n = size === 'small' ? 1 : size === 'huge' ? 3 : sk.int(1, 2) + (size === 'large' ? 1 : 0);
+        const diagonal = sk.bool(0.7);
+        let off0 = 0;
+        for (let i = 0; i < n; i++) {
+          const dir = diagonal ? G.norm(i % 2 ? G.sub(main.U, main.V) : G.add(main.U, main.V)) : i % 2 ? main.V : main.U;
+          const off = i === 2 ? -Math.sign(off0) * Math.max(sk.float(0.3, 0.45) * Ru, 380) : sk.sign() * Math.max(sk.float(0.12, 0.3) * Ru, 230);
+          if (i === 0) off0 = off;
+          across(G.scale(G.perp(dir), off), dir);
+        }
+      } else if (rad0) {
+        const every = rad0.dirs.length > 6 && sk.bool(0.5) ? 2 : 1;
+        rad0.dirs.forEach((D, k) => { if (k % every === 0) { const s = ray(G.add(rad0.Cr, G.scale(D, hubR * 0.7)), D); if (s) sky.push(s); } });
+      } else if (axis) {
+        for (let i = 0, n = size === 'small' ? 1 : 2; i < n; i++) { const f = axis.at((i ? -1 : 1) * La * sk.float(0.25, 0.6)); across(f.p, f.n); }
+      } else {
+        const b0 = sk.float(0, Math.PI * 2), n = size === 'small' ? 2 : 3;
+        for (let i = 0; i < n; i++) {
+          const D = G.fromAngle(b0 + (i * Math.PI * 2) / n + sk.float(-0.4, 0.4)), s = ray(G.lineConvex(citadel.poly, O, D)[1], D);
+          if (s) sky.push(s);
+        }
       }
     }
-
-    // Corporate wall (cyberpunk): down the middle of the streets round the inner district,
-    // with checkpoints where the avenues pass.
     let wall = null;
-    if (cyber && opts.walls) {
-      const near = (list, x) => list.reduce((b, l, i) => (Math.abs(l.pos - x) < Math.abs(list[b].pos - x) ? i : b), 0);
-      const i1 = near(cols, -Ru * 0.34), i2 = near(cols, Ru * 0.34), j1 = near(rows, -Ru * 0.34), j2 = near(rows, Ru * 0.34);
-      if (i2 > i1 && j2 > j1) {
-        const ring2 = [toW(cols[i1].pos, rows[j1].pos), toW(cols[i2].pos, rows[j1].pos), toW(cols[i2].pos, rows[j2].pos), toW(cols[i1].pos, rows[j2].pos)];
-        const gates = [];
-        for (let i = i1 + 1; i < i2; i++) if (cols[i].kind === 'avenue') gates.push(toW(cols[i].pos, rows[j1].pos), toW(cols[i].pos, rows[j2].pos));
-        for (let j = j1 + 1; j < j2; j++) if (rows[j].kind === 'avenue') gates.push(toW(cols[i1].pos, rows[j].pos), toW(cols[i2].pos, rows[j].pos));
-        if (!ring2.some((p) => seaAt(p, 20))) wall = { pts: ring2, gates: gates.filter((g) => !seaAt(g)) };
+    if (citadel) wall = { pts: citadel.poly, gates: roads.map((r2) => Object.assign({}, r2.urban[0])), cut: false };
+    else if (cyber && opts.walls) {
+      if (main) {
+        // Down the middle of the streets round the inner district, checkpoints on the avenues.
+        const cols = main.cols, rows = main.rows, toW = main.toW;
+        const near = (list, x) => list.reduce((b, l, i) => (Math.abs(l.pos - x) < Math.abs(list[b].pos - x) ? i : b), 0);
+        const i1 = near(cols, -Ru * 0.34), i2 = near(cols, Ru * 0.34), j1 = near(rows, -Ru * 0.34), j2 = near(rows, Ru * 0.34);
+        if (i2 > i1 && j2 > j1) {
+          const ring2 = [toW(cols[i1].pos, rows[j1].pos), toW(cols[i2].pos, rows[j1].pos), toW(cols[i2].pos, rows[j2].pos), toW(cols[i1].pos, rows[j2].pos)];
+          const gates = [];
+          for (let i = i1 + 1; i < i2; i++) if (cols[i].kind === 'avenue') gates.push(toW(cols[i].pos, rows[j1].pos), toW(cols[i].pos, rows[j2].pos));
+          for (let j = j1 + 1; j < j2; j++) if (rows[j].kind === 'avenue') gates.push(toW(cols[i1].pos, rows[j].pos), toW(cols[i2].pos, rows[j].pos));
+          if (!ring2.some((p) => seaAt(p, 20))) wall = { pts: ring2, gates: gates.filter((g) => !seaAt(g)), cut: false };
+        }
+      } else if (rad0) wall = { pts: rad0.PP[1], gates: rad0.dirs.map((D, k) => rad0.PP[1][k]), cut: false };
+      else {
+        const pts = [];
+        for (let i = 0; i < 28; i++) { const a = (i / 28) * Math.PI * 2; pts.push(G.add(Fc, G.fromAngle(a, rad(a, 0.42)))); }
+        const sm = G.chaikin(pts, 2, true);
+        if (!sm.some((p) => seaAt(p, 20))) wall = { pts: sm, gates: null, cut: true };
       }
     }
+    if (wall && wall.gates) wall.gates = wall.gates.map((g) => ({ x: g.x, y: g.y, a: G.angle(reg0.U) }));
 
-    // 8. Zoning directions: industry along the railway and inland, wealth on the other side.
+    // 11. Zoning directions: industry along the railway and inland, wealth on the other side.
     const zr = fork('zones');
-    let aInd = rail ? G.angle(rail.dir) + (zr.bool() ? 0 : Math.PI) : zr.float(0, Math.PI * 2);
-    if (coast) for (let q = 0; q < 8 && G.dot(G.fromAngle(aInd), coast.n) > 0.2; q++) aInd += 0.8;
+    let aInd = rail ? G.angle(rail.dir0 || axis.at(0).t) + (zr.bool() ? 0 : Math.PI) : zr.float(0, Math.PI * 2);
+    if (seaDir) for (let q = 0; q < 8 && G.dot(G.fromAngle(aInd), seaDir) > 0.2; q++) aInd += 0.8;
     const aRich = aInd + Math.PI + zr.float(-0.7, 0.7), aFair = aInd + zr.sign() * zr.float(0.8, 1.3), aSlum = aInd + zr.sign() * zr.float(0.5, 0.9);
+    const indW = flavour === 'industrial' ? 0.95 : flavour === 'tourist' ? 0.4 : 0.62;
 
-    // 9. Grid cells.
-    const cells = [], cellMap = new Map(), cid = (i, j) => i * 100000 + j;
-    for (let i = 0; i + 1 < cols.length; i++) {
-      for (let j = 0; j + 1 < rows.length; j++) {
-        const u0 = cols[i].pos + lineW(cols[i]) / 2, u1 = cols[i + 1].pos - lineW(cols[i + 1]) / 2;
-        const v0 = rows[j].pos + lineW(rows[j]) / 2, v1 = rows[j + 1].pos - lineW(rows[j + 1]) / 2;
-        const c = toW((u0 + u1) / 2, (v0 + v1) / 2);
-        if (Math.abs(c.x) > M + 200 || Math.abs(c.y) > M + 200) continue;
-        const cell = { i, j, u0, u1, v0, v1, c, d: dOf(c), a: G.angle(c), poly: [toW(u0, v0), toW(u1, v0), toW(u1, v1), toW(u0, v1)] };
-        cell.avenue = [cols[i], cols[i + 1], rows[j], rows[j + 1]].some((l) => l.kind === 'avenue');
-        cells.push(cell);
-        cellMap.set(cid(i, j), cell);
+    // 12. Grid cells, clipped to their regions (with chamfered corners where the plan says so).
+    const cells = [], cid = (i, j) => i * 4096 + j;
+    const cellAt = (reg, i, j) => reg.map.get(cid(i, j));
+    const cellPoly = (reg, u0, u1, v0, v1) => {
+      const toW = reg.toW, ch = Math.min(reg.chamfer, (u1 - u0) / 3, (v1 - v0) / 3);
+      return ch > 1 ? [toW(u0 + ch, v0), toW(u1 - ch, v0), toW(u1, v0 + ch), toW(u1, v1 - ch), toW(u1 - ch, v1), toW(u0 + ch, v1), toW(u0, v1 - ch), toW(u0, v0 + ch)]
+        : [toW(u0, v0), toW(u1, v0), toW(u1, v1), toW(u0, v1)];
+    };
+    for (const reg of regions) {
+      const { cols, rows, toW, bb } = reg;
+      for (let i = 0; i + 1 < cols.length; i++) {
+        for (let j = 0; j + 1 < rows.length; j++) {
+          const u0 = cols[i].pos + lineW(cols[i], reg) / 2, u1 = cols[i + 1].pos - lineW(cols[i + 1], reg) / 2;
+          const v0 = rows[j].pos + lineW(rows[j], reg) / 2, v1 = rows[j + 1].pos - lineW(rows[j + 1], reg) / 2;
+          if (u1 - u0 < 8 || v1 - v0 < 8) continue;
+          const cc = toW((u0 + u1) / 2, (v0 + v1) / 2);
+          if (!inSheet(cc, 260)) continue;
+          const rect = [toW(u0, v0), toW(u1, v0), toW(u1, v1), toW(u0, v1)], rb = G.bbox(rect);
+          if (rb.x1 < bb.x0 || rb.x0 > bb.x1 || rb.y1 < bb.y0 || rb.y0 > bb.y1) continue;
+          let poly = cellPoly(reg, u0, u1, v0, v1);
+          const full = inside(reg.inner, rect);
+          if (!full) {
+            if (!G.convexOverlap(rect, reg.inner)) continue;
+            poly = G.clipConvex(poly, reg.inner);
+            if (poly.length < 3) continue;
+            const ar = G.area(poly);
+            if (ar < 500 || ar < (u1 - u0) * (v1 - v0) * 0.15) continue;
+          }
+          const c = full ? cc : G.centroid(poly);
+          const cell = { reg, i, j, u0, u1, v0, v1, c, d: dOf(c), a: G.angle(c), poly, full };
+          cell.avenue = !full || [cols[i], cols[i + 1], rows[j], rows[j + 1]].some((l) => l.kind === 'avenue');
+          cells.push(cell);
+          reg.map.set(cid(i, j), cell);
+        }
       }
     }
-    const cellAt = (i, j) => cellMap.get(cid(i, j));
     const lineIndex = (list, x) => {
       let lo = 0, hi = list.length - 1;
       while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (list[mid].pos <= x) lo = mid; else hi = mid; }
       return lo;
     };
-    const cellOf = (p) => cellAt(lineIndex(cols, G.dot(p, U)), lineIndex(rows, G.dot(p, V)));
+    const cellOf = (p) => {
+      const reg = regionAt(p);
+      if (!reg) return null;
+      const q = G.sub(p, reg.o);
+      return cellAt(reg, lineIndex(reg.cols, G.dot(q, reg.U)), lineIndex(reg.rows, G.dot(q, reg.V)));
+    };
     const roadDist = (p) => roads.reduce((m2, r2) => Math.min(m2, G.distToPolyline(p, r2.rural)), Infinity);
     const riverDist = (p) => (river ? G.distToPolyline(p, river.pts) : Infinity);
-    const harbourAt = (p) => !!coast && Math.abs(G.dot(p, coast.t) - sH) < P.harbour &&
-      coast.reach + coast.off(G.dot(p, coast.t)) - G.dot(p, coast.n) < (cyber ? 330 : 190);
+    // Spine of the linear megastructure: a long block down the axis, towers at the joints.
+    let spine = null;
+    if (axis && cyber) {
+      spine = { pieces: [], nodes: [] };
+      for (let k = 0; k + 1 < axis.pts.length; k++) {
+        const a = axis.pts[k], b = axis.pts[k + 1], c = G.mid(a, b);
+        if (!inSheet(c, G.dist(a, b))) continue;
+        spine.pieces.push(G.rect(c.x, c.y, G.dist(a, b), spineW, G.angle(G.sub(b, a))));
+        if (inSheet(b, 100)) spine.nodes.push(G.regular(b.x, b.y, spineW * 0.78, 8, Math.PI / 8 + G.angle(G.sub(b, a))));
+      }
+    }
+    const voids = [];
+    if (core) voids.push(core.obstacle);
+    if (hub) voids.push(grow(hub.poly, Q.avenue / 2 + 2));
+    if (spine) voids.push(...spine.nodes.map((nd) => grow(nd, 6)));
     for (const c of cells) {
       if (c.poly.every((p) => seaAt(p, -2))) c.state = 'sea';
-      else if (core && G.contains(core.obstacle, c.c)) c.state = 'core';
+      else if (voids.some((x) => G.contains(x, c.c)) || c.reg.excl.some((x) => G.contains(x, c.c))) c.state = 'core';
       else if (c.d < 1) c.state = 'urban';
       else if (cyber && c.d < 1.3 && angDiff(c.a, aSlum) < 0.5) Object.assign(c, { state: 'urban', type: 'slum', band: true });
       else if (cyber && c.d < 1.12 && noise.get(c.c.x * 0.004 + 31, c.c.y * 0.004) > 0.1) Object.assign(c, { state: 'urban', type: 'shanty', band: true });
       else if (c.d < 1.5 && roadDist(c.c) < Q.bu[1] * (cyber ? 0.8 : 1.1)) Object.assign(c, { state: 'urban', type: 'shanty', band: cyber });
       else c.state = 'rural';
+      // Curvy suburbs draw their own streets and houses.
+      if (c.state === 'urban' && c.d < 1 && c.reg.kind === 'suburb') Object.assign(c, { curvy: true, type: 'shanty' });
     }
     const urbanCells = cells.filter((c) => c.state === 'urban');
 
-    // 10. Superblocks for the large landmarks, then the zones.
-    const isFree = (c) => c && c.state === 'urban' && !c.type && !c.sb && !c.poly.some((p) => seaAt(p, 10)) && riverDist(c.c) > (river ? river.w + 70 : 0);
+    // 13. Superblocks for the large landmarks, then the zones.
+    const isFree = (c) => c && c.state === 'urban' && !c.type && !c.sb && !c.poly.some((p) => seaAt(p, 10)) && (c.rd === undefined ? (c.rd = riverDist(c.c)) : c.rd) > (river ? river.w + 70 : 0);
     const merge = (c, di, dj, type, dry2) => {
-      const list = [];
-      for (let a = 0; a <= di; a++) for (let b = 0; b <= dj; b++) { const q = cellAt(c.i + a, c.j + b); if (!isFree(q)) return null; list.push(q); }
-      for (let a = 1; a <= di; a++) if (cols[c.i + a].kind === 'rail') return null;
-      for (let b = 1; b <= dj; b++) if (rows[c.j + b].kind === 'rail') return null;
+      const list = [], reg = c.reg;
+      for (let a = 0; a <= di; a++) {
+        for (let b = 0; b <= dj; b++) {
+          const q = cellAt(reg, c.i + a, c.j + b);
+          if (!isFree(q) || ((di || dj) && !q.full)) return null;
+          list.push(q);
+        }
+      }
+      for (let a = 1; a <= di; a++) if (reg.cols[c.i + a].kind === 'rail' || reg.cols[c.i + a].kind === 'canal') return null;
+      for (let b = 1; b <= dj; b++) if (reg.rows[c.j + b].kind === 'rail' || reg.rows[c.j + b].kind === 'canal') return null;
       if (dry2) return list;
       const last = list[list.length - 1];
       const sb = { type, u0: c.u0, v0: c.v0, u1: last.u1, v1: last.v1 };
-      sb.poly = [toW(sb.u0, sb.v0), toW(sb.u1, sb.v0), toW(sb.u1, sb.v1), toW(sb.u0, sb.v1)];
+      sb.poly = list.length > 1 ? cellPoly(reg, sb.u0, sb.u1, sb.v0, sb.v1) : c.poly;
       for (const q of list) Object.assign(q, { sb, type });
       return sb;
     };
     const special = (type, di, dj, score) => {
-      let best = null, bs = -Infinity;
+      let best = null, bs2 = -Infinity;
       for (const c of urbanCells) {
         if (!isFree(c)) continue;
         const s = score(c);
-        if (s > bs && merge(c, di, dj, type, true)) { bs = s; best = c; }
+        if (s > bs2 && merge(c, di, dj, type, true)) { bs2 = s; best = c; }
       }
-      return best && bs > -Infinity ? merge(best, di, dj, type) : null;
+      return best && bs2 > -Infinity ? merge(best, di, dj, type) : null;
     };
     const band = (lo2, hi2) => (c) => (c.d >= lo2 && c.d <= hi2 ? zr.next() : -Infinity);
     if (station) {
@@ -2397,40 +2997,67 @@
       if (isFree(fc)) fc.type = 'forecourt';
     }
     if (cyber) {
-      if (opts.citadel) {
-        const i0 = cols.findIndex((l) => l.axis), j0 = rows.findIndex((l) => l.axis);
-        const c0 = cellAt(i0 - 1, j0 - 1);
+      if (opts.citadel && main) {
+        const i0 = main.cols.findIndex((l) => l.axis), j0 = main.rows.findIndex((l) => l.axis);
+        const c0 = cellAt(main, i0 - 1, j0 - 1);
         if (!(c0 && merge(c0, 1, 1, 'castle')) && !special('castle', 1, 1, (c) => -c.d)) special('castle', 0, 0, (c) => -c.d);
+      } else if (opts.citadel && citadel) {
+        if (!special('castle', 1, 1, (c) => (c.reg === citadel.reg ? -G.len(c.c) : -Infinity))) special('castle', 0, 0, (c) => (c.reg === citadel.reg ? -G.len(c.c) : -Infinity));
       }
       if (opts.temple) special('temple', 0, 0, band(0.2, 0.5));
-      if (opts.plaza) special('market', 0, 0, (c) => (c.avenue && c.d > 0.2 && c.d < 0.55 ? zr.next() : -Infinity));
-      special('park', 0, 0, band(0.3, 0.7));
-      for (let q = big ? 2 : 1; q > 0; q--) special('military', 0, 0, band(0.25, 0.5));
+      if (opts.plaza) special('market', 0, 0, (c) => (c.avenue && c.d > 0.2 && c.d < 0.55 && !c.reg.citadel ? zr.next() : -Infinity));
+      for (let q = Math.max(1, Math.round(parkK)); q > 0; q--) special('park', 0, 0, band(0.3, 0.7));
+      for (let q = big ? 2 : 1; q > 0; q--) special('military', 0, 0, (c) => (c.d > 0.25 && c.d < 0.5 && !c.reg.citadel ? zr.next() : -Infinity));
     } else {
       const toStation = (c) => (station ? -G.dist(c.c, station.R0) / Ru : -Math.abs(c.d - 0.4));
       if (opts.citadel) special('castle', size === 'small' ? 0 : 1, size === 'huge' ? 1 : 0, (c) => (c.d > 0.2 && c.d < 0.65 ? toStation(c) + zr.float(0, 0.25) : -Infinity));
       if (size !== 'small') special('fair', 1, big ? 1 : 0, (c) => (c.d > 0.72 && c.d < 1 && angDiff(c.a, aFair) < 0.9 ? zr.next() : -Infinity));
       if (big) special('stadium', 1, 1, (c) => (c.d > 0.6 && c.d < 0.95 && angDiff(c.a, aFair) > 0.9 ? zr.next() : -Infinity));
+      if (big && zr.bool(Math.min(0.9, parkK * 0.4))) special('park', 2, 1, band(0.3, 0.75));
       if (big) special('park', 1, 1, band(0.3, 0.7));
-      const nParks = Math.max(1, Math.round(urbanCells.length / 40));
-      for (let q = 0; q < nParks; q++) special('park', 0, 0, (c) => (c.d < 0.9 ? zr.next() + (riverDist(c.c) < Q.bu[1] * 1.6 ? 0.6 : 0) : -Infinity));
+      const nParks = Math.max(1, Math.round((urbanCells.length / 40) * parkK));
+      for (let q = 0; q < nParks; q++) special('park', 0, 0, (c) => (c.d < 0.9 ? zr.next() + ((c.rd === undefined ? (c.rd = riverDist(c.c)) : c.rd) < Q.bu[1] * 1.6 ? 0.6 : 0) : -Infinity));
       for (let q = size === 'huge' ? 2 : size === 'small' ? 0 : 1; q > 0; q--) {
         const mall = special('merchant', 0, 0, (c) => (c.d > 0.78 && c.d < 1 && c.avenue ? zr.next() : -Infinity));
         if (mall) mall.mall = true;
       }
     }
+    if (flavour === 'campus' && size !== 'small') special('campus', 1, big ? 1 : 0, (c) => (c.d > 0.3 && c.d < 0.85 && !c.reg.citadel ? zr.next() : -Infinity));
+    const shoreDist = (p) => (coast ? -coast.sdf(p) : Infinity);
+    const nB = rad0 ? rad0.nRing + 1 : 1;
     for (const c of urbanCells) {
       if (c.type) continue;
-      const d = c.d, a = c.a;
+      const d = c.d, a = c.a, reg = c.reg;
       if (harbourAt(c.c)) c.type = 'harbour';
-      else if (cyber) {
-        c.type = d < 0.3 ? 'administration'
-          : d > 0.84 && angDiff(a, aSlum) < 0.5 ? 'slum'
-            : d > 0.7 && angDiff(a, aInd) < 0.6 ? 'industrial'
+      else if (flavour === 'tourist' && shoreDist(c.c) < Q.bu[1] * 1.5 && d < 0.95) c.type = 'resort';
+      else if (cyber && rad0) {
+        // Round the spire: corporate towers, then the sprawl, then the Combat Zone.
+        const f = reg.band / nB;
+        c.type = f <= 0.34 ? (zr.bool(0.55) ? 'administration' : 'patriciate')
+          : f <= 0.67 ? (c.avenue && zr.bool(0.4) ? 'merchant' : 'craftsmen')
+            : d > 0.7 && angDiff(a, aInd) < 0.6 ? 'industrial' : zr.bool(0.6) ? 'slum' : 'craftsmen';
+      } else if (cyber && citadel) {
+        if (reg.citadel) c.type = G.len(c.c) < citR * 0.4 ? 'administration' : c.avenue && zr.bool(0.3) ? 'merchant' : zr.bool(0.55) ? 'patriciate' : 'administration';
+        else {
+          const nz = noise.get(c.c.x * 0.005 + 13, c.c.y * 0.005 - 3);
+          c.type = d > 0.72 && angDiff(a, aInd) < 0.6 ? 'industrial' : nz > 0.3 ? 'merchant' : d > 0.88 ? 'shanty' : 'slum';
+        }
+      } else if (cyber && axis) {
+        const off = Math.abs(axis.proj(c.c).d) / Wa;
+        c.type = off < 0.38 ? (c.avenue && zr.bool(0.5) ? 'merchant' : 'craftsmen')
+          : off < 0.62 && angDiff(a, aRich) < 0.8 ? 'patriciate'
+            : d > 0.7 && angDiff(a, aInd) < 0.7 ? 'industrial' : zr.bool(0.55) ? 'slum' : 'craftsmen';
+      } else if (cyber) {
+        const slumW = flavour === 'decay' ? 0.9 : 0.5;
+        c.type = d < (flavour === 'corporate' ? 0.4 : 0.3) ? 'administration'
+          : d > (flavour === 'decay' ? 0.7 : 0.84) && angDiff(a, aSlum) < slumW ? 'slum'
+            : d > 0.7 && angDiff(a, aInd) < (flavour === 'industrial' ? 0.95 : 0.6) ? 'industrial'
               : d > 0.28 && d < 0.66 && angDiff(a, aRich) < 0.55 ? 'patriciate'
                 : c.avenue && zr.bool(0.4) ? 'merchant' : 'craftsmen';
-      } else {
-        c.type = d > 0.78 && angDiff(a, aInd) < 0.62 ? 'industrial'
+      } else if (reg.era === 'estate' && zr.bool(0.75)) c.type = 'slum';
+      else if (reg.era === 'old' && d < 0.75) c.type = c.avenue && zr.bool(0.5) ? 'merchant' : 'craftsmen';
+      else {
+        c.type = d > 0.78 && angDiff(a, aInd) < indW ? 'industrial'
           : d > 0.3 && d < 0.85 && angDiff(a, aRich) < 0.45 ? 'patriciate'
             : d > 0.84 ? 'shanty'
               : d > 0.5 && angDiff(a, aInd) < 1.35 ? 'slum'
@@ -2438,38 +3065,205 @@
       }
     }
 
-    // 11. Blocks: cells carved by the core, the station, water, railway and roads.
+    // 14. Blocks: cells carved by the core, the station, water, railway, roads and walls.
     const cutsU = [], cutsR = [];
+    const beachW = flavour === 'tourist' ? (coast && coast.kind === 'lake' ? 14 : 30) : 0;
     if (river) { cutsU.push(corridor(river.pts, river.w / 2 + Q.street + 2.5)); cutsR.push(corridor(river.pts, river.w / 2 + 4)); }
-    if (coast) { const cp = simplify(coast.pts, 1); cutsU.push(corridor(cp, Q.street + 3)); cutsR.push(corridor(cp, 4)); }
-    if (rail) { cutsU.push(corridor(rail.pts, Q.rail / 2 + 1)); cutsR.push(corridor(rail.pts, Q.rail / 2 + 3)); }
+    if (coast) {
+      const cp = simplify(coast.pts, 1), closed = !!coast.closed;
+      cutsU.push(corridor(cp, (beachW ? beachW + Q.avenue : Q.street) + 3, closed));
+      cutsR.push(corridor(cp, 4, closed));
+    }
+    if (rail) { const hw = rail.spine ? spineW / 2 + 2 : Q.rail / 2 + 1; cutsU.push(corridor(rail.pts, hw)); cutsR.push(corridor(rail.pts, hw + 2)); }
     for (const rg of ring) { cutsU.push(corridor(rg.pts, Q.ring / 2 + 3, rg.closed)); cutsR.push(corridor(rg.pts, Q.ring / 2 + 3, rg.closed)); }
     for (const rd of roads) {
       if (!rd.axis) { cutsU.push(corridor(rd.urban, Q.avenue / 2 + 1)); cutsR.push(corridor(rd.urban, Q.avenue / 2 + 2)); }
       cutsU.push(corridor(rd.rural, Q.road / 2 + 2));
       cutsR.push(corridor(rd.rural, Q.road / 2 + 3));
     }
+    if (wall && wall.cut) cutsU.push(corridor(wall.pts, 7, true));
     const obstacles = [];
     if (core) obstacles.push(core.obstacle);
     if (station) obstacles.push(station.zone);
-    const carve = (poly, urban) => {
+    if (hub) obstacles.push(grow(hub.poly, Q.avenue / 2 + 2));
+    if (spine) obstacles.push(...spine.pieces.map((p2) => grow(p2, Q.avenue + 2)), ...spine.nodes.map((nd) => grow(nd, 6)));
+    const carve = (poly, urban, reg) => {
       let ps = [poly];
       for (const ob of obstacles) ps = carveConvex(ps, ob);
+      if (reg) for (const ob of reg.excl) ps = carveConvex(ps, ob);
       for (const cor of urban ? cutsU : cutsR) ps = carveLine(ps, cor);
       return ps.filter((p) => G.area(p) > (urban ? 250 : 600) && !seaAt(G.centroid(p)) && !p.some((v) => seaAt(v, -4)));
     };
 
     const br = fork('buildings');
     const k = M / 500;
-    const X = { U, cyber, small: size === 'small' && !cyber, tree: cyber ? 14 : 12, tr: cyber ? [3, 4.5] : [3.2, 5], furrow: 4 * k, shack: 60 + 14 * k };
+    const X = { U: reg0.U, cyber, small: marina, leafy, tree: cyber ? 14 : 12, tr: cyber ? [3, 4.5] : [3.2, 5], furrow: 4 * k, shack: 60 + 14 * k };
     const wards = [];
     const newWard = (type, block, inner) => ({ type, inner, block, buildings: [], special: [] });
+    // 15. Curvy suburbs (present day): collector roads in from the avenues, cul-de-sacs
+    //     ending in turning circles, detached houses on their lots along them.
+    const suburbRoads = [], culs = [];
+    const sr = fork('suburbs');
+    const clearOf = (p, m) => cutsU.every((cor) => !segsNear(cor, { x0: p.x - m - cor.hw, x1: p.x + m + cor.hw, y0: p.y - m - cor.hw, y1: p.y + m + cor.hw }).some((s) => G.distToSegment(p, s.a, s.b) < cor.hw + m));
+    for (const reg of regions) {
+      if (reg.kind !== 'suburb') continue;
+      const own = cells.filter((c) => c.reg === reg && c.curvy);
+      // Where no curvy layout fits, the cells go back to plain blocks.
+      const giveUp = () => { for (const c of own) c.curvy = false; };
+      if (own.length < 2) { giveUp(); continue; }
+      const okAt = (p, m = 0) => G.contains(reg.inner, p) && dOf(p) < 1.02 && !seaAt(p, 8 + m) &&
+        !voids.some((x) => G.contains(x, p)) && !(station && G.contains(station.zone, p)) && clearOf(p, m);
+      const lines = [];
+      const nearRoad = (p, skip, dmin) => lines.some((l) => l !== skip && p.x > l.bb.x0 - dmin && p.x < l.bb.x1 + dmin && p.y > l.bb.y0 - dmin && p.y < l.bb.y1 + dmin && G.distToPolyline(p, l.pts) < dmin);
+      const walk = (start, h0, maxL, parent) => {
+        const pts = [start];
+        let p = start, h = h0, len = 0;
+        const bendR = sr.float(-1, 1) * 0.012;
+        while (len < maxL) {
+          h += bendR * 8 + noise.get(p.x * 0.012 + 77, p.y * 0.012 - 5) * 0.09;
+          const q = G.add(p, G.fromAngle(h, 8));
+          if (!okAt(q, 4) || (len > 24 && nearRoad(q, parent, 26)) || nearRoad(q, null, 9)) break;
+          pts.push(q);
+          p = q;
+          len += 8;
+        }
+        return pts;
+      };
+      // Collectors from the edges of the region facing the town centre.
+      const P2 = reg.inner, entries = [];
+      for (let i = 0; i < P2.length; i++) {
+        const a = P2[i], b = P2[(i + 1) % P2.length], m = G.mid(a, b);
+        if (G.dist(a, b) < 60 || dOf(m) > 0.98) continue;
+        entries.push({ m, inN: G.norm(G.perp(G.sub(b, a))), d: G.dist(m, Fc) });
+      }
+      entries.sort((x, y) => x.d - y.d);
+      for (const en of entries.slice(0, own.length > 10 ? 3 : 2)) {
+        const st = G.add(en.m, G.scale(en.inN, 2));
+        if (!okAt(st)) continue;
+        const pts = walk(st, G.angle(en.inN) + sr.float(-0.4, 0.4), Ru * 1.5, null);
+        if (pts.length < 6) continue;
+        pts.unshift(G.sub(en.m, G.scale(en.inN, reg.seamW / 2 + 1)));
+        const col = { pts, hw: Q.street / 2, kind: 'street' };
+        col.bb = G.bbox(pts);
+        lines.push(col);
+        // Cul-de-sacs off the collector.
+        const L = G.polylineLength(pts);
+        let side = sr.sign();
+        for (let s = sr.float(40, 70); s < L - 30; s += sr.float(55, 90)) {
+          const at = G.along(pts, s);
+          side = -side;
+          const h = G.angle(at.dir) + side * (Math.PI / 2 + sr.float(-0.35, 0.35));
+          const cp = walk(G.add(at.p, G.fromAngle(h, Q.street / 2 + 2)), h, sr.float(60, 140), col);
+          if (cp.length < 5) continue;
+          cp.unshift(at.p);
+          const end = cp[cp.length - 1];
+          const cul = { pts: cp, hw: 4, kind: 'drive', bb: G.bbox(cp) };
+          lines.push(cul);
+          if (okAt(end, 6)) culs.push({ x: end.x, y: end.y, r: 11, line: cul });
+        }
+      }
+      if (!lines.length) { giveUp(); continue; }
+      // Fill the gaps: more cul-de-sacs towards land still far from any road.
+      const samples = [];
+      for (const c of own) {
+        const bb2 = G.bbox(c.poly);
+        for (let x = bb2.x0 + 15; x < bb2.x1; x += 30) for (let y = bb2.y0 + 15; y < bb2.y1; y += 30) if (G.contains(c.poly, { x, y })) samples.push({ x, y });
+      }
+      for (const p of sr.shuffle(samples)) {
+        if (nearRoad(p, null, 40) || !okAt(p, 6)) continue;
+        let bi = -1, bd = Infinity, bl = null;
+        for (const l of lines) l.pts.forEach((q, i) => { const d = G.dist(p, q); if (d < bd) { bd = d; bi = i; bl = l; } });
+        if (!bl) continue;
+        const from = bl.pts[bi], h = G.angle(G.sub(p, from));
+        const cp = walk(G.add(from, G.fromAngle(h, bl.hw + 2)), h, Math.min(bd + 50, 420), bl);
+        if (cp.length < 5) continue;
+        cp.unshift(from);
+        const cul = { pts: cp, hw: 4, kind: 'drive', bb: G.bbox(cp) }, end = cp[cp.length - 1];
+        lines.push(cul);
+        if (okAt(end, 6)) culs.push({ x: end.x, y: end.y, r: 11, line: cul });
+      }
+      // Lots and houses along both sides.
+      const w = newWard('shanty', null, true);
+      w.noGround = true;
+      const hash = new Map(), hk = (p) => Math.floor(p.x / 40) + ':' + Math.floor(p.y / 40);
+      const lots = [];
+      const free = (lot) => {
+        const c = G.centroid(lot), cx = Math.floor(c.x / 40), cy2 = Math.floor(c.y / 40);
+        for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const o of hash.get((cx + a) + ':' + (cy2 + b)) || []) if (G.convexOverlap(o, lot, 0.6)) return false;
+        return true;
+      };
+      // Road pieces and turning circles in 32 m buckets, for the clearance tests.
+      const sg = new Map(), sk = (x, y) => x + ':' + y;
+      const bucket = (x0, y0, x1, y1, item) => {
+        for (let x = Math.floor(x0 / 32); x <= Math.floor(x1 / 32); x++) {
+          for (let y = Math.floor(y0 / 32); y <= Math.floor(y1 / 32); y++) {
+            if (!sg.has(sk(x, y))) sg.set(sk(x, y), []);
+            sg.get(sk(x, y)).push(item);
+          }
+        }
+      };
+      for (const l of lines) each(l.pts, false, (a, b) => bucket(Math.min(a.x, b.x) - 14, Math.min(a.y, b.y) - 14, Math.max(a.x, b.x) + 14, Math.max(a.y, b.y) + 14, { a, b, r: l.hw + 0.6 }));
+      for (const cu of culs) if (lines.includes(cu.line)) bucket(cu.x - 14, cu.y - 14, cu.x + 14, cu.y + 14, { a: cu, b: cu, r: cu.r + 2 });
+      const clearRoads = (pts2) => pts2.every((p) => (sg.get(sk(Math.floor(p.x / 32), Math.floor(p.y / 32))) || []).every((q) => G.distToSegment(p, q.a, q.b) > q.r));
+      const tryLot = (p, dir, nrm) => {
+        const depth = sr.float(26, 32), front = sr.float(15, 18), ang = G.angle(dir);
+        for (const dd of [depth, depth * 0.72, depth * 0.52]) {
+          const lc = G.add(p, G.scale(nrm, 1.5 + dd / 2)), lot = G.rect(lc.x, lc.y, front, dd, ang);
+          if (!lot.every((q) => okAt(q)) || !clearRoads(lot) || !free(lot)) continue;
+          const hd = sr.float(8, 10), hc = G.add(p, G.scale(nrm, 1.5 + 4.5 + hd / 2));
+          const house = G.rect(hc.x, hc.y, Math.min(front - 4, sr.float(10, 13)), hd, ang);
+          lots.push(lot);
+          const key2 = hk(G.centroid(lot));
+          if (!hash.has(key2)) hash.set(key2, []);
+          hash.get(key2).push(lot);
+          (w.gardens || (w.gardens = [])).push(lot);
+          w.buildings.push(house);
+          if (sr.bool(0.4)) {
+            const tp = G.add(p, G.scale(nrm, 1.5 + dd - 4));
+            (w.trees || (w.trees = [])).push({ x: tp.x + sr.float(-4, 4), y: tp.y, r: sr.float(X.tr[0], X.tr[1]) });
+          }
+          if (sr.bool(0.12)) {
+            const pc = G.add(p, G.scale(nrm, 1.5 + dd - 7)), pool = G.rect(pc.x, pc.y, 8, 4, ang);
+            if (!G.convexOverlap(pool, house, 1)) (w.pools || (w.pools = [])).push(pool);
+          }
+          return;
+        }
+      };
+      for (const l of lines) {
+        const L = G.polylineLength(l.pts);
+        for (let s = 12; s < L - (l.kind === 'drive' ? 4 : 10); s += sr.float(16, 19)) {
+          const at = G.along(l.pts, s);
+          for (const sg of [-1, 1]) tryLot(G.add(at.p, G.scale(G.perp(at.dir), sg * l.hw)), at.dir, G.scale(G.perp(at.dir), sg));
+        }
+      }
+      for (const cu of culs) {
+        if (!lines.includes(cu.line)) continue;
+        const pts = cu.line.pts, inA = G.angle(G.sub(pts[pts.length - 2], pts[pts.length - 1]));
+        for (let a = inA + 0.9; a < inA + Math.PI * 2 - 0.9; a += 0.75) {
+          const D = G.fromAngle(a);
+          tryLot(G.add(cu, G.scale(D, cu.r)), G.perp(D), D);
+        }
+      }
+      if (lots.length < 4) { giveUp(); continue; }
+      // Cells the curvy streets never reached are built as ordinary blocks.
+      const hc = w.buildings.map((b) => G.centroid(b)), rp = [].concat(...lines.map((l) => l.pts));
+      for (const c of own) {
+        const bb2 = G.bbox(c.poly), inBox = (p) => p.x > bb2.x0 && p.x < bb2.x1 && p.y > bb2.y0 && p.y < bb2.y1;
+        if (!hc.some((p) => inBox(p) && G.contains(c.poly, p)) && !rp.some((p) => inBox(p) && G.contains(c.poly, p))) c.curvy = false;
+      }
+      w.block = hull(lots.flat());
+      wards.push(w);
+      for (const l of lines) suburbRoads.push(l);
+    }
+
     const done = new Set();
     for (const c of urbanCells) {
+      if (c.curvy) continue;
       const unit = c.sb || c;
       if (done.has(unit)) continue;
       done.add(unit);
-      let pieces = carve(c.sb ? c.sb.poly : c.poly, true);
+      X.U = c.reg.U;
+      let pieces = carve(c.sb ? c.sb.poly : c.poly, true, c.reg);
       if (c.sb && pieces.length > 1) pieces.sort((x, y) => G.area(y) - G.area(x));
       pieces.forEach((piece, i) => {
         const type = i && c.sb ? (cyber ? 'craftsmen' : 'park') : unit.type;
@@ -2482,18 +3276,31 @@
         wards.push(w);
       });
     }
+    // The spire, and the megastructure.
+    if (hub) {
+      const w = newWard(opts.citadel ? 'castle' : 'market', hub.poly, true);
+      X.U = reg0.U;
+      fillBlock(br, w, X);
+      wards.push(w);
+    }
+    if (spine) {
+      const w = newWard('castle', spine.pieces[Math.floor(spine.pieces.length / 2)], true);
+      w.spine = spine;
+      w.special = spine.pieces.concat(spine.nodes);
+      wards.push(w);
+    }
 
-    // 12. The historic core: Voronoi patches clipped to the outline, with the medieval wards.
+    // 16. The historic core: Voronoi patches clipped to the outline, with the medieval wards.
     const landmarks = [];
     const census = {};
     if (core) {
       const kr = core.rng, C = core.C;
       const s0 = Math.sqrt(2000 / Math.PI), golden = Math.PI * (3 - Math.sqrt(5)), b0 = kr.float(0, Math.PI * 2);
       const pts = [];
-      for (let i = 0, n1 = Math.round(P.core * 3); i < n1; i++) {
-        const rad = s0 * Math.sqrt(i + 0.5) * (1 + kr.float(-0.1, 0.1));
+      for (let i = 0, n1 = Math.max(12, Math.round((3 * Math.PI * Rcore * Rcore) / 2000)); i < n1; i++) {
+        const rad2 = s0 * Math.sqrt(i + 0.5) * (1 + kr.float(-0.1, 0.1));
         const a = b0 + i * golden + kr.float(-0.3, 0.3);
-        pts.push({ x: Math.cos(a) * rad, y: Math.sin(a) * rad });
+        pts.push({ x: Math.cos(a) * rad2, y: Math.sin(a) * rad2 });
       }
       const topo = buildTopo(Carto.Voronoi.relax(pts, 2, (p) => G.len(p) < Rcore * 1.3), Rcore * 1.8);
       const inCore = new Set(topo.patches.filter((p) => {
@@ -2509,12 +3316,12 @@
         }
         return out;
       };
-      let plaza = null, bs = Infinity;
+      let plaza = null, bs3 = Infinity;
       for (const p of inCore) {
         const a = G.area(p.verts);
         if (a < 700) continue;
-        const sc = G.len(G.centroid(p.verts)) / Math.sqrt(a) + (river && riverDist(G.centroid(p.verts)) < river.w + 30 ? 9 : 0);
-        if (sc < bs) { bs = sc; plaza = p; }
+        const sc = G.len(G.centroid(p.verts)) / Math.sqrt(a) + (river && riverDist(G.centroid(p.verts)) < river.w + 30 ? 9 : 0) + (seaAt(G.centroid(p.verts), 60) ? 9 : 0);
+        if (sc < bs3) { bs3 = sc; plaza = p; }
       }
       if (plaza) {
         plaza.type = opts.plaza ? 'market' : 'oldtown';
@@ -2559,7 +3366,7 @@
         if (block.length < 3) continue;
         let pieces = [block];
         for (const cor of coreCuts) pieces = carveLine(pieces, cor);
-        pieces = pieces.filter((q) => G.area(q) > 40).sort((x, y) => G.area(y) - G.area(x));
+        pieces = pieces.filter((q) => G.area(q) > 40 && !seaAt(G.centroid(q), 2)).sort((x, y) => G.area(y) - G.area(x));
         pieces.forEach((piece, i) => {
           const type = i && p.type !== 'oldtown' && p.type ? 'oldtown' : p.type || 'oldtown';
           const w = newWard(type, piece, true);
@@ -2613,78 +3420,143 @@
         else if (cur.length) lines.push(cur);
         core.walls = lines.filter((l) => l.length > 1);
         core.bastions = wl.map((v, i) => {
-          const e1 = G.norm(G.sub(wl[(i + n - 1) % n], v)), e2 = G.norm(G.sub(wl[(i + 1) % n], v));
-          const o = G.scale(G.norm(G.add(e1, e2)), -1);
-          return [G.add(v, G.scale(e1, 12)), G.add(v, G.scale(o, 16)), G.add(v, G.scale(e2, 12)), G.add(v, G.scale(o, -4))];
-        }).filter((b) => !core.gates.some((g) => G.dist(g, b[3]) < 22));
+          const e1b = G.norm(G.sub(wl[(i + n - 1) % n], v)), e2b = G.norm(G.sub(wl[(i + 1) % n], v));
+          const o = G.scale(G.norm(G.add(e1b, e2b)), -1);
+          return [G.add(v, G.scale(e1b, 12)), G.add(v, G.scale(o, 16)), G.add(v, G.scale(e2b, 12)), G.add(v, G.scale(o, -4))];
+        }).filter((b) => !core.gates.some((g) => G.dist(g, b[3]) < 22) && !seaAt(b[1], 4));
       }
     }
 
-    // 13. Countryside: parcels of up to 3 x 3 cells between the lanes, carved by roads and water.
+    // 17. Countryside: parcels of up to 3 x 3 cells between the lanes, carved by roads and
+    //     water; an airport for the larger towns.
+    let airportZone = null;
+    if (airport) {
+      const ar2 = fork('airport');
+      const Lr = { large: 1500, huge: 2100 }[size] * ar2.float(0.85, 1.05);
+      for (let tries = 0; tries < 40 && !airportZone; tries++) {
+        const a = aInd + ar2.float(-1.4, 1.4), c = G.add(Fc, G.fromAngle(a, rad(a) * ar2.float(1.3, 1.65) + 160));
+        const ang = a + Math.PI / 2 + ar2.float(-0.5, 0.5);
+        const zone = G.rect(c.x, c.y, Lr + 160, 330, ang);
+        if (!inSheet(c, -260) || zone.some((p) => !inSheet(p, 420))) continue;
+        const f = { c, u: G.fromAngle(ang), v: G.perp(G.fromAngle(ang)) }, samples = [];
+        for (let x = -0.5; x <= 0.5; x += 0.1) for (const y of [-0.5, 0, 0.5]) samples.push(fpt(f, x * (Lr + 160), y * 330));
+        if (samples.some((p) => seaAt(p, 80) || dS(p) < 1.08 || riverDist(p) < rw / 2 + 50 || roadDist(p) < 30 ||
+          (rail && G.distToPolyline(p, rail.pts) < 40) || ring.some((rg) => G.distToPolyline(p, rg.pts, rg.closed) < 40))) continue;
+        airportZone = { zone, f, Lr };
+      }
+      if (airportZone) {
+        const { zone, f, Lr } = airportZone, w = newWard('airport', zone, false);
+        w.lawns = [zone];
+        const ang = Math.atan2(f.u.y, f.u.x);
+        w.runway = frect(f, 0, -70, Lr, 45);
+        w.marks = [];
+        for (let x = -Lr / 2 + 60; x < Lr / 2 - 60; x += 50) w.marks.push([fpt(f, x, -70), fpt(f, x + 24, -70)]);
+        w.taxi = [[fpt(f, -Lr * 0.45, -70), fpt(f, -Lr * 0.42, -10), fpt(f, Lr * 0.42, -10), fpt(f, Lr * 0.45, -70)], [fpt(f, 0, -10), fpt(f, 0, 40)]];
+        w.apron = frect(f, 0, 75, Lr * 0.36, 80);
+        w.special.push(frect(f, 0, 135, Lr * 0.26, 26));
+        for (let q = 0; q < 3; q++) w.buildings.push(frect(f, Lr * 0.3 + q * 46, 70, 38, 44));
+        if (cyber) for (let x = -Lr * 0.15; x <= Lr * 0.15; x += 36) { const p = fpt(f, x, 75); (w.pads || (w.pads = [])).push(G.regular(p.x, p.y, 12, 16)); }
+        w.ang = ang;
+        wards.push(w);
+        obstacles.push(zone);
+      }
+    }
     const rural = (c) => c && c.state === 'rural' && !c.used;
-    for (const c of cells.slice().sort((x, y) => x.j - y.j || x.i - y.i)) {
+    for (const c of cells.slice().sort((x, y) => x.reg.id - y.reg.id || x.j - y.j || x.i - y.i)) {
       if (!rural(c)) continue;
+      const reg = c.reg, cols = reg.cols, rows = reg.rows;
       let ei = c.i, ej = c.j;
       for (let a = 1, di = zr.int(0, 2); a <= di; a++) {
-        if (cols[c.i + a].lane || cols[c.i + a].kind === 'rail' || !rural(cellAt(c.i + a, c.j))) break;
+        if (cols[c.i + a].lane || cols[c.i + a].kind === 'rail' || !rural(cellAt(reg, c.i + a, c.j))) break;
         ei = c.i + a;
       }
       for (let b = 1, dj = zr.int(0, 2); b <= dj; b++) {
         let ok = !rows[c.j + b].lane && rows[c.j + b].kind !== 'rail';
-        for (let a = c.i; a <= ei && ok; a++) ok = rural(cellAt(a, c.j + b));
+        for (let a = c.i; a <= ei && ok; a++) ok = rural(cellAt(reg, a, c.j + b));
         if (!ok) break;
         ej = c.j + b;
       }
-      for (let a = c.i; a <= ei; a++) for (let b = c.j; b <= ej; b++) cellAt(a, b).used = true;
+      for (let a = c.i; a <= ei; a++) for (let b = c.j; b <= ej; b++) cellAt(reg, a, b).used = true;
       // Fields reach the middle of the grid lines: only the lanes are tracks.
-      const u0 = cols[c.i].pos, u1 = cols[ei + 1].pos, v0 = rows[c.j].pos, v1 = rows[ej + 1].pos;
-      const poly = G.insetConvex([toW(u0, v0), toW(u1, v0), toW(u1, v1), toW(u0, v1)], 2);
+      let poly = [reg.toW(cols[c.i].pos, rows[c.j].pos), reg.toW(cols[ei + 1].pos, rows[c.j].pos), reg.toW(cols[ei + 1].pos, rows[ej + 1].pos), reg.toW(cols[c.i].pos, rows[ej + 1].pos)];
+      if (!inside(reg.poly, poly)) poly = G.clipConvex(poly, reg.poly);
+      poly = poly.length >= 3 ? G.insetConvex(poly, 2) : [];
       if (poly.length < 3) continue;
       const pc = G.centroid(poly), d = dOf(pc);
       const forest = noise.fbm(pc.x * 0.0016 + 300, pc.y * 0.0016, 3);
+      // Wooded slopes on the sides of a valley town.
+      const slope = axis && !cyber ? Math.abs(axis.proj(pc).d) / Wa - 1.6 : 0;
       let type;
-      if (cyber) type = opts.farms && d < 1.8 && zr.bool(0.3) ? 'farm' : zr.bool(0.1) && roadDist(pc) < 260 ? 'outer' : 'wood';
-      else if (forest > 0.3 && d > 1.25) type = 'wood';
+      if (cyber && plan === 'bay' && !coast) type = zr.bool(0.45) ? 'flood' : opts.farms && d < 1.8 && zr.bool(0.3) ? 'farm' : 'wood';
+      else if (cyber) type = opts.farms && d < 1.8 && zr.bool(0.3) ? 'farm' : zr.bool(0.1) && roadDist(pc) < 260 ? 'outer' : 'wood';
+      else if ((forest + Math.max(0, slope) * 0.5 > 0.3) && d > 1.25) type = 'wood';
       else type = opts.farms ? (zr.bool(0.1) ? 'meadow' : 'farm') : forest > 0.05 ? 'wood' : 'meadow';
-      for (const piece of carve(poly, false)) {
+      X.U = reg.U;
+      for (const piece of carve(poly, false, reg)) {
         const w = newWard(type, piece, false);
         fillBlock(br, w, X);
         wards.push(w);
       }
     }
 
-    // 14. Streets: grid segments between built cells, cut where they meet water, the core,
-    //     the railway or the ring road; bridges where they cross the river.
-    const streets = [], bridges = [], railBridges = [];
-    const rcor = river ? corridor(river.pts, river.w / 2 + 1) : null;
-    const railCor = rail ? corridor(rail.pts, Q.rail / 2) : null;
+    // 18. Streets: grid segments between built cells, cut where they meet water, the core,
+    //     the railway or the ring road; bridges where they cross the river or a canal.
+    const streets = [], bridges = [], railBridges = [], junctions = [];
+    const canals = [];
+    if (main && main.cols.concat(main.rows).some((l) => l.kind === 'canal')) {
+      for (const [fam, other, isCol] of [[main.cols, main.rows, true], [main.rows, main.cols, false]]) {
+        fam.forEach((line, i) => {
+          if (line.kind !== 'canal') return;
+          let run = null;
+          for (let j = 0; j + 1 < other.length; j++) {
+            const A = isCol ? cellAt(main, i - 1, j) : cellAt(main, j, i - 1), Bc2 = isCol ? cellAt(main, i, j) : cellAt(main, j, i);
+            const a = isCol ? main.toW(line.pos, other[j].pos) : main.toW(other[j].pos, line.pos);
+            const b = isCol ? main.toW(line.pos, other[j + 1].pos) : main.toW(other[j + 1].pos, line.pos);
+            const wet = [A, Bc2].some((c) => c && c.state === 'urban') || dOf(G.mid(a, b)) < 1.12;
+            if (wet && !seaAt(a, -20)) { if (!run) canals.push(run = { pts: [a] }); run.pts.push(b); } else run = null;
+          }
+        });
+      }
+    }
+    const wets = [];
+    if (river) wets.push({ cor: corridor(river.pts, river.w / 2 + 1), w: river.w });
+    for (const cn of canals) wets.push({ cor: corridor(cn.pts, Q.canal / 2 + 1), w: Q.canal });
+    const railCor = rail && !rail.spine ? corridor(rail.pts, Q.rail / 2) : null;
     const ringCor = ring.map((rg) => corridor(rg.pts, Q.ring / 2, rg.closed));
-    const coreStop = core ? core.boulevard : null;
+    const wallCor = wall && wall.cut ? corridor(wall.pts, 5, true) : null;
+    const stops = [];
+    if (core) stops.push({ poly: core.boulevard, owner: -1 });
+    if (citadel) stops.push({ poly: citadel.outer, owner: citadel.reg ? citadel.reg.id : -2 });
+    if (hub) stops.push({ poly: hub.poly, owner: -1 });
     const nearOf = (cor, a, b) => (cor ? segsNear(cor, { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y) }) : []);
     const hit = (segs, p, hw) => segs.some((s) => G.distToSegment(p, s.a, s.b) < hw);
-    const addStreet = (a, b, w, kind, bridge) => {
-      const nr = nearOf(rcor, a, b), nl = nearOf(railCor, a, b);
+    const addStreet = (a, b, w, kind, bridge, owner = -1) => {
+      const nw = wets.map((x) => ({ segs: nearOf(x.cor, a, b), w: x.w })).filter((x) => x.segs.length);
+      const nl = nearOf(railCor, a, b), nwall = nearOf(wallCor, a, b);
       const ng = [].concat(...ringCor.map((rc) => nearOf(rc, a, b)));
       const len = G.dist(a, b), n = Math.max(1, Math.ceil(len / 4));
-      const main = kind === 'road' || kind === 'ring';
+      const main2 = kind === 'road' || kind === 'ring';
       const pts = [], st = [];
+      let wmax = 0;
       for (let q = 0; q <= n; q++) {
         const p = G.lerp(a, b, q / n);
         let s = 1;
+        const wet = nw.find((x) => hit(x.segs, p, x.w / 2 + 1));
         if (seaAt(p, 2) || (station && G.contains(station.zone, p))) s = 0;
-        else if (!main && coreStop && G.contains(coreStop, p)) s = 0;
-        else if (!main && kind !== 'avenue' && nl.length && hit(nl, p, Q.rail / 2 + 1)) s = 0;
-        else if (kind !== 'avenue' && !main && ng.length && hit(ng, p, Q.ring / 2 + 1)) s = 0;
-        else if (nr.length && hit(nr, p, river.w / 2 + 1)) s = bridge ? 2 : 0;
+        else if (!main2 && stops.some((x) => (x.owner < 0 || x.owner !== owner) && G.contains(x.poly, p))) s = 0;
+        else if (!main2 && kind !== 'avenue' && nl.length && hit(nl, p, Q.rail / 2 + 1)) s = 0;
+        else if (kind !== 'avenue' && !main2 && ng.length && hit(ng, p, Q.ring / 2 + 1)) s = 0;
+        else if (kind !== 'avenue' && !main2 && nwall.length && hit(nwall, p, 6)) s = 0;
+        else if (wet) { s = bridge ? 2 : 0; wmax = Math.max(wmax, wet.w); }
         pts.push(p);
         st.push(s);
       }
-      // Bridges cross the river squarely: a street running along it stops at the bank instead.
+      // Bridges cross the water squarely: a street running along it stops at the bank instead.
       for (let q = 0; q <= n;) {
         if (st[q] !== 2) { q++; continue; }
         let e = q;
         while (e + 1 <= n && st[e + 1] === 2) e++;
-        const long = G.dist(pts[q], pts[e]) > river.w * (main ? 2.4 : 1.25) + 8;
+        const long = G.dist(pts[q], pts[e]) > wmax * (main2 ? 2.4 : 1.25) + 8;
         if (long) for (let x = q; x <= e; x++) st[x] = 0;
         else {
           const d = G.norm(G.sub(b, a));
@@ -2697,35 +3569,61 @@
         if (st[q]) { if (!run) { run = { a: pts[q], b: pts[q] }; streets.push(Object.assign(run, { w, kind })); } else run.b = pts[q]; } else run = null;
       }
     };
-    const built = (c) => c && c.state === 'urban';
+    const built = (c) => c && c.state === 'urban' && !c.curvy;
     const ruralLane = (c) => c && c.state === 'rural';
-    for (const [fam, other, isCol] of [[cols, rows, true], [rows, cols, false]]) {
-      for (let i = 1; i < fam.length - 1; i++) {
-        const line = fam[i];
-        if (line.kind === 'rail') continue;
-        for (let j = 0; j + 1 < other.length; j++) {
-          const A = isCol ? cellAt(i - 1, j) : cellAt(j, i - 1), Bc = isCol ? cellAt(i, j) : cellAt(j, i);
-          if (!A && !Bc) continue;
-          let kind = line.kind;
-          if (A && Bc && A.sb && A.sb === Bc.sb) continue;
-          if (!built(A) && !built(Bc)) {
-            if (!(line.lane && ruralLane(A) && ruralLane(Bc))) continue;
-            kind = 'lane';
+    for (const reg of regions) {
+      const ownerId = reg.citadel ? reg.id : -1;
+      for (const [fam, other, isCol] of [[reg.cols, reg.rows, true], [reg.rows, reg.cols, false]]) {
+        for (let i = 1; i < fam.length - 1; i++) {
+          const line = fam[i];
+          if (line.kind === 'rail' || line.kind === 'canal') continue;
+          for (let j = 0; j + 1 < other.length; j++) {
+            const A = isCol ? cellAt(reg, i - 1, j) : cellAt(reg, j, i - 1), Bc2 = isCol ? cellAt(reg, i, j) : cellAt(reg, j, i);
+            if (!A && !Bc2) continue;
+            let kind = line.kind;
+            if (A && Bc2 && A.sb && A.sb === Bc2.sb) continue;
+            if (!built(A) && !built(Bc2)) {
+              if (!(line.lane && ruralLane(A) && ruralLane(Bc2))) continue;
+              kind = 'lane';
+            }
+            const a = isCol ? reg.toW(line.pos, other[j].pos) : reg.toW(other[j].pos, line.pos);
+            const b = isCol ? reg.toW(line.pos, other[j + 1].pos) : reg.toW(other[j + 1].pos, line.pos);
+            const sg = clipSeg(a, b, reg.poly);
+            if (!sg) continue;
+            addStreet(sg[0], sg[1], kind === 'lane' ? Q.lane : lineW(line, reg), kind, kind === 'avenue' || (cyber && kind === 'street' && i % 3 === 0) || plan === 'bay', ownerId);
           }
-          const a = isCol ? toW(line.pos, other[j].pos) : toW(other[j].pos, line.pos);
-          const b = isCol ? toW(line.pos, other[j + 1].pos) : toW(other[j + 1].pos, line.pos);
-          addStreet(a, b, kind === 'lane' ? Q.lane : lineW(line), kind, kind === 'avenue' || (cyber && kind === 'street' && i % 3 === 0));
+        }
+      }
+      // Chamfered crossings are paved corner to corner.
+      if (reg.chamfer) {
+        for (let i = 1; i + 1 < reg.cols.length; i++) {
+          for (let j = 1; j + 1 < reg.rows.length; j++) {
+            const around = [cellAt(reg, i - 1, j - 1), cellAt(reg, i, j - 1), cellAt(reg, i - 1, j), cellAt(reg, i, j)];
+            if (!around.every((c) => built(c) && c.full)) continue;
+            const c = reg.toW(reg.cols[i].pos, reg.rows[j].pos);
+            if (seaAt(c, 10) || (core && G.contains(core.obstacle, c))) continue;
+            const r2 = Math.max(lineW(reg.cols[i], reg), lineW(reg.rows[j], reg)) / 2 + reg.chamfer;
+            junctions.push(G.regular(c.x, c.y, r2, 4, G.angle(reg.U)));
+          }
         }
       }
     }
-    const each = (pts, closed, fn) => { for (let i = 0; i + 1 < pts.length + (closed ? 1 : 0); i++) fn(pts[i], pts[(i + 1) % pts.length]); };
+    // The plan's avenues: rings, radials, seams between the grids.
+    for (const sm of seams) {
+      const L = G.dist(sm.a, sm.b), n = Math.max(1, Math.ceil(L / 30));
+      for (let q = 0; q < n; q++) {
+        const a = G.lerp(sm.a, sm.b, q / n), b = G.lerp(sm.a, sm.b, (q + 1) / n), mid = G.mid(a, b);
+        if (dOf(mid) < 1.03 && inSheet(mid, 60)) addStreet(a, b, sm.w, sm.kind, true);
+      }
+    }
     for (const rd of roads) {
-      if (!rd.axis) addStreet(rd.urban[0], rd.urban[1], Q.avenue, 'avenue', true);
+      if (!rd.axis) addStreet(rd.urban[0], rd.urban[1], Q.avenue, 'avenue', true, citadel && citadel.reg ? citadel.reg.id : -1);
       each(rd.pts, false, (a, b) => addStreet(a, b, Q.road, 'road', true));
     }
     for (const rg of ring) each(rg.pts, rg.closed, (a, b) => addStreet(a, b, Q.ring, 'ring', true));
     if (core) each(core.boulevard, true, (a, b) => addStreet(a, b, Q.avenue, 'avenue', true));
-    // Embankments and the seafront.
+    for (const l of suburbRoads) each(l.pts, false, (a, b) => addStreet(a, b, l.hw * 2, l.kind, false));
+    // Embankments, quays, the seafront (a promenade with a beach in a seaside resort).
     const banks = [];
     if (river) {
       for (const side of [-1, 1]) {
@@ -2742,11 +3640,30 @@
         }
       }
     }
+    for (const cn of canals) for (const side of [-1, 1]) banks.push(G.offsetPolyline(cn.pts, side * (Q.canal / 2)));
+    const beach = [], umbrellas = [];
+    let promenadeAt = null;
     if (coast) {
-      const sea2 = coast.pts.map((p) => G.sub(p, G.scale(coast.n, Q.street / 2 + 2)));
-      each(sea2, false, (a, b) => { if (dOf(G.mid(a, b)) < 1.02) addStreet(a, b, Q.street, 'street', false); });
+      const inl = (p, d) => G.sub(p, G.scale(seaN(p), d));
+      const sp = G.resample(coast.pts, 18, !!coast.closed);
+      const front = sp.map((p) => inl(p, (beachW ? beachW + Q.avenue / 2 : Q.street / 2) + 2));
+      let bRun = null;
+      each(front, !!coast.closed, (a, b) => {
+        const mid = G.mid(a, b), inTown = dOf(mid) < 1.02 && inSheet(mid, 40);
+        if (inTown) addStreet(a, b, beachW ? Q.avenue : Q.street, beachW ? 'avenue' : 'street', false);
+        if (beachW && inTown && !harbourAt(mid) && riverDist(mid) > rw + 20) {
+          const i = front.indexOf(a), s0p = sp[i], s1p = sp[(i + 1) % sp.length];
+          if (!bRun) beach.push(bRun = [inl(s0p, beachW / 2)]);
+          bRun.push(inl(s1p, beachW / 2));
+          if (!promenadeAt && G.dist(mid, O) < Ru * 0.6) promenadeAt = mid;
+          for (let q = 0.25; q < 1; q += 0.5) {
+            const pp = G.lerp(s0p, s1p, q);
+            for (const dd of [beachW * 0.35, beachW * 0.65]) if (beachW > 20) umbrellas.push(inl(G.lerp(s0p, s1p, q + 0.1), dd));
+          }
+        } else bRun = null;
+      });
     }
-    if (rail && river) {
+    if (rail && river && !rail.spine) {
       const near = segsNear(corridor(river.pts, river.w / 2 + 2), G.bbox(rail.pts));
       each(rail.pts, false, (a, b) => {
         const n = Math.ceil(G.dist(a, b) / 4);
@@ -2761,6 +3678,17 @@
         rb.a = G.sub(rb.a, G.scale(d, 6)); rb.b = G.add(rb.b, G.scale(d, 6));
       }
     }
+    // Checkpoints where the avenues and roads pass the wall.
+    if (wall && !wall.gates) {
+      wall.gates = [];
+      for (const s of streets) {
+        if (s.kind !== 'avenue' && s.kind !== 'road') continue;
+        each(wall.pts, true, (a, b) => {
+          const x = G.segmentIntersect(a, b, s.a, s.b);
+          if (x && !wall.gates.some((g) => G.dist(g, x) < 60)) wall.gates.push({ x: x.x, y: x.y, a: G.angle(G.sub(s.b, s.a)) });
+        });
+      }
+    }
     // Roundabouts where the roads out of town meet the ring road.
     const roundabouts = [];
     for (const rd of roads) {
@@ -2772,41 +3700,83 @@
       }
     }
     // Trees along the avenues (neon strips in cyberpunk).
-    const avenues = streets.filter((s) => s.kind === 'avenue' && dOf(G.mid(s.a, s.b)) < 1.05).map((s) => [s.a, s.b]);
+    const avenues = streets.filter((s) => s.kind === 'avenue' && dOf(G.mid(s.a, s.b)) < 1.05 && G.dist(s.a, s.b) > 6).map((s) => [s.a, s.b]);
 
-    // 15. Harbour: piers into the sea, a breakwater, cranes and containers.
+    // 19. Harbour: piers into the water, a breakwater, cranes and containers (a marina
+    //     with jetties in villages, resorts and on lakes).
     let harbour = null;
-    if (coast && wards.some((w) => w.type === 'harbour') || coast && size === 'small') {
+    if (Hc && (wards.some((w) => w.type === 'harbour') || marina)) {
       const hr = fork('harbour');
-      const small = X.small;
-      const pierL = (cyber ? 1.25 : 1) * { small: 55, medium: 140, large: 200, huge: 260 }[size];
+      const small = marina;
+      const pierL = (cyber ? 1.25 : 1) * (small ? 55 : { small: 55, medium: 140, large: 200, huge: 260 }[size]);
       const pierW = small ? 4 : (cyber ? 62 : 46);
       harbour = { piers: [], cranes: [], containers: [], pads: [], breakwater: null };
-      const ang = G.angle(coast.n);
-      for (let s = sH - P.harbour + 30; s < sH + P.harbour - 20; s += small ? hr.float(24, 32) : hr.float(110, 160)) {
-        const base = shore(s), len = pierL * hr.float(0.75, 1.1), w2 = pierW * hr.float(0.85, 1.15);
-        const c = G.add(base, G.scale(coast.n, len / 2 - 8));
+      const N0 = seaN(Hc);
+      for (let s = -hSpan + 30; s < hSpan - 20; s += small ? hr.float(24, 32) : hr.float(110, 160)) {
+        // The shore at this point, found along the local normal.
+        let base = G.add(Hc, G.scale(Ht, s));
+        for (let q = 0; q < 60 && seaAt(base); q++) base = G.sub(base, G.scale(N0, 5));
+        for (let q = 0; q < 60 && !seaAt(base); q++) base = G.add(base, G.scale(N0, 5));
+        const nn = seaN(base), ang = G.angle(nn);
+        const len = pierL * hr.float(0.75, 1.1), w2 = pierW * hr.float(0.85, 1.15);
+        const c = G.add(base, G.scale(nn, len / 2 - 8));
         const pier = G.rect(c.x, c.y, len + 16, w2, ang);
         if (river && G.distToPolyline(c, river.pts) < river.w + w2 + len / 2) continue;
+        if (!seaAt(G.add(base, G.scale(nn, len)), 10)) continue;
         harbour.piers.push(pier);
         if (small) continue;
         // Cranes along one side, containers on the deck, drone pads at the tip.
-        const side = hr.sign(), pf = { c, u: coast.n, v: coast.t };
+        const side = hr.sign(), pf = { c, u: nn, v: G.perp(nn) };
         for (let x = -len / 2 + 14; x < len / 2 - 10; x += 34) harbour.cranes.push(frect(pf, x, side * (w2 / 2 - 2), 7, 24));
         for (let x = -len / 2 + 6; x < len / 2 - 24; x += 13.4) {
           for (let y = -w2 / 2 + 12; y < w2 / 2 - 14; y += 3) if (hr.bool(0.8)) harbour.containers.push(frect(pf, x + 6, -side * 2 + y, 12.2, 2.4));
         }
         if (cyber) { const t2 = fpt(pf, len / 2 - 4, 0); harbour.pads.push(G.regular(t2.x, t2.y, Math.min(14, w2 / 2 - 4), 20)); }
       }
-      // Breakwater: parallel to the shore, open at one end.
-      const far = pierL * 1.15 + (small ? 40 : 70), s1 = sH - P.harbour - 50, s2 = sH + P.harbour + 50;
-      const o1 = coast.reach + Math.max(coast.off(s1), coast.off(s2)) + far;
-      const mk = (s) => G.add(G.scale(coast.t, s), G.scale(coast.n, o1));
-      harbour.breakwater = hr.bool() ? [shore(s2, -5), mk(s2), mk(s1 + (small ? 40 : 110))] : [shore(s1, -5), mk(s1), mk(s2 - (small ? 40 : 110))];
-      landmarks.push({ key: small ? 'city.marina' : 'city.harbour', x: G.mid(shore(sH), mk(sH)).x, y: G.mid(shore(sH), mk(sH)).y, offshore: true });
+      // Breakwater: parallel to the shore, open at one end, if the water is wide enough.
+      const far = pierL * 1.15 + (small ? 40 : 70);
+      const mk = (s) => G.add(G.add(Hc, G.scale(Ht, s)), G.scale(N0, far));
+      const s1 = -hSpan - 50, s2 = hSpan + 50;
+      const bw = hr.bool() ? [G.add(Hc, G.scale(Ht, s2)), mk(s2), mk(s1 + (small ? 40 : 110))] : [G.add(Hc, G.scale(Ht, s1)), mk(s1), mk(s2 - (small ? 40 : 110))];
+      let ok = true;
+      for (let q = 0; q <= 10 && ok; q++) ok = seaAt(G.lerp(bw[1], bw[2], q / 10), 15);
+      for (let q = 0; q < 60 && seaAt(bw[0]); q++) bw[0] = G.sub(bw[0], G.scale(N0, 5));
+      if (ok) ok = !harbour.piers.some((pr) => segPolyDist(pr, bw[0], bw[1]) < 6 || segPolyDist(pr, bw[1], bw[2]) < 6);
+      if (ok && seaAt(bw[1], 15) && coast.kind !== 'lake') harbour.breakwater = bw;
+      if (harbour.piers.length) {
+        const lp = G.add(Hc, G.scale(N0, far / 2));
+        landmarks.push({ key: small ? 'city.marina' : 'city.harbour', x: lp.x, y: lp.y, offshore: true });
+      } else harbour = null;
+    }
+    // Floating slums on the lagoon of the flooded city.
+    if (coast && coast.kind === 'lagoon') {
+      const fr2 = fork('rafts'), sp = coast.pts;
+      const n = { small: 3, medium: 5, large: 8, huge: 11 }[size];
+      for (let q = 0, made = 0; q < n * 4 && made < n; q++) {
+        const p0 = sp[fr2.int(0, sp.length - 1)], nn = seaN(p0), tg = G.perp(nn);
+        if (Hc && G.dist(p0, Hc) < P.harbour + 120) continue;
+        const c0 = G.add(p0, G.scale(nn, fr2.float(60, 110)));
+        if (!inSheet(c0, -80)) continue;
+        let any = false, prev = null;
+        // Pontoons moored side by side along the shore, a few loose ones further out.
+        for (let i = 0, m = fr2.int(5, 10); i < m; i++) {
+          const c = G.add(c0, G.add(G.scale(tg, (i - m / 2) * 44 + fr2.float(-6, 6)), G.scale(nn, i % 3 === 2 ? fr2.float(30, 60) : fr2.float(-8, 8))));
+          const raft = G.rect(c.x, c.y, fr2.float(32, 40), fr2.float(22, 34), G.angle(tg) + fr2.float(-0.25, 0.25));
+          if (!raft.every((p) => seaAt(p, -12)) || wards.some((w) => w.raft && G.convexOverlap(w.block, raft, 6))) continue;
+          if (canals.some((cn) => G.distToPolyline(c, cn.pts) < Q.canal + 30)) continue;
+          const w = newWard('float', raft, true);
+          w.raft = true;
+          if (prev && G.dist(prev, c) < 90) w.gangs = [[prev, c]];
+          prev = c;
+          for (const s of shacks(fr2, G.insetConvex(raft, 2), X.shack * 0.7, 0.8)) w.buildings.push(s);
+          wards.push(w);
+          any = true;
+        }
+        if (any) made++;
+      }
     }
 
-    // 16. Names on the map: landmarks, districts and road numbers.
+    // 20. Names on the map: landmarks, districts and road numbers.
     const nameR = fork('labels');
     const centre = (list) => {
       const avg = G.average(list.map((w) => G.centroid(w.block)));
@@ -2819,20 +3789,28 @@
     const extra = {};
     if (cyber) extra.corp = Carto.Names.corp(nameR); else extra.mayor = Carto.Names.person(nameR);
     if (castleW) {
-      const c = G.centroid(castleW.block);
-      landmarks.push(cyber ? { key: 'city.arcology', params: { n: extra.corp }, x: c.x, y: c.y + (castleW.arcology ? 0 : 20) } : { key: 'city.castle', x: c.x, y: c.y });
+      const c = castleW.spine ? axis.at(La * 0.22).p : G.centroid(castleW.block);
+      landmarks.push(cyber ? { key: castleW.spine ? 'city.spine' : 'city.arcology', params: { n: extra.corp }, x: c.x, y: c.y + (castleW.arcology || castleW.spine ? 0 : 20) } : { key: 'city.castle', x: c.x, y: c.y });
     }
+    if (citadel) landmarks.push({ key: 'ward.citadel', district: true, x: citadel.top.x, y: citadel.top.y });
     for (const [t2, key2] of [['temple', 'city.cathedral'], ['market', 'city.market']]) {
       if (!cyber) continue;
       const list = byType(t2);
       if (list.length) { const c = G.centroid(list[0].block); landmarks.push({ key: key2, x: c.x, y: c.y }); }
     }
     if (station) landmarks.push({ key: 'city.station', x: station.label.x, y: station.label.y });
+    else if (spine && spine.nodes.length) {
+      const nd = spine.nodes.reduce((b, x) => (G.len(G.centroid(x)) < G.len(G.centroid(b)) ? x : b)), c = G.centroid(nd);
+      landmarks.push({ key: 'city.station', x: c.x, y: c.y + spineW * 0.9 });
+    }
     const stad = byType('stadium')[0];
     if (stad) { const c = G.centroid(stad.block); landmarks.push({ key: 'city.stadium', x: c.x, y: c.y }); }
+    if (coast && coast.kind === 'lake') landmarks.push({ key: 'city.lake', x: coast.c.x, y: coast.c.y, offshore: true });
+    if (promenadeAt) landmarks.push({ key: coast.kind === 'lake' ? 'city.lakefront' : 'city.promenade', x: promenadeAt.x, y: promenadeAt.y, road: true });
+    if (airportZone) landmarks.push({ key: 'ward.airport', district: true, x: fpt(airportZone.f, 0, 190).x, y: fpt(airportZone.f, 0, 190).y });
     const named = cyber
-      ? ['craftsmen', 'merchant', 'patriciate', 'administration', 'slum', 'military', 'shanty', 'industrial']
-      : ['oldtown', 'merchant', 'patriciate', 'fair', 'slum', 'park', 'shanty', 'industrial'];
+      ? ['craftsmen', 'merchant', 'patriciate', 'administration', 'slum', 'military', 'shanty', 'industrial', 'campus', 'float']
+      : ['oldtown', 'merchant', 'patriciate', 'fair', 'slum', 'park', 'shanty', 'industrial', 'campus', 'resort'];
     for (const t2 of named) {
       const list = t2 === 'oldtown' ? byType(t2, true) : byType(t2);
       if (!list.length) continue;
@@ -2847,46 +3825,68 @@
     const roadLabels = cyber ? sky.map((s) => ({ pts: s, main: true })).concat(roads.map((r2) => ({ pts: r2.pts }))) : roads.map((r2, i) => ({ pts: r2.pts, main: !i }));
     for (const rl of roadLabels) {
       const pts = rl.pts.length === 2 ? G.resample(rl.pts, 30) : rl.pts;
-      const at = pts.find((v) => Math.max(Math.abs(v.x), Math.abs(v.y)) > M * (rl.main && cyber ? 0.62 : 0.8));
-      if (at) landmarks.push({ key: rl.main ? 'city.road.main' : 'city.road', params: { n: rl.main ? nameR.int(1, 99) : nameR.int(10, 320) }, x: at.x, y: at.y, road: true });
+      const at = pts.find((v) => Math.max(Math.abs(v.x - view.x), Math.abs(v.y - view.y)) > M * (rl.main && cyber ? 0.62 : 0.8));
+      if (at && inSheet(at, -M * 0.08)) landmarks.push({ key: rl.main ? 'city.road.main' : 'city.road', params: { n: rl.main ? nameR.int(1, 99) : nameR.int(10, 320) }, x: at.x, y: at.y, road: true });
     }
 
-    // 17. Census: districts are runs of neighbouring cells of one type.
-    const seen = new Set();
-    for (const c of urbanCells) {
-      if (seen.has(c) || !c.type || c.type === 'forecourt') continue;
-      census[c.type] = (census[c.type] || 0) + 1;
-      const stack = [c];
-      seen.add(c);
-      while (stack.length) {
-        const q = stack.pop();
-        for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-          const nb = cellAt(q.i + di, q.j + dj);
-          if (nb && !seen.has(nb) && nb.state === 'urban' && nb.type === c.type) { seen.add(nb); stack.push(nb); }
-        }
+    // 21. Census: districts are runs of neighbouring cells of one type (also across seams).
+    const typed = urbanCells.filter((c) => c.type && c.type !== 'forecourt');
+    const parent = new Map(typed.map((c) => [c, c]));
+    const find = (c) => { while (parent.get(c) !== c) { parent.set(c, parent.get(parent.get(c))); c = parent.get(c); } return c; };
+    const unite = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) parent.set(ra, rb); };
+    for (const c of typed) {
+      for (const [di, dj] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+        const nb = cellAt(c.reg, c.i + di, c.j + dj);
+        if (nb && parent.has(nb) && nb.type === c.type) unite(c, nb);
       }
     }
+    const edgeCells = typed.filter((c) => !c.full && regions.length > 1);
+    for (let i = 0; i < edgeCells.length; i++) {
+      for (let j = i + 1; j < edgeCells.length; j++) {
+        const a = edgeCells[i], b = edgeCells[j];
+        if (a.reg !== b.reg && a.type === b.type && G.dist(a.c, b.c) < Q.bu[1] * 1.6) unite(a, b);
+      }
+    }
+    const roots = new Set();
+    for (const c of typed) {
+      const r0 = find(c);
+      if (roots.has(r0)) continue;
+      roots.add(r0);
+      census[c.type] = (census[c.type] || 0) + 1;
+    }
+    for (const w of wards) if (w.type === 'float' && !census.float) census.float = 1;
+    if (hub || spine) census.castle = 1;
     if (station) census.station = 1;
+    if (airportZone) census.airport = 1;
     extra.outer = {};
-    for (const w of wards) if (!w.inner) extra.outer[w.type === 'outer' ? 'industrial' : w.type] = (extra.outer[w.type === 'outer' ? 'industrial' : w.type] || 0) + 1;
+    for (const w of wards) {
+      if (w.inner || w.type === 'airport') continue;
+      const kk = w.type === 'outer' ? 'industrial' : w.type === 'flood' ? 'wood' : w.type;
+      extra.outer[kk] = (extra.outer[kk] || 0) + 1;
+    }
 
     let floor = 0;
     const fl = FLOORS[cyber ? 'cyber' : 'modern'];
     for (const w of wards) {
       if (!w.inner || !fl[w.type]) continue;
-      for (const b of w.buildings.concat(w.type === 'castle' ? w.special : [])) floor += G.area(b) * fl[w.type];
+      const f2 = w.spine ? 40 : fl[w.type];
+      for (const b of w.buildings.concat(w.type === 'castle' ? w.special : [])) floor += G.area(b) * f2;
     }
     // Bigger towns build taller.
     floor *= { small: 0.8, medium: 1, large: 1.4, huge: 2 }[size];
     const population = cyber ? Math.round(floor / 15 / 1000) * 1000 : Math.round(floor / 40 / 100) * 100;
     const name = opts.name ? opts.name : Carto.Names.place(fork('name'));
-    const sea = coast ? coast.pts.concat([G.add(coast.pts[coast.pts.length - 1], G.scale(coast.n, M * 4)), G.add(coast.pts[0], G.scale(coast.n, M * 4))]) : null;
-    return {
-      layout: 'grid', seed, name, size, M, Rc: Ru, walls: !!opts.walls, U,
-      wards, bridges, railBridges, avenues, roundabouts, banks,
-      sea, coastline: coast ? coast.pts : null,
+    let sea = null, land = null;
+    if (coast && coast.kind === 'line') sea = coast.pts.concat([G.add(coast.pts[coast.pts.length - 1], G.scale(coast.n, M * 4)), G.add(coast.pts[0], G.scale(coast.n, M * 4))]);
+    else if (coast && coast.kind === 'lake') sea = coast.pts;
+    else if (coast) land = coast.pts;
+    const model = {
+      layout: 'grid', plan, flavour, seed, name, size, M, Rc: Ru, walls: !!opts.walls, U: reg0.U, view: { x: view.x, y: view.y },
+      wards, bridges, railBridges, avenues, roundabouts, banks, junctions, culs: culs.map((c) => ({ x: c.x, y: c.y, r: c.r })),
+      sea, land, coastline: coast ? coast.pts : null, coastClosed: !!(coast && coast.closed),
+      beach, umbrellas, canals: canals.map((cn) => cn.pts), canalW: Q.canal,
       river: river ? { pts: river.pts, w: river.w, canal: !!river.canal } : null,
-      rail: rail ? { pts: rail.pts } : null, station, ring, sky, harbour,
+      rail: rail ? { pts: rail.pts, spine: !!rail.spine } : null, station, ring, sky, harbour,
       wall,
       core: core ? { C: core.C, belt: opts.walls ? grow(core.C, core.gb) : null, walls: core.walls || [], bastions: core.bastions || [] } : null,
       roads: roads.map((r2) => r2.pts), landmarks,
@@ -2895,16 +3895,19 @@
       population, buildingCount: wards.reduce((s, w) => s + w.buildings.length + (w.type === 'castle' || w.type === 'fair' || w.type === 'temple' && w.core ? w.special.length : 0), 0),
       gateCount: roads.length, census, extra,
     };
+    return model;
   }
 
   function renderGrid(m, o) {
     const pal = o.palette;
     const cyber = Carto.Setting.current === 'cyber';
     const M = m.M, S = 2 * M, k = M / 500;
+    // The sheet is centred on the town's chosen view, not always on its centre.
+    const vx = m.view ? m.view.x : 0, vy = m.view ? m.view.y : 0;
     const svg = new Svg(S, S);
     const clip = Carto.uid('cityclip'), woodPat = Carto.uid('woods');
     const tr = 4.2 * k;
-    svg.defs('<clipPath id="' + clip + '"><rect x="' + -M + '" y="' + -M + '" width="' + S + '" height="' + S + '"/></clipPath>' +
+    svg.defs('<clipPath id="' + clip + '"><rect x="' + Svg.num(vx - M) + '" y="' + Svg.num(vy - M) + '" width="' + S + '" height="' + S + '"/></clipPath>' +
       '<pattern id="' + woodPat + '" width="' + Svg.num(tr * 4) + '" height="' + Svg.num(tr * 4) + '" patternUnits="userSpaceOnUse">' +
       (cyber
         ? '<path d="M' + Svg.num(tr) + ' ' + Svg.num(tr * 1.4) + 'l' + Svg.num(tr * 0.8) + ' 0M' + Svg.num(tr * 2.6) + ' ' + Svg.num(tr * 3.2) + 'l' + Svg.num(tr * 0.6) + ' 0" stroke="' + pal.greenInk + '" stroke-width="' + Svg.num(k * 0.8) + '" opacity="0.6"/>'
@@ -2912,7 +3915,12 @@
           '<circle cx="' + Svg.num(tr * 3) + '" cy="' + Svg.num(tr * 3) + '" r="' + Svg.num(tr * 0.9) + '" fill="' + pal.tree + '" stroke="' + pal.greenInk + '" stroke-width="' + Svg.num(k * 0.4) + '"/>') +
       '</pattern>');
     svg.rect(0, 0, S, S, { fill: pal.paper });
-    svg.open({ transform: 'translate(' + M + ' ' + M + ')', clipPath: 'url(#' + clip + ')' });
+    svg.open({ transform: 'translate(' + Svg.num(M - vx) + ' ' + Svg.num(M - vy) + ')', clipPath: 'url(#' + clip + ')' });
+    // The flooded city: water all round, the land an island.
+    if (m.land) {
+      svg.rect(vx - M, vy - M, S, S, { fill: pal.water });
+      svg.poly(m.land, { fill: pal.paper, stroke: pal.waterInk, strokeWidth: 3 * k, opacity: 1 });
+    }
     const lw = 0.32 * k + 0.25;
     const Bt = () => new Svg.Batch();
     const draw = (b, a) => svg.path(b.toString(), a);
@@ -2924,10 +3932,14 @@
       (f.kind === 'field' ? fieldA : f.kind === 'fieldAlt' ? fieldB : meadow).poly(f.poly);
       for (const s of f.furrows) furrows.line(s[0], s[1]);
     });
+    const floods = Bt();
     for (const w of m.wards) {
       if (w.wood) woods.poly(w.block);
       if (w.meadow) meadow.poly(w.block);
+      if (w.flood) floods.poly(w.block);
     }
+    draw(floods, { fill: pal.water, stroke: pal.waterInk, strokeWidth: 0.8 * k });
+    if (cyber) draw(floods, { fill: pal.waterInk, opacity: 0.3 });
     draw(meadow, { fill: pal.green, opacity: 0.5 });
     draw(fieldA, { fill: pal.field, stroke: pal.fieldInk, strokeWidth: 0.4 * k });
     draw(fieldB, { fill: pal.fieldAlt, stroke: pal.fieldInk, strokeWidth: 0.4 * k });
@@ -2939,7 +3951,7 @@
     // Town ground: blocks, squares and yards, parks and gardens.
     const ground = Bt(), squares = Bt(), yards = Bt(), parks = Bt(), gardens = Bt(), lawns = Bt(), parking = Bt(), stalls = Bt();
     for (const w of m.wards) {
-      if (!w.inner) continue;
+      if (!w.inner || w.noGround || w.raft) continue;
       if (w.green) parks.poly(w.block);
       else if (w.square) squares.poly(w.block);
       else ground.poly(w.block);
@@ -2948,8 +3960,10 @@
     all('gardens', (g) => gardens.poly(g));
     all('lawns', (g) => lawns.poly(g));
     all('parking', (p) => {
+      if (p.length < 3) return;
       parking.poly(p);
-      for (const s of G.stripes(G.insetConvex(p, 2.5), G.perp(m.U), 5.5, 0.5)) stalls.line(s[0], s[1]);
+      const pf = G.frame(p);
+      for (const s of G.stripes(G.insetConvex(p, 2.5), pf.h > pf.w ? pf.u : pf.v, 5.5, 0.5)) stalls.line(s[0], s[1]);
     });
     if (m.core) {
       if (m.core.belt) svg.poly(m.core.belt, { fill: pal.green, stroke: pal.greenInk, strokeWidth: 0.4 * k });
@@ -2963,6 +3977,18 @@
     draw(parks, { fill: pal.green, stroke: pal.greenInk, strokeWidth: 0.4 * k });
     draw(parking, { fill: pal.grid, stroke: pal.inkSoft, strokeWidth: 0.3 * k });
     draw(stalls, { stroke: pal.inkSoft, strokeWidth: 0.2 * k, opacity: 0.6 });
+    // Airport: apron, taxiways, the runway and its centre line.
+    for (const w of m.wards) {
+      if (!w.runway) continue;
+      const tx = Bt(), mk = Bt();
+      for (const l of w.taxi) tx.poly(l, false);
+      for (const l of w.marks) mk.line(l[0], l[1]);
+      draw(tx, { fill: 'none', stroke: pal.inkSoft, strokeWidth: 20 + 1.2 * k, strokeLinejoin: 'round' });
+      draw(tx, { fill: 'none', stroke: pal.grid, strokeWidth: 20, strokeLinejoin: 'round' });
+      svg.poly(w.apron, { fill: pal.grid, stroke: pal.inkSoft, strokeWidth: 0.6 * k });
+      svg.poly(w.runway, { fill: cyber ? pal.road : pal.inkSoft, stroke: pal.ink, strokeWidth: 0.8 * k, opacity: cyber ? 1 : 0.85 });
+      draw(mk, { stroke: cyber ? pal.accent : pal.road, strokeWidth: 1.6 * k, opacity: 0.9 });
+    }
     const paths = Bt(), ponds = Bt(), pools = Bt();
     all('paths', (p) => paths.poly(p, false));
     all('ponds', (p) => ponds.poly(p));
@@ -2977,10 +4003,18 @@
         const sclip = Carto.uid('seaclip');
         svg.defs('<clipPath id="' + sclip + '"><path d="' + sd + '"/></clipPath>');
         svg.open({ clipPath: 'url(#' + sclip + ')' });
-        for (const [wd, op] of [[34, 0.1], [18, 0.16], [8, 0.3]]) svg.poly(m.coastline, { fill: 'none', stroke: pal.waterInk, strokeWidth: wd * k, opacity: op, strokeLinejoin: 'round' }, false);
+        for (const [wd, op] of [[34, 0.1], [18, 0.16], [8, 0.3]]) svg.poly(m.coastline, { fill: 'none', stroke: pal.waterInk, strokeWidth: wd * k, opacity: op, strokeLinejoin: 'round' }, !!m.coastClosed);
         svg.close();
       }
-      svg.poly(m.coastline, { fill: 'none', stroke: cyber ? pal.ink : pal.waterInk, strokeWidth: (cyber ? 0.9 : 1.1) * k, strokeLinejoin: 'round', opacity: cyber ? 0.7 : 1 }, false);
+      svg.poly(m.coastline, { fill: 'none', stroke: cyber ? pal.ink : pal.waterInk, strokeWidth: (cyber ? 0.9 : 1.1) * k, strokeLinejoin: 'round', opacity: cyber ? 0.7 : 1 }, !!m.coastClosed);
+    }
+    // Beach and its umbrellas.
+    if (m.beach && m.beach.length) {
+      const bb = Bt(), ub = Bt();
+      for (const l of m.beach) bb.poly(l, false);
+      draw(bb, { fill: 'none', stroke: pal.sand, strokeWidth: 30, strokeLinejoin: 'round', strokeLinecap: 'butt' });
+      for (const u of m.umbrellas) ub.circle(u.x, u.y, 1.6 + 0.2 * k);
+      draw(ub, { fill: pal.accent, opacity: 0.7 });
     }
     if (m.river) {
       const rd = Svg.d(m.river.canal ? m.river.pts : G.chaikin(m.river.pts, 1, false), false);
@@ -2990,6 +4024,17 @@
       const bk = Bt();
       for (const b of m.banks) bk.poly(b, false);
       draw(bk, { fill: 'none', stroke: cyber ? pal.ink : pal.ink, strokeWidth: 1.2 * k, opacity: cyber ? 0.8 : 0.7 });
+    }
+    // Canals of the flooded city, with their quays.
+    if (m.canals && m.canals.length) {
+      const cb = Bt(), qb = Bt();
+      for (const c of m.canals) cb.poly(c, false);
+      if (!m.river) for (const b of m.banks) qb.poly(b, false);
+      draw(cb, { fill: 'none', stroke: pal.waterInk, strokeWidth: m.canalW + 1.6 * k, strokeLinecap: 'square' });
+      draw(cb, { fill: 'none', stroke: pal.water, strokeWidth: m.canalW, strokeLinecap: 'square' });
+      draw(cb, { fill: 'none', stroke: pal.waterInk, strokeWidth: m.canalW, opacity: cyber ? 0.38 : 0.22, strokeLinecap: 'square' });
+      draw(cb, { fill: 'none', stroke: pal.waterInk, strokeWidth: 0.8 * k, strokeDasharray: Svg.num(6 * k) + ' ' + Svg.num(10 * k), opacity: 0.8 });
+      draw(qb, { fill: 'none', stroke: pal.ink, strokeWidth: 1 * k, opacity: 0.7 });
     }
     draw(ponds, { fill: pal.water, stroke: pal.waterInk, strokeWidth: 0.4 * k });
     draw(pools, { fill: pal.water, stroke: pal.waterInk, strokeWidth: 0.3 * k });
@@ -3012,20 +4057,32 @@
       deck.poly(G.rect(c.x, c.y, L, b.w + 2.5 * k, Math.atan2(b.b.y - b.a.y, b.b.x - b.a.x)));
     }
     draw(deck, { fill: pal.road, stroke: pal.ink, strokeWidth: 0.8 * k });
-    const KINDS = ['lane', 'street', 'road', 'avenue', 'ring'];
-    const byKind = {};
-    for (const kd of KINDS) byKind[kd] = Bt();
-    const widths = {};
-    for (const s of m.streets) { byKind[s.kind].line(s.a, s.b); widths[s.kind] = s.w; }
-    for (const kd of KINDS) {
-      if (byKind[kd].empty) continue;
-      const strong = kd === 'ring' || kd === 'road';
-      draw(byKind[kd], { fill: 'none', stroke: strong ? pal.ink : pal.inkSoft, strokeWidth: widths[kd] + (strong ? 1.6 : 1.1) * k, strokeLinecap: kd === 'lane' ? 'round' : 'square', opacity: kd === 'lane' ? 0.5 : strong ? 0.85 : 0.75 });
+    // Streets by kind and width (cul-de-sacs and alleys are narrower).
+    const KINDS = ['lane', 'drive', 'street', 'road', 'avenue', 'ring'];
+    const groups = new Map();
+    for (const s of m.streets) {
+      const gk = s.kind + '|' + Svg.num(s.w);
+      if (!groups.has(gk)) groups.set(gk, { kind: s.kind, w: s.w, b: Bt() });
+      groups.get(gk).b.line(s.a, s.b);
     }
-    for (const kd of KINDS) {
-      if (byKind[kd].empty) continue;
-      draw(byKind[kd], { fill: 'none', stroke: pal.road, strokeWidth: widths[kd], strokeLinecap: kd === 'lane' ? 'round' : 'square' });
-      if ((kd === 'road' || kd === 'ring') && !cyber) draw(byKind[kd], { fill: 'none', stroke: pal.accent, strokeWidth: widths[kd] * 0.55, strokeLinecap: 'square', opacity: 0.22 });
+    const ordered = [...groups.values()].sort((x, y) => KINDS.indexOf(x.kind) - KINDS.indexOf(y.kind) || x.w - y.w);
+    const culs = Bt(), culIn = Bt();
+    for (const c of m.culs || []) { culs.circle(c.x, c.y, c.r + 0.55 * k); culIn.circle(c.x, c.y, c.r); }
+    for (const g of ordered) {
+      const kd = g.kind, strong = kd === 'ring' || kd === 'road';
+      draw(g.b, { fill: 'none', stroke: strong ? pal.ink : pal.inkSoft, strokeWidth: g.w + (strong ? 1.6 : 1.1) * k, strokeLinecap: kd === 'lane' || kd === 'drive' ? 'round' : 'square', opacity: kd === 'lane' ? 0.5 : strong ? 0.85 : 0.75 });
+    }
+    draw(culs, { fill: pal.inkSoft, opacity: 0.75 });
+    for (const g of ordered) {
+      const kd = g.kind;
+      draw(g.b, { fill: 'none', stroke: pal.road, strokeWidth: g.w, strokeLinecap: kd === 'lane' || kd === 'drive' ? 'round' : 'square' });
+      if ((kd === 'road' || kd === 'ring') && !cyber) draw(g.b, { fill: 'none', stroke: pal.accent, strokeWidth: g.w * 0.55, strokeLinecap: 'square', opacity: 0.22 });
+      if (kd === 'drive') draw(culIn, { fill: pal.road });
+    }
+    if (m.junctions && m.junctions.length) {
+      const jb = Bt();
+      for (const j of m.junctions) jb.poly(j);
+      draw(jb, { fill: pal.road });
     }
     if (m.roundabouts.length) {
       const rb = Bt(), rin = Bt();
@@ -3053,7 +4110,7 @@
       draw(pf, { fill: pal.paperShade, stroke: pal.inkSoft, strokeWidth: 0.4 * k });
       draw(tb, { fill: 'none', stroke: pal.ink, strokeWidth: 1.1 * k, strokeLinejoin: 'round' });
     }
-    if (m.rail) {
+    if (m.rail && !m.rail.spine) {
       const rd = Svg.d(m.rail.pts, false);
       svg.path(rd, { fill: 'none', stroke: pal.ink, strokeWidth: 3.6 * k, strokeLinejoin: 'round' });
       svg.path(rd, { fill: 'none', stroke: cyber ? pal.accent : pal.paper, strokeWidth: 1.8 * k, strokeDasharray: Svg.num(9 * k) + ' ' + Svg.num(9 * k), opacity: cyber ? 0.8 : 1 });
@@ -3061,12 +4118,14 @@
 
     // Buildings.
     const houses = Bt(), specials = Bt(), sheds = Bt(), farms = Bt(), tanks = Bt(), cont = [Bt(), Bt(), Bt()], courts = Bt(), huts = Bt();
-    const SHED = { industrial: 1, harbour: 1, outer: 1 };
+    const SHED = { industrial: 1, harbour: 1, outer: 1, airport: 1 };
     let ci = 0;
+    const rafts = Bt();
     for (const w of m.wards) {
-      const target = SHED[w.type] ? sheds : cyber && (w.type === 'slum' || w.type === 'shanty') ? huts : houses;
+      const target = SHED[w.type] ? sheds : cyber && (w.type === 'slum' || w.type === 'shanty' || w.type === 'float') ? huts : houses;
+      if (w.raft) rafts.poly(w.block);
       for (const b of w.buildings) target.poly(b);
-      for (const s of w.special) if (!w.arcology) specials.poly(s);
+      for (const s of w.special) if (!w.arcology && !w.spine) specials.poly(s);
       if (w.farms) for (const b of w.farms) farms.poly(b);
       if (w.tanks) for (const b of w.tanks) tanks.poly(b);
       if (w.courts) for (const b of w.courts) courts.poly(b);
@@ -3074,6 +4133,10 @@
     }
     if (m.harbour) for (const b of m.harbour.containers) cont[ci++ % 3].poly(b);
     if (m.station) specials.poly(m.station.building);
+    const gangs = Bt();
+    all('gangs', (g) => gangs.line(g[0], g[1]));
+    draw(gangs, { stroke: pal.inkSoft, strokeWidth: 2.4 + 0.3 * k, opacity: 0.9 });
+    draw(rafts, { fill: pal.roof, stroke: cyber ? pal.accent : pal.ink, strokeWidth: lw * 1.2, strokeLinejoin: 'round', opacity: 0.95 });
     draw(houses, { fill: pal.building, stroke: pal.ink, strokeWidth: lw, strokeLinejoin: 'round' });
     draw(sheds, { fill: pal.roof, stroke: pal.ink, strokeWidth: lw, strokeLinejoin: 'round' });
     draw(huts, { fill: pal.roof, stroke: pal.inkSoft, strokeWidth: lw * 0.7, strokeLinejoin: 'round' });
@@ -3107,6 +4170,29 @@
       w.arcology.forEach((tier, i) => svg.poly(tier, { fill: i % 2 ? pal.building : pal.buildingSpecial, stroke: pal.accent, strokeWidth: lw * (i === 3 ? 2.4 : 1.4), strokeLinejoin: 'round' }));
       svg.poly(w.arcology[3], { fill: pal.accent, opacity: 0.35 });
     }
+    // The megastructure: a glowing spine of stacked decks, towers at the joints, the maglev on top.
+    for (const w of m.wards) {
+      if (!w.spine) continue;
+      const body = Bt(), core2 = Bt(), nodes = Bt();
+      for (const p of w.spine.pieces) {
+        const f = G.frame(p);
+        body.poly(p);
+        core2.poly(G.rect(f.c.x, f.c.y, f.w, f.h * 0.42, Math.atan2(f.u.y, f.u.x)));
+      }
+      for (const p of w.spine.nodes) nodes.poly(p);
+      draw(body, { fill: 'none', stroke: pal.accent, strokeWidth: 16 * k, opacity: 0.16, strokeLinejoin: 'round' });
+      draw(body, { fill: pal.buildingSpecial, stroke: pal.accent, strokeWidth: lw * 1.6, strokeLinejoin: 'round' });
+      draw(core2, { fill: pal.building, stroke: pal.accent, strokeWidth: lw, opacity: 0.9 });
+      draw(nodes, { fill: pal.buildingSpecial, stroke: pal.accent, strokeWidth: lw * 2, strokeLinejoin: 'round' });
+      const inner = Bt();
+      for (const p of w.spine.nodes) inner.poly(G.scalePoly(p, 0.55));
+      draw(inner, { fill: pal.accent, opacity: 0.35 });
+    }
+    if (m.rail && m.rail.spine) {
+      const rd = Svg.d(m.rail.pts, false);
+      svg.path(rd, { fill: 'none', stroke: pal.ink, strokeWidth: 3.6 * k, strokeLinejoin: 'round' });
+      svg.path(rd, { fill: 'none', stroke: pal.accent, strokeWidth: 1.8 * k, strokeDasharray: Svg.num(9 * k) + ' ' + Svg.num(9 * k), opacity: 0.8 });
+    }
     // Fences and pads (cyberpunk compounds).
     const fences = Bt(), pads = Bt();
     all('fences', (f) => fences.poly(f));
@@ -3134,7 +4220,7 @@
       svg.poly(m.wall.pts, { fill: 'none', stroke: pal.accent, strokeWidth: 9 * k, opacity: 0.22, strokeLinejoin: 'miter' });
       svg.poly(m.wall.pts, { fill: 'none', stroke: pal.accent, strokeWidth: 2.2 * k, strokeLinejoin: 'miter' });
       const cb = Bt();
-      for (const g of m.wall.gates) cb.poly(G.rect(g.x, g.y, 14 * k, 14 * k, Math.atan2(m.U.y, m.U.x)));
+      for (const g of m.wall.gates) cb.poly(G.rect(g.x, g.y, 14 * k, 14 * k, g.a !== undefined ? g.a : Math.atan2(m.U.y, m.U.x)));
       draw(cb, { fill: pal.paper, stroke: pal.accent, strokeWidth: 1.2 * k });
     }
     // Old town walls (present day).
@@ -3182,7 +4268,7 @@
       const sub = t('city.sub.' + (m.size || 'medium')) + (m.walls ? ' · ' + t('city.sub.walled') : '');
       const taken = [Draw.textBox(S / 2, S * 0.075, m.name, S * 0.048, { title: true }), Draw.textBox(S / 2, S * 0.075 + S * 0.048 * 0.85, sub, S * 0.048 * 0.42, { title: true })];
       const labels = m.landmarks.map((l) => {
-        const lab = { x: l.x + M, y: l.y + M, text: t(l.key, l.params), size: fs, italic: true };
+        const lab = { x: l.x - vx + M, y: l.y - vy + M, text: t(l.key, l.params), size: fs, italic: true };
         // District names in spaced capitals (measured as title type, which is wider).
         if (l.district) Object.assign(lab, { text: lab.text.toUpperCase(), size: fs * 0.72, italic: false, title: true, spacing: fs * 0.05, color: cyber ? pal.accent : pal.inkSoft });
         if (l.road) Object.assign(lab, { size: fs * 0.75, italic: false, title: true });
@@ -3215,6 +4301,8 @@
     options: [
       { id: 'size', type: 'select', values: ['small', 'medium', 'large', 'huge'], def: 'medium' },
       { id: 'water', type: 'select', values: ['none', 'river', 'coast', 'both'], def: 'river' },
+      // The street plan of present-day and cyberpunk towns (the medieval town has its own).
+      { id: 'plan', type: 'select', values: ['auto'].concat(PLANS), def: 'auto', settings: ['modern', 'cyber'] },
       // Walls are medieval: off by default in the present day and in cyberpunk
       // (`defs`: per-setting defaults, for an app that supports them).
       { id: 'walls', type: 'bool', def: true, defs: { modern: false, cyber: false } },
